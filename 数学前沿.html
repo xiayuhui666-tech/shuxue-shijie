@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学前沿 · Frontier</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #07061a; --bg-mid: #110e2e; --bg-light: #1f1a52;
+    --gold: #ffd700; --gold-soft: #f4c430;
+    --aurora: #ff61f6; --cyan: #00e5ff;
+    --green: #80ed99; --red: #ff6b6b;
+    --text: #e8e5ff; --text-dim: #a0a0c4;
+  }
+  html, body { height: 100%; font-family: 'Microsoft YaHei', sans-serif;
+    background: radial-gradient(ellipse at top, var(--bg-mid) 0%, var(--bg-deep) 70%);
+    color: var(--text); overflow: hidden; user-select: none; }
+  body::before { content: ''; position: fixed; inset: 0;
+    background-image: radial-gradient(2px 2px at 10% 20%, white, transparent),
+      radial-gradient(1px 1px at 30% 70%, var(--gold-soft), transparent),
+      radial-gradient(2px 2px at 60% 30%, var(--aurora), transparent),
+      radial-gradient(1px 1px at 80% 80%, var(--cyan), transparent),
+      radial-gradient(2px 2px at 90% 10%, white, transparent);
+    background-size: 100% 100%; opacity: 0.5; pointer-events: none; animation: tw 6s ease-in-out infinite; }
+  @keyframes tw { 0%,100%{opacity:0.5} 50%{opacity:0.25} }
+  #app { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .scene { width: 100%; max-width: min(980px, 94vw); max-height: 95vh;
+    background: rgba(17,14,46,0.7); backdrop-filter: blur(20px);
+    border: 2px solid var(--aurora); border-radius: 24px; padding: 24px 28px;
+    box-shadow: 0 0 60px rgba(255,97,246,0.3); display: flex; flex-direction: column; overflow-y: auto; animation: fIn 0.5s ease; }
+  @keyframes fIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  h1,h2,h3 { font-family: 'Georgia', serif; }
+  h1 { color: var(--gold); font-size: 38px; text-align: center; margin-bottom: 8px; letter-spacing: 2px; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+  h2 { color: var(--gold); font-size: 24px; margin-bottom: 14px; text-shadow: 0 0 12px rgba(255,215,0,0.4); }
+  h3 { color: var(--aurora); font-size: 18px; margin: 8px 0; }
+  .subtitle { text-align: center; color: var(--text-dim); font-style: italic; margin-bottom: 24px; letter-spacing: 3px; }
+  button { font-family: inherit; font-size: 16px; padding: 12px 24px;
+    background: linear-gradient(135deg, var(--bg-light), var(--bg-mid)); color: var(--text);
+    border: 2px solid var(--aurora); border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+  button:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,215,0,0.4); border-color: var(--gold); }
+  button.primary { background: linear-gradient(135deg, var(--gold), var(--gold-soft)); color: var(--bg-deep); font-weight: bold; border-color: var(--gold); }
+  .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .menu-content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .frontier-crystal { font-size: 70px; margin: 16px 0; color: var(--aurora); text-shadow: 0 0 40px var(--aurora), 0 0 80px var(--gold); font-family: 'Georgia', serif; animation: pulse 3s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px var(--aurora))} 50%{transform:scale(1.05);filter:drop-shadow(0 0 40px var(--gold))} }
+  .gallery { flex: 1; overflow-y: auto; padding: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  /* 仅"关卡地图"这类网格页加宽铺满；菜单/做题/故事等聚焦页保持窄宽舒适阅读 */
+  .scene:has(.tower-map), .scene:has(.peak-map), .scene:has(.course-map), .scene:has(.topic-grid), .scene:has(.gallery) { max-width: min(1400px, 95vw); }
+  .frontier-card { background: linear-gradient(135deg, rgba(17,14,46,0.85), rgba(31,26,82,0.85));
+    border: 2px solid var(--aurora); border-radius: 16px; padding: 18px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+  .frontier-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent, rgba(255,97,246,0.1), transparent); transform: translateX(-100%); transition: transform 0.6s; }
+  .frontier-card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(255,215,0,0.3); }
+  .frontier-card:hover::before { transform: translateX(100%); }
+  .f-icon { font-size: 40px; text-align: center; margin: 8px 0; color: var(--cyan); font-family: 'Cambria Math', serif; text-shadow: 0 0 20px var(--cyan); }
+  .f-title { font-size: 18px; color: var(--gold); margin-bottom: 4px; font-weight: bold; text-align: center; }
+  .f-sub { font-size: 13px; color: var(--text-dim); text-align: center; }
+  .f-status { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-top: 6px; }
+  .f-status.open { background: rgba(255,107,107,0.2); color: var(--red); border: 1px solid var(--red); }
+  .f-status.solved { background: rgba(128,237,153,0.2); color: var(--green); border: 1px solid var(--green); }
+  .f-status.partial { background: rgba(255,215,0,0.2); color: var(--gold); border: 1px solid var(--gold); }
+  .reading { flex: 1; overflow-y: auto; padding: 4px 8px; }
+  .section { background: rgba(7,6,26,0.6); border-left: 4px solid var(--aurora); border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  .section h3 { color: var(--gold); margin-bottom: 10px; font-size: 17px; }
+  .section p { font-size: 15px; line-height: 1.8; color: var(--text); margin: 8px 0; }
+  .section .formula, .formula { color: var(--cyan); font-family: 'Cambria Math', serif; font-style: italic; background: rgba(0,229,255,0.1); padding: 0 6px; border-radius: 4px; }
+  .section .hl { color: var(--gold-soft); font-weight: bold; }
+  .section .quote { font-style: italic; color: var(--aurora); border-left: 2px solid var(--aurora); padding-left: 14px; margin: 14px 8px; font-size: 14px; }
+  .section ul { list-style: none; padding-left: 0; }
+  .section li { font-size: 14px; line-height: 1.7; padding: 4px 0 4px 22px; position: relative; }
+  .section li::before { content: '◆'; color: var(--aurora); position: absolute; left: 4px; top: 4px; font-size: 10px; }
+  .top-banner { text-align: center; background: linear-gradient(90deg, transparent, rgba(255,97,246,0.15), transparent); padding: 8px; margin-bottom: 12px; border-radius: 8px; color: var(--text-dim); font-size: 13px; letter-spacing: 2px; }
+  .voice-btn { position: fixed; top: 14px; right: 14px; z-index: 100; width: 44px; height: 44px; border-radius: 50%; background: rgba(17,14,46,0.85); border: 2px solid var(--aurora); color: var(--gold); font-size: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+  .voice-btn:hover { transform: scale(1.1); }
+  .speak-btn { background: transparent; border: 1px solid var(--aurora); color: var(--aurora); border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 13px; cursor: pointer; margin-left: 8px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+  .speak-btn:hover { background: rgba(255,97,246,0.2); transform: scale(1.1); }
+  @media (max-width: 600px) { h1 { font-size: 26px; } .scene { padding: 16px; } .gallery { grid-template-columns: 1fr; } .voice-btn{width:38px;height:38px;top:8px;right:8px;font-size:17px} }
+</style>
+</head>
+<body>
+<a href="index.html" title="返回数学世界 · 五阶段总目录" style="position:fixed;top:13px;left:13px;z-index:9999;font:600 12px/1 'Microsoft YaHei',sans-serif;color:#ffd700;background:rgba(10,10,26,0.62);border:1px solid rgba(255,215,0,0.45);border-radius:14px;padding:6px 11px;text-decoration:none;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.3);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(255,215,0,0.2)';this.style.borderColor='#ffd700'" onmouseout="this.style.background='rgba(10,10,26,0.62)';this.style.borderColor='rgba(255,215,0,0.45)'">⌂ 数学世界</a>
+<div id="app"></div>
+<script>
+"use strict";
+const FRONTIERS = [
+  {
+    id: 1, icon: 'ζ', title: '黎曼假设', sub: 'Riemann Hypothesis', status: 'open',
+    sections: [
+      { h: '问题', p: '<p>黎曼 ζ 函数 <span class="formula">ζ(s) = Σ 1/nˢ</span>（s = σ + it，Re s &gt; 1）解析延拓到整个复平面（除 s = 1 处的简单极点）。</p><p>它有"<span class="hl">平凡零点</span>"：负偶数 −2, −4, −6, … 此外的零点都满足 <span class="formula">Re s = 1/2</span> 吗？这就是<span class="hl">黎曼假设 (RH)</span>。</p>' },
+      { h: '为什么重要', p: '<p>素数定理告诉我们：素数计数函数 π(x) ~ x/ln x，更精确的近似是对数积分 <span class="hl">Li(x)</span>。但<span class="hl">误差项</span>（π(x) 与 Li(x) 之差）的大小取决于 ζ 函数零点的分布。</p><p>若 RH 成立，则 |π(x) − Li(x)| = O(√x · ln x)——这是关于素数最强的不等式之一，影响整个数论、密码学、随机矩阵理论。</p>' },
+      { h: '已知进展', p: '<ul><li>Hardy 1914 证明：临界线 Re s = 1/2 上有<span class="hl">无穷多</span>零点</li><li>Selberg 1942：临界线上零点占总零点的正比例</li><li>Conrey 1989：至少 40% 的零点在临界线上</li><li>数值验证：前 10^13 个零点都在临界线上（Gourdon 2004）</li></ul>' },
+      { h: '与其他领域的桥梁', p: '<ul><li><span class="hl">朗兰兹纲领</span>：ζ 是最简单的 L 函数</li><li><span class="hl">随机矩阵</span>：Montgomery-Dyson 发现 ζ 零点间距统计与 GUE 矩阵特征值一致</li><li><span class="hl">物理</span>：Berry-Keating 猜想——存在一个量子系统其能级正是 ζ 零点的虚部</li></ul>', quote: '"如果有人把我从睡眠中唤醒一百年后，我会问的第一个问题是：黎曼假设证明了吗？" — Hilbert' }
+    ]
+  },
+  {
+    id: 2, icon: '𝓛', title: '朗兰兹纲领', sub: 'Langlands Program', status: 'partial',
+    sections: [
+      { h: '宏图', p: '<p>Langlands 1967 年的猜想：<span class="hl">自守形式</span>（在 GL(n) 等群上的特殊函数）与<span class="hl">Galois 表示</span>（数论对称的具体化）之间有一一对应——双方互换信息。</p><p>它把<span class="hl">数论、表示论、代数几何、调和分析</span>统一为一张巨网。被誉为"数学的大统一理论"。</p>' },
+      { h: '已实现的里程碑', p: '<ul><li>函数域版本（Drinfeld 1974，L. Lafforgue 2002，菲尔兹奖）</li><li>椭圆曲线模性定理（Wiles 1994，1995）——推出费马大定理</li><li>Sato-Tate 猜想（Taylor 等 2008）</li><li>p-adic Langlands 局部对应（Colmez 2010）</li><li>几何 Langlands（Beilinson-Drinfeld）</li></ul>' },
+      { h: '21 世纪进展', p: '<p><span class="hl">Peter Scholze</span>（2018 菲尔兹）的 <span class="hl">perfectoid 空间</span>与 <span class="hl">diamond</span> 重新塑造了 p-adic 几何，给局部 Langlands 提供新工具。</p><p>Fargues-Scholze 2021 写出关于局部 Langlands 几何化的 350 页论文，对应关系正逐步显形。</p>' },
+      { h: '尚未解决的核心', p: '<ul><li>一般数域上的函子性 (Functoriality) 猜想</li><li>从 Galois 边到自守边的完整字典（已知方向 + 未知方向）</li><li>非交换 Iwasawa 理论与 p-adic L 函数</li></ul>', quote: '"Langlands 纲领是当代数学的统一愿景。一旦实现，整个数学的版图都将重画。" — Peter Sarnak' }
+    ]
+  },
+  {
+    id: 3, icon: '𝕊³', title: '庞加莱猜想', sub: 'Poincaré Conjecture · 已解决', status: 'solved',
+    sections: [
+      { h: '问题', p: '<p>Poincaré 1904 提问：每个<span class="hl">单连通的紧致 3 维流形</span>（无边）是否同胚于 3 维球面 S³？</p><p>"单连通"意味着任意闭曲线都能在流形内收缩到一点——直觉上"没有洞"。</p>' },
+      { h: '高维情形先解决', p: '<ul><li>n ≥ 5：Smale 1961 年证明（1966 菲尔兹奖）</li><li>n = 4：Freedman 1982 年证明（1986 菲尔兹奖）</li><li>n = 3：困扰了一百年</li></ul><p>反直觉的是 3 维最难，4 维次之，更高维度反而最简单。</p>' },
+      { h: 'Ricci 流的曙光', p: '<p>1982 年 <span class="hl">Hamilton</span> 提出 <span class="formula">∂g/∂t = -2 Ric(g)</span>——让度量沿 Ricci 张量收缩。直觉上"把流形烫平"。</p><p>关键难点：会出现<span class="hl">奇异性</span>（"颈缩"）。Hamilton 把奇异性分类，但卡在控制奇异性后流形的复杂度上。</p>' },
+      { h: 'Perelman 的突破', p: '<p>2002-03 年俄罗斯数学家 <span class="hl">Grigori Perelman</span> 在 arXiv 贴出三篇 preprint（共 ~70 页），用<span class="hl">熵单调性、κ-noncollapsing、Ricci flow with surgery</span> 完成了 Hamilton 计划。</p><p>2006 年由 Cao-Zhu、Kleiner-Lott、Morgan-Tian 三组人马独立验证。</p>' },
+      { h: '后续', p: '<p>这是<span class="hl">第一个被解决的 Clay 千禧年问题</span>。Perelman 拒绝菲尔兹奖（2006）和 100 万美金（2010），隐居圣彼得堡。</p>', quote: '"如果证明正确，无须更多承认了。" — Perelman' }
+    ]
+  },
+  {
+    id: 4, icon: 'P≠NP', title: 'P vs NP', sub: '计算复杂性的世纪难题', status: 'open',
+    sections: [
+      { h: '问题', p: '<p><span class="hl">P</span>：多项式时间内可解的判定问题。<br><span class="hl">NP</span>：多项式时间内可<span class="hl">验证</span>的判定问题（给一个候选解，能快速检查是否对）。</p><p>显然 P ⊆ NP。但是否 <span class="formula">P = NP</span>？也就是说，<span class="hl">能高效验证</span>是否意味着<span class="hl">能高效求解</span>？</p>' },
+      { h: '为什么是七大千禧年问题之一', p: '<p>如果 P = NP：</p><ul><li>所有 NP 判定问题（如 SAT，以及 TSP、整数规划等问题的判定版本）都有多项式时间算法</li><li>许多依赖计算困难性的公钥密码体系需要重建</li><li>数学定理的证明搜索会出现全新可能（"证明 = NP 验证 + P 搜索"）</li></ul><p>大多数计算机科学家相信 P ≠ NP，但没人能证明。</p>' },
+      { h: '已知进展', p: '<ul><li>Cook-Levin 1971：SAT 是 NP-完全（任何 NP 问题可多项式归约到 SAT）</li><li>无数问题被证为 NP-完全（Karp 21 题、Garey-Johnson）</li><li>Razborov-Rudich 1994："自然证明" barrier——很多"显然"的证明思路被原则上排除</li><li>geometric complexity theory (Mulmuley)：用代数几何攻 P vs NP</li></ul>' },
+      { h: '更宽的图景', p: '<p>除 P/NP 外：</p><ul><li><span class="hl">BPP</span>（多项式时间随机算法）：BPP = P? 当前认为是</li><li><span class="hl">BQP</span>（量子多项式时间）：与 NP 关系未知</li><li><span class="hl">PSPACE</span>、<span class="hl">EXP</span> 等更高层级</li></ul>', quote: '"P vs NP 是数学和计算机科学最深刻的开放问题——它问：创造性思维能否被机械化？" — Stephen Cook' }
+    ]
+  },
+  {
+    id: 5, icon: 'YM', title: '杨-米尔斯', sub: 'Yang-Mills Existence & Mass Gap', status: 'open',
+    sections: [
+      { h: '物理背景', p: '<p>1954 年杨振宁、米尔斯把 Maxwell 电磁场的 U(1) 规范推广为 SU(2) 等非阿贝尔群——这就是<span class="hl">杨-米尔斯理论</span>。</p><p>标准模型的强作用 (QCD)、弱作用都建立在杨-米尔斯框架上。</p>' },
+      { h: '数学问题', p: '<p>对任意紧致单李群 G，证明在 ℝ⁴ 上存在一个量子杨-米尔斯场论（公理化的 Wightman / OS 公理），且</p><p>① 真空唯一；② 谱有"<span class="hl">质量缺口</span>"——最低非零能量 Δ &gt; 0。</p><p>物理上 QCD 之所以"<span class="hl">夸克禁闭</span>"——只能看到强子而无自由夸克——正是质量缺口的体现。</p>' },
+      { h: '已知进展', p: '<ul><li>2+1 维已部分证明（Douglas-Glimm-Jaffe 1980s）</li><li>格点 (lattice) 杨-米尔斯有完整严格定义，且数值证据强烈支持质量缺口</li><li>4 维连续极限的存在性是核心难题</li></ul>' },
+      { h: '相关数学', p: '<p>Donaldson 用 4 维杨-米尔斯方程的反自对偶解 (instanton) 研究 4 维流形——得菲尔兹奖（1986）。这是物理与数学最戏剧性的交叉之一。</p>', quote: '"质量缺口在数学上意味着：纯规范理论的低能动力学被一个有质量的胶球主导。" — Witten' }
+    ]
+  },
+  {
+    id: 6, icon: 'NS', title: 'Navier-Stokes 光滑性', sub: '流体方程', status: 'open',
+    sections: [
+      { h: '方程', p: '<p>不可压缩、粘性流体的速度场 <span class="formula">u(x, t)</span> 与压强 p 满足：</p><p class="formula" style="text-align:center;font-size:18px;padding:12px;">∂u/∂t + (u·∇)u = −∇p + νΔu，∇·u = 0</p><p>初始条件 u(x, 0) = u₀(x) 在 ℝ³ 上光滑且衰减。</p>' },
+      { h: '千禧年问题（Fefferman 表述）', p: '<p>证明或反例：对任意光滑、有限能量初值 u₀，在 ℝ³ 上 Navier-Stokes 方程存在一个<span class="hl">全局光滑解</span> u(x, t) ∈ C^∞，t ≥ 0。</p><p>也就是说：流体方程不会在有限时间内"爆炸"出现奇异性。</p>' },
+      { h: '已知进展', p: '<ul><li><span class="hl">弱解</span>存在性：Leray-Hopf 1934（但三维唯一性至今未知，仍是公开问题）</li><li>2 维情形：完整解决，全局光滑</li><li>Caffarelli-Kohn-Nirenberg 1982：奇异点集 Hausdorff 维数 ≤ 1</li><li>Tao 2016：构造可类比模型的爆破——暗示真问题可能解为"否"</li><li>Buckmaster-Vicol 2017：弱解不唯一（反例属不满足能量不等式的更弱解类，不在 Leray-Hopf 能量类内）</li></ul>' },
+      { h: '物理意义', p: '<p>湍流的数学理论高度依赖于 NS 光滑性。<span class="hl">柯尔莫哥洛夫</span> K41 理论、湍流耗散——都建立在这个方程上。</p><p>它的解决会从根本上影响气象、空气动力学、海洋学。</p>', quote: '"我们对方程比对物理本身了解更深，但我们对解析解一无所知。" — Charles Fefferman' }
+    ]
+  },
+  {
+    id: 7, icon: 'Hodge', title: '霍奇猜想', sub: 'Hodge Conjecture', status: 'open',
+    sections: [
+      { h: '陈述', p: '<p>设 X 是<span class="hl">光滑复射影代数簇</span>（它是一类紧致凯勒流形）。它的 ℚ 系数上同调 H^k(X, ℚ) 通过张量到 ℂ 后有 Hodge 分解：</p><p class="formula" style="text-align:center;">H^{2p}(X, ℂ) = ⊕_{i+j=2p} H^{i,j}</p><p>Hodge 类 = H^{p,p} 中 ℚ 系数部分。<span class="hl">霍奇猜想</span>：每个 Hodge 类都是 X 上代数闭链类的 ℚ 线性组合。</p>' },
+      { h: '为什么深刻', p: '<p>它把<span class="hl">代数（多项式定义的子簇）</span>与<span class="hl">拓扑 / 解析（上同调类）</span>建立完美对应。</p><p>如果成立：复几何 / 解析的工具可以全部用于代数几何；反过来代数几何的"刚性"约束可以指导解析问题。</p>' },
+      { h: '已知证据', p: '<ul><li>Lefschetz (1, 1) 定理：当 p = 1 时（即 H²）猜想成立</li><li>低维代数簇大多已验证</li><li>奇维 / 高维情形未知</li><li>Deligne：定义"绝对 Hodge 类"扩展猜想框架</li></ul>' },
+      { h: '困难', p: '<p>主要挑战：找不到一个明确的非平凡 Hodge 类<span class="hl">不是</span>代数闭链类——即使没找到反例，也无法构造一般证明。</p><p>近年用 motivic Galois 群、p-adic 比较定理（Faltings、Tsuji、Scholze）等工具切入，但远未触及。</p>' }
+    ]
+  },
+  {
+    id: 8, icon: 'HoTT', title: '同伦类型论 (HoTT)', sub: 'Homotopy Type Theory · 数学基础新范式', status: 'partial',
+    sections: [
+      { h: '问题', p: '<p>传统数学基础是<span class="hl">集合论</span> (ZFC)。21 世纪初，Voevodsky 等人发现：<span class="hl">类型论</span> (Martin-Löf) + <span class="hl">同伦语义</span> 可能是更自然的基础。</p><p>"相等"被理解为<span class="hl">同伦</span>，类型是<span class="hl">空间</span>，证明是<span class="hl">路径</span>——数学的拓扑化。</p>' },
+      { h: 'Voevodsky 的洞见', p: '<p>2010 年前后，菲尔兹奖得主（2002 年获奖）<span class="hl">Vladimir Voevodsky</span>（同伦理论 / motivic cohomology 的奠基者）发现 Martin-Löf 类型论与"无穷范畴"（Quillen 模型范畴）的对应。</p><p>他提出 <span class="hl">Univalence Axiom</span>：等价的类型可视为相等。这是 HoTT 的灵魂公理。</p>' },
+      { h: '为什么是革命', p: '<ul><li>许多数学结构（群、流形、范畴）可以用"<span class="hl">类型</span>"组织</li><li>证明本身是数学对象，<span class="hl">可被计算机机器验证</span></li><li>等价可视为相等 → "本应如此"的等价被语言天然支持</li><li>给"<span class="hl">同伦类型 (∞-groupoid)</span>"以严格基础</li></ul>' },
+      { h: '工具与社区', p: '<p>形式化证明助手：<span class="hl">Coq、Agda、Lean</span>。</p><p>2013 IAS Special Year on Univalent Foundations 出版 The HoTT Book（300+ 页，集体编写）。</p><p>2017 Voevodsky 去世（51 岁），但 HoTT 社区已自我繁衍——Lean mathlib 已形式化了大量本科到研究生数学。</p>', quote: '"我相信，几十年后，数学家将主要用类型论而不是集合论交流。" — Vladimir Voevodsky' }
+    ]
+  }
+];
+
+const app = document.getElementById('app');
+function render(html) { app.innerHTML = `<div class="scene">${html}</div>`; if (typeof ensureVoiceBtn==='function') ensureVoiceBtn(); }
+
+function sceneMenu() {
+  speech.stop();
+  render(`<div class="menu-content"><h1>数学前沿</h1><div class="subtitle">Frontier · 八大研究专题</div><div class="frontier-crystal">∞</div><p style="color:var(--text-dim);font-size:13px;">百年悬念 / Clay 千禧年 / 当代基础重构</p><p style="margin-top:10px;color:var(--text-dim);font-size:12px;">本卷无练习题，只有阅读与凝视。<br>这里的每个问题都是数学最高级的舞台。</p><div class="btn-row"><button class="primary" onclick="sceneGallery()">进入画廊</button></div><p style="margin-top:18px;color:var(--text-dim);font-size:11px;">右上角 🔊 可切换语音朗读</p></div>`);
+}
+function sceneGallery() {
+  speech.stop();
+  const cards = FRONTIERS.map(f => `<div class="frontier-card" onclick="openFrontier(${f.id})"><div class="f-icon">${f.icon}</div><div class="f-title">${f.title}</div><div class="f-sub">${f.sub}</div><div style="text-align:center;"><span class="f-status ${f.status}">${f.status === 'open' ? '✦ 仍待解决' : f.status === 'solved' ? '✓ 已被证明' : '◐ 部分进展'}</span></div></div>`).join('');
+  render(`<div class="top-banner">— 数学版图最深处的八个谜 —</div><h2 style="text-align:center;">🌌 前沿画廊</h2><div class="gallery">${cards}</div><div class="btn-row"><button onclick="sceneMenu()">主菜单</button></div>`);
+}
+let _curFrontier = null;
+function openFrontier(id) {
+  speech.stop();
+  const f = FRONTIERS.find(x => x.id === id);
+  _curFrontier = f;
+  const secs = f.sections.map((s, i) => `<div class="section"><h3>◆ ${s.h} <button class="speak-btn" onclick="speakSection(${i})">🔊</button></h3>${s.p}${s.quote?`<div class="quote">${s.quote}</div>`:''}</div>`).join('');
+  render(`<div class="top-banner">${f.title} · ${f.sub}</div><h1 style="font-size:32px;">${f.icon} ${f.title}</h1><div class="reading">${secs}</div><div class="btn-row"><button class="primary" onclick="sceneGallery()">返回画廊</button><button onclick="speakWholeFrontier()">🔊 朗读全文</button>${id<FRONTIERS.length?`<button onclick="openFrontier(${id+1})">下一专题 →</button>`:''}</div>`);
+}
+function speakSection(i) {
+  if (!_curFrontier) return;
+  const s = _curFrontier.sections[i];
+  speech.speak(`${s.h}。${s.p}${s.quote?'。引用：'+s.quote:''}`);
+}
+function speakWholeFrontier() {
+  if (!_curFrontier) return;
+  const text = `${_curFrontier.title}。` + _curFrontier.sections.map(s => `${s.h}：${s.p}${s.quote?'。'+s.quote:''}`).join('。 下一节：');
+  speech.speak(text);
+}
+
+// ============== 🔊 Voice / TTS ==============
+const speech = {
+  on: localStorage.getItem('math_voice_on') !== '0', voice: null,
+  init() { if (!('speechSynthesis' in window)) { this.on = false; return; }
+    const sv = () => { const vs = speechSynthesis.getVoices();
+      this.voice = vs.find(v=>/zh-CN/i.test(v.lang)&&/xiaoxiao|yaoyao|huihui|tingting|female|woman/i.test(v.name))||vs.find(v=>/zh-CN|cmn-Hans/i.test(v.lang))||vs.find(v=>/zh/i.test(v.lang))||null; };
+    sv(); if (speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=sv; },
+  clean(t) { return String(t).replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/[（()【】\[\]「」]/g,' ').replace(/×/g,'乘').replace(/÷/g,'除以').replace(/π/g,'派').replace(/²/g,'的平方').replace(/³/g,'的立方').replace(/√/g,'根号').replace(/∂/g,'偏').replace(/∮/g,'回路积分').replace(/∫/g,'积分').replace(/∑/g,'西格玛').replace(/∞/g,'无穷').replace(/ζ/g,'zeta').replace(/ν/g,'nu').replace(/ε/g,'epsilon').replace(/δ/g,'delta').replace(/Δ/g,'delta').replace(/≤/g,'小于等于').replace(/≥/g,'大于等于').replace(/−/g,'负').replace(/⊆/g,'包含于').replace(/∪/g,'并').replace(/∩/g,'交').replace(/\s+/g,' ').trim(); },
+  speak(t, o={}) { if (!this.on||!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const c=this.clean(t); if (!c) return; const u=new SpeechSynthesisUtterance(c); u.lang='zh-CN'; if (this.voice) u.voice=this.voice; u.rate=o.rate||0.95; u.pitch=o.pitch||1.0; speechSynthesis.speak(u); },
+  stop() { if ('speechSynthesis' in window) speechSynthesis.cancel(); },
+  toggle() { this.on=!this.on; localStorage.setItem('math_voice_on',this.on?'1':'0'); if (!this.on) this.stop(); return this.on; }
+};
+speech.init();
+function voiceToggle() { const on=speech.toggle(); const b=document.getElementById('voiceBtn'); if (b) b.textContent=on?'🔊':'🔇'; }
+function ensureVoiceBtn() { if (document.getElementById('voiceBtn')) return; const b=document.createElement('button'); b.id='voiceBtn'; b.className='voice-btn'; b.textContent=speech.on?'🔊':'🔇'; b.title='语音朗读'; b.onclick=voiceToggle; document.body.appendChild(b); }
+
+sceneMenu();
+</script>
+</body>
+</html>

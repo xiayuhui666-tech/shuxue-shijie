@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高中数学之巅 · Summit</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a1929; --bg-mid: #142840; --bg-light: #1f3d5e;
+    --gold: #ffd700; --gold-soft: #f4c430; --cyan: #4dd0e1; --cyan-light: #80deea;
+    --teal: #26c6da; --teal-light: #80deea;
+    --green: #80ed99; --red: #ff6b6b; --orange: #ffa940; --purple: #ba68c8;
+    --text: #e6f0ff; --text-dim: #93a8c4;
+  }
+  html, body { height: 100%; font-family: 'Microsoft YaHei', sans-serif;
+    background: radial-gradient(ellipse at top, var(--bg-mid) 0%, var(--bg-deep) 70%);
+    color: var(--text); overflow: hidden; user-select: none; }
+  body::before { content: ''; position: fixed; inset: 0;
+    background-image: radial-gradient(2px 2px at 10% 20%, white, transparent),
+      radial-gradient(1px 1px at 30% 70%, var(--gold-soft), transparent),
+      radial-gradient(2px 2px at 60% 30%, var(--teal), transparent),
+      radial-gradient(1px 1px at 80% 80%, var(--teal-light), transparent),
+      radial-gradient(2px 2px at 90% 10%, white, transparent),
+      radial-gradient(1px 1px at 15% 90%, white, transparent);
+    background-size: 100% 100%; opacity: 0.5; pointer-events: none; animation: twinkle 4s ease-in-out infinite; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.25; } }
+  #app { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 1; }
+  .scene { width: 100%; max-width: min(980px, 94vw); max-height: 95vh;
+    background: rgba(20, 40, 64, 0.7); backdrop-filter: blur(20px);
+    border: 2px solid var(--teal); border-radius: 24px; padding: 24px 28px;
+    box-shadow: 0 0 60px rgba(38,198,218,0.4), inset 0 0 40px rgba(255,215,0,0.05);
+    display: flex; flex-direction: column; overflow-y: auto; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  h1, h2, h3 { font-family: 'Georgia', serif; color: var(--gold); text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+  h1 { font-size: 40px; text-align: center; margin-bottom: 8px; letter-spacing: 2px; }
+  h2 { font-size: 26px; margin-bottom: 14px; }
+  h3 { font-size: 18px; margin-bottom: 10px; }
+  .subtitle { text-align: center; color: var(--text-dim); font-style: italic; margin-bottom: 24px; letter-spacing: 3px; }
+  button { font-family: inherit; font-size: 16px; padding: 12px 24px;
+    background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-mid) 100%);
+    color: var(--text); border: 2px solid var(--teal); border-radius: 12px;
+    cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(38,198,218,0.3); }
+  button:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,215,0,0.4); border-color: var(--gold); }
+  button:active { transform: translateY(0); }
+  button.primary { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%); color: var(--bg-deep); font-weight: bold; border-color: var(--gold); }
+  button.danger { background: linear-gradient(135deg, #b03060 0%, #5a0a2a 100%); border-color: var(--red); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; flex-shrink: 0; }
+  .hud { display: flex; justify-content: space-between; align-items: center;
+    background: rgba(10,25,41,0.6); border: 1px solid var(--teal); border-radius: 12px;
+    padding: 8px 16px; margin-bottom: 14px; font-size: 14px; flex-wrap: wrap; gap: 8px; }
+  .hud .item { display: flex; gap: 6px; align-items: center; }
+  .hud .label { color: var(--text-dim); }
+  .hud .value { color: var(--gold); font-weight: bold; }
+  .hp-bar { width: 120px; height: 10px; background: rgba(0,0,0,0.4); border-radius: 6px; overflow: hidden; border: 1px solid var(--red); }
+  .hp-fill { height: 100%; background: linear-gradient(90deg, var(--red), #ffa07a); transition: width 0.4s; }
+  .badges-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge-slot { width: 30px; height: 30px; background: rgba(0,0,0,0.3); border: 1px dashed var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-family: 'Cambria Math', serif; }
+  .badge-slot.owned { background: rgba(255,215,0,0.15); border: 2px solid var(--gold); color: var(--gold); }
+
+  .menu-content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .summit-crystal { font-size: 80px; margin: 16px 0; color: var(--teal); text-shadow: 0 0 30px var(--teal), 0 0 60px var(--gold); animation: float 3s ease-in-out infinite; font-family: 'Georgia', serif; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+  /* 山峰地图 */
+  .peak-map { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 14px; }
+  .phase-section { display: flex; flex-direction: column; gap: 10px; }
+  .peak-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  /* 仅"关卡地图"这类网格页加宽铺满；菜单/做题/故事等聚焦页保持窄宽舒适阅读 */
+  .scene:has(.tower-map), .scene:has(.peak-map), .scene:has(.course-map), .scene:has(.topic-grid), .scene:has(.gallery) { max-width: min(1400px, 95vw); }
+  .phase-header { color: var(--teal-light); font-size: 16px; text-shadow: none; border-bottom: 1px dashed var(--teal); padding-bottom: 6px; }
+  .peak-card { background: linear-gradient(90deg, rgba(20,40,64,0.85), rgba(31,61,94,0.85));
+    border: 2px solid var(--teal); border-radius: 14px; padding: 14px 18px; cursor: pointer;
+    transition: all 0.3s; display: flex; align-items: center; gap: 14px; position: relative; }
+  .peak-card:hover:not(.locked) { border-color: var(--gold); transform: translateX(6px); box-shadow: 0 8px 24px rgba(255,215,0,0.25); }
+  .peak-card.locked { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6); }
+  .peak-card.completed { border-color: var(--green); background: linear-gradient(90deg, rgba(34,78,45,0.85), rgba(45,94,60,0.85)); }
+  .peak-num { font-family: 'Georgia', serif; font-size: 36px; color: var(--gold); font-weight: bold; min-width: 60px; text-align: center; text-shadow: 0 0 12px var(--gold); }
+  .peak-num.locked-num { color: var(--text-dim); text-shadow: none; }
+  .peak-info { flex: 1; }
+  .peak-title { font-size: 18px; color: var(--gold); margin-bottom: 4px; font-weight: bold; }
+  .peak-sub { font-size: 13px; color: var(--text-dim); }
+  .peak-icon { font-size: 34px; font-family: 'Cambria Math', serif; }
+  .peak-check { position: absolute; top: 8px; right: 12px; color: var(--green); font-size: 20px; font-weight: bold; }
+
+  .story-box { flex: 1; overflow-y: auto; padding: 16px; }
+  .dialogue { background: rgba(10,25,41,0.6); border-left: 4px solid var(--gold); border-radius: 8px; padding: 14px 18px; margin-bottom: 14px; animation: slideIn 0.4s ease; }
+  .dialogue .speaker { color: var(--gold); font-weight: bold; font-size: 15px; margin-bottom: 6px; }
+  .dialogue .text { font-size: 16px; line-height: 1.7; }
+  .dialogue .formula { color: var(--teal-light); font-family: 'Cambria Math', serif; font-style: italic; font-size: 18px; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+  .concept-card { background: rgba(10,25,41,0.7); border: 2px solid var(--teal); border-radius: 14px;
+    padding: 16px 20px; margin: 8px auto; max-width: 700px; text-align: left; }
+  .concept-title { color: var(--gold); font-size: 17px; margin-bottom: 8px; font-weight: bold; }
+  .concept-body { color: var(--text); font-size: 15px; line-height: 1.7; }
+  .concept-body .hl { color: var(--gold-soft); font-weight: bold; }
+  .concept-body .formula { color: var(--teal-light); font-family: 'Cambria Math', serif; font-style: italic; background: rgba(38,198,218,0.1); padding: 0 6px; border-radius: 4px; }
+
+  .q-expr { text-align: center; font-family: 'Cambria Math', serif; font-size: 28px; color: var(--gold); margin: 14px 0 6px; letter-spacing: 1px; }
+  .q-hint { text-align: center; color: var(--text-dim); font-size: 14px; margin-bottom: 12px; }
+  .q-progress { text-align: center; color: var(--text-dim); font-size: 13px; margin-bottom: 8px; }
+  .opt-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; margin: 8px auto; width: 100%; }
+  .opt-btn { padding: 14px; font-size: 17px; background: rgba(20,40,64,0.85); border: 2px solid var(--teal); color: var(--text); border-radius: 10px; cursor: pointer; transition: all 0.2s; font-family: 'Cambria Math', serif; }
+  .opt-btn:hover:not(:disabled) { border-color: var(--gold); }
+  .opt-btn.correct { background: rgba(128,237,153,0.3); border-color: var(--green); }
+  .opt-btn.wrong { background: rgba(255,107,107,0.3); border-color: var(--red); animation: shake 0.4s; }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+  .feedback { text-align: center; margin-top: 12px; font-size: 17px; min-height: 28px; line-height: 1.5; }
+  .feedback.correct { color: var(--green); }
+  .feedback.wrong { color: var(--red); }
+  .num-pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 320px; margin: 14px auto; }
+  .num-pad button { padding: 14px 0; font-size: 20px; background: linear-gradient(135deg, var(--bg-mid), var(--bg-deep)); border: 1px solid var(--teal); box-shadow: none; font-family: 'Georgia', serif; }
+  .num-pad button.fn { background: rgba(255,215,0,0.12); color: var(--gold); border-color: var(--gold); }
+  .num-pad button.submit { background: linear-gradient(135deg, var(--green), #4caf50); color: var(--bg-deep); grid-column: span 2; font-weight: bold; }
+  .num-pad button.clear { background: rgba(255,107,107,0.18); color: var(--red); border-color: var(--red); }
+  .num-display { background: rgba(0,0,0,0.4); border: 2px solid var(--gold); border-radius: 10px; font-family: 'Georgia', serif; font-size: 30px; color: var(--gold); text-align: center; padding: 12px 16px; min-height: 60px; margin: 0 auto 12px; max-width: 320px; letter-spacing: 2px; }
+  .num-display.empty { color: var(--text-dim); font-style: italic; font-size: 18px; }
+
+  .boss-portrait { text-align: center; font-size: 90px; margin: 4px 0; filter: drop-shadow(0 0 25px var(--red)); transition: transform 0.3s; }
+  .boss-portrait.hit { animation: bossHit 0.4s; }
+  @keyframes bossHit { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15) rotate(-5deg); filter: drop-shadow(0 0 40px var(--gold)); } }
+  .boss-name { text-align: center; font-size: 20px; color: var(--red); margin-bottom: 8px; }
+  .boss-hp-bar { width: 100%; height: 14px; background: rgba(0,0,0,0.5); border-radius: 7px; overflow: hidden; border: 1px solid var(--red); margin-bottom: 14px; }
+  .boss-hp-fill { height: 100%; background: linear-gradient(90deg, var(--red), #ff8c8c); transition: width 0.5s; }
+
+  .victory-content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .trophy { font-size: 90px; margin: 12px 0; animation: float 2s infinite; }
+  .reward-pet { background: rgba(255,215,0,0.1); border: 2px solid var(--gold); border-radius: 16px; padding: 16px; margin: 14px auto; max-width: 320px; }
+  .reward-pet .pet-icon { font-size: 56px; color: var(--teal); font-family: 'Cambria Math', serif; }
+  .reward-pet .pet-name { color: var(--gold); font-size: 18px; margin-top: 8px; }
+  .confetti { position: fixed; width: 10px; height: 10px; pointer-events: none; z-index: 999; animation: confettiFall linear forwards; }
+  @keyframes confettiFall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+  .toast-popup { position: fixed; bottom: 6%; left: 50%; transform: translateX(-50%); background: rgba(10,25,41,0.95); border: 2px solid var(--gold); color: var(--gold); padding: 10px 22px; border-radius: 24px; font-size: 15px; z-index: 1001; box-shadow: 0 4px 20px rgba(255,215,0,0.4); pointer-events: none; animation: toastSlide 1.8s ease-out forwards; white-space: nowrap; }
+  @keyframes toastSlide { 0% { opacity: 0; transform: translate(-50%, 20px); } 15%,85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -10px); } }
+  .screen-flash { position: fixed; inset: 0; z-index: 999; pointer-events: none; animation: flashFade 0.5s ease-out forwards; opacity: 0.4; }
+  @keyframes flashFade { 0% { opacity: 0.4; } 100% { opacity: 0; } }
+  .combo-popup { position: fixed; top: 22%; left: 50%; transform: translateX(-50%); font-size: 36px; color: var(--gold); font-weight: bold; text-shadow: 0 0 24px var(--gold); pointer-events: none; z-index: 1000; animation: comboPop 1.1s ease-out forwards; white-space: nowrap; }
+  @keyframes comboPop { 0% { opacity: 0; transform: translate(-50%, 40px) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.25); } 100% { opacity: 0; transform: translate(-50%, -80px) scale(0.9); } }
+  .voice-btn { position: fixed; top: 14px; right: 14px; z-index: 100; width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(20,40,64,0.85); border: 2px solid var(--teal); color: var(--gold); font-size: 20px; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center; }
+  .voice-btn:hover { transform: scale(1.1); box-shadow: 0 6px 18px rgba(38,198,218,0.5); }
+  .speak-btn { background: transparent; border: 1px solid var(--teal-light); color: var(--teal-light); border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 13px; cursor: pointer; margin-left: 8px; display: inline-flex; align-items: center; justify-content: center; box-shadow: none; }
+  .speak-btn:hover { background: rgba(38,198,218,0.2); transform: scale(1.1); }
+  .fun-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 16px 0; }
+  .fun-card { background: linear-gradient(135deg, rgba(20,40,64,0.85), rgba(10,25,41,0.85)); border: 2px solid var(--teal); border-radius: 16px; padding: 20px 16px; text-align: center; cursor: pointer; transition: all 0.25s; }
+  .fun-card:hover { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 10px 28px rgba(255,215,0,0.3); }
+  .fun-ic { font-size: 42px; margin-bottom: 8px; }
+  .fun-tt { color: var(--gold); font-weight: bold; font-size: 17px; margin-bottom: 4px; }
+  .fun-sub { color: var(--text-dim); font-size: 12px; }
+  .info-list { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+  .info-card { background: rgba(10,25,41,0.5); border-left: 3px solid var(--gold-soft); border-radius: 8px; padding: 12px 14px; }
+  .info-h { color: var(--gold); font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .info-b { color: var(--text); line-height: 1.7; font-size: 14px; }
+  .info-meta { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+  .riddle-toggle { color: var(--teal); cursor: pointer; font-size: 13px; margin-top: 6px; display: inline-block; }
+  .riddle-ans { display: none; margin-top: 6px; padding: 8px 10px; background: rgba(255,215,0,0.08); border-radius: 6px; color: var(--gold-soft); font-size: 13px; }
+  .riddle-ans.show { display: block; }
+  @media (max-width: 600px) { h1 { font-size: 28px; } .opt-grid { grid-template-columns: 1fr; } .q-expr { font-size: 22px; } .peak-num { font-size: 28px; min-width: 50px; } .scene { padding: 16px; } .voice-btn { width: 38px; height: 38px; font-size: 17px; top: 8px; right: 8px; } }
+  /* ============ 💬 问数学家 · AI 对话 ============ */
+  @keyframes askFade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .ask-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
+  .ask-bar select { padding:9px 12px; background:var(--bg-mid); color:var(--text); border:2px solid var(--cyan); border-radius:10px; font-size:15px; font-family:inherit; cursor:pointer; }
+  .ask-bar .mini { font-size:14px; padding:9px 14px; border-radius:10px; }
+  .api-pill { font-size:13px; padding:5px 12px; border-radius:999px; border:1px solid currentColor; }
+  .chat-area { height:48vh; min-height:280px; overflow-y:auto; padding:16px; background:rgba(0,0,0,0.22); border:1px solid rgba(255,255,255,0.10); border-radius:16px; margin-bottom:12px; display:flex; flex-direction:column; gap:10px; }
+  .chat-area::-webkit-scrollbar { width:6px; } .chat-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:3px; }
+  .bubble { padding:11px 15px; border-radius:14px; max-width:82%; word-wrap:break-word; line-height:1.65; font-size:15px; animation:askFade .25s; }
+  .bubble.user { align-self:flex-end; background:linear-gradient(135deg,var(--purple),#7b5cff); color:#fff; border-bottom-right-radius:4px; }
+  .bubble.sci { align-self:flex-start; background:linear-gradient(135deg,rgba(255,215,0,0.14),rgba(255,215,0,0.05)); border:1px solid rgba(255,215,0,0.30); color:var(--text); border-bottom-left-radius:4px; }
+  .bubble.sci .sci-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; color:var(--gold); font-weight:700; font-size:14px; }
+  .bubble.sci .face-mini { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.10); display:grid; place-items:center; font-size:18px; border:1px solid rgba(255,215,0,0.5); }
+  .bubble.thinking { opacity:.7; font-style:italic; }
+  .bubble code { background:rgba(0,0,0,0.35); padding:1px 6px; border-radius:5px; font-size:14px; color:var(--cyan-light); font-family:'Courier New',monospace; }
+  .input-row { display:flex; gap:8px; }
+  .input-row textarea { flex:1; padding:12px 14px; background:var(--bg-mid); color:var(--text); border:2px solid var(--cyan); border-radius:12px; font-size:16px; resize:none; min-height:50px; font-family:inherit; }
+  .input-row button { padding:0 22px; }
+  .preset-row { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; justify-content:center; }
+  .preset-row button { padding:7px 13px; font-size:13px; border-radius:999px; }
+  .voice-toggle { display:inline-flex; align-items:center; gap:6px; padding:9px 14px; border-radius:999px; cursor:pointer; user-select:none; background:var(--bg-mid); border:2px solid var(--cyan); font-size:14px; color:var(--text); }
+  .voice-toggle.on { background:linear-gradient(135deg,var(--green),#3fb37a); border-color:var(--green); color:var(--bg-deep); font-weight:700; }
+  .mic-btn { width:50px; min-width:50px; padding:0; font-size:22px; border-radius:50%; background:linear-gradient(135deg,#ff6b6b,#ff9d6b); color:#fff; border:none; box-shadow:0 4px 14px rgba(255,107,107,0.4); }
+  .mic-btn.recording { animation:micPulse .8s infinite; }
+  @keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,.7)} 50%{box-shadow:0 0 0 12px rgba(255,107,107,0)} }
+  .tts-btn { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; margin-left:8px; font-size:12px; background:rgba(77,208,225,0.15); border:1px solid rgba(77,208,225,0.4); color:var(--cyan-light); border-radius:999px; cursor:pointer; box-shadow:none; }
+  .tts-btn:hover { background:rgba(77,208,225,0.3); transform:none; border-color:var(--cyan); }
+  .tts-btn.playing { background:var(--cyan); color:var(--bg-deep); animation:ttsWave 1.2s infinite; }
+  @keyframes ttsWave { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+  .listen-tip { display:inline-block; padding:8px 14px; background:rgba(255,107,107,0.15); border:1px dashed var(--red); color:#ff9d9d; border-radius:10px; font-size:13px; margin-bottom:8px; }
+  .ask-entry { background:linear-gradient(135deg,var(--purple),#7b5cff)!important; border-color:var(--purple)!important; color:#fff!important; font-weight:bold; }
+  /* 语音连续对话舱 */
+  .vc-mask { position:fixed; inset:0; background:rgba(8,12,28,0.94); z-index:9999; display:grid; place-items:center; backdrop-filter:blur(10px); animation:askFade .3s; }
+  .vc-card { width:min(560px,94vw); height:min(92vh,760px); background:linear-gradient(160deg,var(--bg-mid),var(--bg-deep) 75%); border:1px solid rgba(255,255,255,0.15); border-radius:24px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 30px 80px rgba(0,0,0,0.5); }
+  .vc-top { display:flex; align-items:center; justify-content:space-between; }
+  .vc-sci { display:flex; align-items:center; gap:12px; }
+  .vc-avatar { width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg,var(--gold),#ff9d6b); display:grid; place-items:center; font-size:30px; border:2px solid rgba(255,255,255,0.3); }
+  .vc-orb-wrap { display:grid; place-items:center; padding:6px 0; }
+  .vc-orb { width:130px; height:130px; border-radius:50%; background:radial-gradient(circle at 30% 30%,var(--cyan),#118ab2 60%,#073b4c); box-shadow:0 0 60px rgba(77,208,225,0.3); transition:.4s; }
+  .vc-orb.vc-listen { background:radial-gradient(circle at 30% 30%,#ff9d9d,var(--red) 60%,#770020); animation:vcPulse 1s infinite; }
+  .vc-orb.vc-thinking { background:radial-gradient(circle at 30% 30%,var(--gold),#f48c06 60%,#6a4202); animation:vcSpin 1.6s linear infinite; }
+  .vc-orb.vc-speak { background:radial-gradient(circle at 30% 30%,#cbb8ff,var(--purple) 60%,#3b1a8a); animation:vcWave .7s infinite; }
+  .vc-orb.vc-paused { opacity:.5; }
+  @keyframes vcPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+  @keyframes vcSpin { from{filter:hue-rotate(0)} to{filter:hue-rotate(360deg)} }
+  @keyframes vcWave { 0%,100%{transform:scale(1)} 25%{transform:scale(1.1)} 50%{transform:scale(.94)} 75%{transform:scale(1.08)} }
+  .vc-status { text-align:center; font-size:15px; color:var(--cyan-light); min-height:22px; font-weight:600; }
+  .vc-transcript { flex:1; overflow-y:auto; padding:10px 12px; background:rgba(0,0,0,0.2); border-radius:12px; display:flex; flex-direction:column; gap:6px; font-size:14px; line-height:1.6; }
+  .vc-bubble { padding:8px 12px; border-radius:12px; max-width:90%; word-break:break-word; }
+  .vc-bubble.user { background:linear-gradient(135deg,var(--purple),#7b5cff); color:#fff; align-self:flex-end; }
+  .vc-bubble.sci { background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); align-self:flex-start; }
+  .vc-bubble.err { background:rgba(255,107,107,0.2); color:#ff9d9d; align-self:center; }
+  .vc-live { min-height:30px; padding:6px 14px; font-size:14px; color:var(--text-dim); font-style:italic; text-align:center; border-top:1px dashed rgba(255,255,255,0.1); }
+  .vc-bottom { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  /* AI 设置弹窗 */
+  .llm-mask { position:fixed; inset:0; background:rgba(8,12,28,0.85); z-index:9998; display:grid; place-items:center; backdrop-filter:blur(6px); animation:askFade .25s; padding:20px; }
+  .llm-modal { width:min(560px,94vw); max-height:90vh; overflow-y:auto; background:linear-gradient(160deg,var(--bg-mid),var(--bg-deep)); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:24px; box-shadow:0 30px 80px rgba(0,0,0,0.5); }
+  .setting-grid { display:grid; gap:12px; margin:16px 0; }
+  .setting-grid label { font-size:13px; color:var(--text-dim); display:block; margin-bottom:4px; }
+  .setting-grid input { width:100%; padding:10px 12px; background:var(--bg-deep); color:var(--text); border:2px solid rgba(255,255,255,0.18); border-radius:10px; font-size:14px; font-family:'Courier New',monospace; box-sizing:border-box; }
+  /* 🧑‍🏫 悬浮 AI 助教球 + 💬 对话浮层 */
+  .ai-fab-wrap { position:fixed; right:18px; bottom:18px; z-index:9000; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .ai-fab-ball { width:62px; height:62px; min-width:62px; border-radius:50%; font-size:30px; padding:0; border:2px solid var(--gold); background:linear-gradient(135deg,var(--purple),#7b5cff); box-shadow:0 6px 22px rgba(123,92,255,0.55); cursor:pointer; display:grid; place-items:center; animation:fabFloat 3.5s ease-in-out infinite; }
+  .ai-fab-ball:hover { transform:scale(1.08); border-color:var(--gold); }
+  @keyframes fabFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  .ai-fab-menu { display:flex; flex-direction:column; gap:8px; opacity:0; pointer-events:none; transform:translateY(10px) scale(.96); transition:.18s; }
+  .ai-fab-menu.open { opacity:1; pointer-events:auto; transform:none; }
+  .ai-fab-act { font-size:14px; padding:11px 16px; border-radius:999px; white-space:nowrap; background:var(--bg-mid); border:2px solid var(--cyan); color:var(--text); box-shadow:0 4px 14px rgba(0,0,0,0.35); cursor:pointer; }
+  .ai-fab-act:hover { border-color:var(--gold); }
+  .chat-ov-mask { position:fixed; inset:0; background:rgba(8,12,28,0.78); z-index:9500; display:grid; place-items:center; backdrop-filter:blur(6px); animation:askFade .22s; padding:16px; }
+  .chat-ov-panel { width:min(680px,96vw); height:min(86vh,760px); display:flex; flex-direction:column; background:linear-gradient(160deg,var(--bg-mid),var(--bg-deep)); border:1px solid rgba(255,255,255,0.14); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,0.55); overflow:hidden; }
+  .chat-ov-head { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:17px; font-weight:800; color:var(--gold); flex-shrink:0; }
+  .chat-ov-body { flex:1; min-height:0; padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; }
+  .chat-ov-body .subtitle { margin-top:0; }
+
+  /* 全局键盘：按键高亮 + 浮动快捷键提示条 */
+  button.keyflash, .opt-btn.keyflash { outline: 2px solid var(--gold); outline-offset: 1px; filter: brightness(1.18); transform: scale(0.97); transition: transform .05s; }
+  #kbdHint { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 200;
+    background: rgba(13,27,46,0.82); border: 1px solid rgba(77,208,225,0.4); color: var(--text-dim);
+    font-size: 12px; padding: 5px 14px; border-radius: 20px; backdrop-filter: blur(6px);
+    pointer-events: none; white-space: nowrap; max-width: 94vw; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  #kbdHint kbd { background: rgba(77,208,225,0.16); border: 1px solid var(--cyan); border-radius: 4px; padding: 0 5px; color: var(--cyan-light); font-family: inherit; }
+  @media (max-width: 600px) { #kbdHint { font-size: 10px; padding: 4px 10px; bottom: 6px; } }
+</style>
+</head>
+<body>
+<a href="index.html" title="返回数学世界 · 五阶段总目录" style="position:fixed;top:13px;left:13px;z-index:9999;font:600 12px/1 'Microsoft YaHei',sans-serif;color:#ffd700;background:rgba(10,10,26,0.62);border:1px solid rgba(255,215,0,0.45);border-radius:14px;padding:6px 11px;text-decoration:none;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.3);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(255,215,0,0.2)';this.style.borderColor='#ffd700'" onmouseout="this.style.background='rgba(10,10,26,0.62)';this.style.borderColor='rgba(255,215,0,0.45)'">⌂ 数学世界</a>
+<div id="app"></div>
+<script>
+"use strict";
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function distract(ans, deltas, fmt){const s=new Set([ans]);let n=0;while(s.size<4&&n++<40)s.add(ans+pick(deltas));return shuffle([...s].map(fmt||String));}
+
+const PEAKS = [
+  {
+    id: 1, phase: '必修一', icon: '∈', title: '第一座峰 · 集合与逻辑', sub: '集合 · 命题',
+    speaker: '逻辑长老 Logos',
+    story: [
+      { speaker: '逻辑长老 Logos', text: '一切数学始于<span class="hl">分类</span>。把具有共同特征的对象放在一起，就形成<span class="formula">集合</span>。' },
+      { speaker: '逻辑长老 Logos', text: '元素和集合的关系只有两种：属于（∈）或不属于（∉）。' },
+      { speaker: '逻辑长老 Logos', text: '集合间的关系：<span class="formula">⊆</span> 子集、<span class="formula">⊊</span> 真子集、<span class="formula">=</span> 相等。' },
+      { speaker: '逻辑长老 Logos', text: '集合运算三大式：<span class="formula">A ∩ B</span> 交、<span class="formula">A ∪ B</span> 并、<span class="formula">∁ₐA</span> 补。' }
+    ],
+    concepts: [
+      { title: '集合的表示', body: '列举法：把元素写在大括号里，如 <span class="formula">{1,2,3}</span>。<br>描述法：<span class="formula">{x | x &lt; 5, x ∈ ℕ}</span>。<br>四大基本数集：<span class="formula">ℕ、ℤ、ℚ、ℝ</span>（自然数 → 整数 → 有理数 → 实数）。' },
+      { title: '集合的关系', body: 'A ⊆ B：A 中每个元素都在 B 中。<br>A ⊊ B：A ⊆ B 且 A ≠ B。<br>A = B：A ⊆ B 且 B ⊆ A。<br><span class="hl">空集 ∅ 是任何集合的子集</span>。' },
+      { title: '集合的运算', body: '<span class="hl">交集</span> A ∩ B：既在 A 又在 B。<br><span class="hl">并集</span> A ∪ B：在 A 中<span class="hl">或</span>在 B 中。<br><span class="hl">补集</span> ∁ᵤA：全集 U 中不在 A 的元素。<br>德摩根：<span class="formula">∁(A ∩ B) = ∁A ∪ ∁B</span>、<span class="formula">∁(A ∪ B) = ∁A ∩ ∁B</span>。' },
+      { title: '充分必要条件', body: '"p ⇒ q"：p 是 q 的<span class="hl">充分</span>条件，q 是 p 的<span class="hl">必要</span>条件。<br>"p ⇔ q"：p 是 q 的<span class="hl">充要</span>条件。<br>口诀："小⇒大，小是大的充分条件"。' },
+      { title: '全称 / 存在量词', body: '<span class="formula">∀</span>：任意；<span class="formula">∃</span>：存在。<br>否定规则：<span class="hl">∀ x ∈ M, p(x)</span> 的否定是 <span class="hl">∃ x ∈ M, ¬p(x)</span>，反之亦然。' }
+    ],
+    pet: { name: '集合精灵', symbol: '∈' }, boss: { name: '逻辑使徒 Logicus', emoji: '🧠', hp: 10 }
+  },
+  {
+    id: 2, phase: '必修一', icon: 'f(x)', title: '第二座峰 · 函数殿堂', sub: '定义域 · 单调 · 奇偶 · 不等式 · 零点',
+    speaker: '函数仙 Functia',
+    story: [
+      { speaker: '函数仙 Functia', text: '函数：对定义域 A 中每个 x，按法则 f 对应唯一的 y = f(x)。' },
+      { speaker: '函数仙 Functia', text: '三件套：<span class="hl">定义域、对应法则、值域</span>——值域是定义域经法则映射后的结果。' },
+      { speaker: '函数仙 Functia', text: '<span class="hl">单调性</span>：x 增大 y 也增大叫单调增；反之单调减。' },
+      { speaker: '函数仙 Functia', text: '<span class="hl">奇偶性</span>：f(−x) = f(x) 偶函数（图像关于 y 轴对称）；f(−x) = −f(x) 奇函数（关于原点对称）。' }
+    ],
+    concepts: [
+      { title: '函数三要素', body: '<span class="hl">定义域</span>、<span class="hl">对应法则</span>、<span class="hl">值域</span>。<br>两个函数相同 ⇔ 定义域相同且对应法则相同。<br>求定义域：使解析式有意义的 x 的范围（注意分母 ≠ 0、被开方数 ≥ 0、对数真数 &gt; 0 等）。' },
+      { title: '单调性', body: '函数 f 在区间 I 上：<br>任取 <span class="formula">x₁ &lt; x₂ ∈ I</span>，若 <span class="formula">f(x₁) &lt; f(x₂)</span>，单调<span class="hl">递增</span>；若 <span class="formula">f(x₁) &gt; f(x₂)</span>，单调<span class="hl">递减</span>。<br>判断法：定义法、求导法。' },
+      { title: '奇偶性', body: '前提：定义域<span class="hl">关于原点对称</span>。<br><span class="formula">f(−x) = f(x)</span>：<span class="hl">偶函数</span>（关于 y 轴对称），如 y = x², y = cos x。<br><span class="formula">f(−x) = −f(x)</span>：<span class="hl">奇函数</span>（关于原点对称），如 y = x³, y = sin x。' },
+      { title: '最值', body: '函数在定义域 D 上有<span class="hl">最大值 M</span>：① ∀x ∈ D, f(x) ≤ M；② ∃x₀ ∈ D, f(x₀) = M。<br>最小值同理改方向。<br>常见求法：图像法、单调性法、导数法。' },
+      { title: '基本初等函数', body: '一次函数、二次函数、幂函数、指数函数、对数函数、三角函数——它们的图像与性质是后续一切函数分析的"原子"。' },
+      { title: '基本不等式（必修·预备知识）', body: '当 <span class="hl">a &gt; 0, b &gt; 0</span> 时：<span class="formula">a + b ≥ 2√(ab)</span>，<span class="hl">当且仅当 a = b 时取等号</span>。<br>变形：<span class="formula">ab ≤ ((a+b)/2)²</span>。<br>用途：求<span class="hl">最值</span>——"和定积最大、积定和最小"。例：x &gt; 0 时，<span class="formula">x + 1/x ≥ 2</span>（x = 1 时取等）。' },
+      { title: '一元二次不等式与"三个二次"', body: '解 <span class="formula">ax² + bx + c &gt; 0</span>（a &gt; 0）：先求方程 ax²+bx+c=0 的根，再"<span class="hl">大于取两边，小于取中间</span>"。<br><span class="hl">三个二次是一家人</span>：二次函数 y = ax²+bx+c 的图象——<br>· 与 x 轴<span class="hl">交点</span> ＝ 方程 ax²+bx+c=0 的根；<br>· 图象在 x 轴<span class="hl">上方</span>的 x ＝ 不等式 &gt; 0 的解集，<span class="hl">下方</span> ＝ &lt; 0 的解集。' }
+,
+      { title: '函数的零点', body: '使 <span class="formula">f(x) = 0</span> 的实数 x 叫函数的<span class="hl">零点</span>。三件事等价：x 是 f 的零点 ⇔ 方程 f(x)=0 有实根 ⇔ 函数图象与 x 轴有<span class="hl">交点</span>。<br>注意：零点是一个<span class="hl">数</span>（横坐标），不是点 (x, 0)。二次函数零点个数看判别式：Δ&gt;0 两个、Δ=0 一个、Δ&lt;0 零个。' },
+      { title: '零点存在定理 · 二分法', body: '<span class="hl">零点存在定理</span>：若 f 在 [a, b] 上图象<span class="hl">连续不断</span>，且 <span class="formula">f(a)·f(b) &lt; 0</span>，则 (a, b) 内<span class="hl">至少有一个</span>零点。<br><span class="hl">二分法</span>求近似解：取中点 c=(a+b)/2，看 f(a)·f(c) 的符号——异号则零点在 [a, c]、同号则在 [c, b]，不断对半缩小区间逼近零点。' }
+    ],
+    pet: { name: '映射蝶', symbol: 'f' }, boss: { name: '函数之神 Functus', emoji: '🌀', hp: 12 }
+  },
+  {
+    id: 3, phase: '必修一', icon: 'aˣ', title: '第三座峰 · 指对幂大陆', sub: '指数函数 · 对数函数 · 幂函数',
+    speaker: '指对仙人 Logarithmus',
+    story: [
+      { speaker: '指对仙人 Logarithmus', text: '幂运算扩展到<span class="hl">实数指数</span>：a^x，底数 a &gt; 0 且 a ≠ 1，x ∈ ℝ。' },
+      { speaker: '指对仙人 Logarithmus', text: '<span class="formula">log_a N</span> 是 "a 的几次方等于 N"。指数与对数互为<span class="hl">逆运算</span>。' },
+      { speaker: '指对仙人 Logarithmus', text: '常用对数 <span class="formula">lg = log₁₀</span>；自然对数 <span class="formula">ln = log_e</span>（e ≈ 2.71828…）。' },
+      { speaker: '指对仙人 Logarithmus', text: '指数 y = aˣ 与对数 y = log_a x 图像<span class="hl">关于直线 y = x 对称</span>，二者互为反函数。' }
+    ],
+    concepts: [
+      { title: '指数函数 y = aˣ', body: '<span class="hl">a &gt; 1</span>：在 ℝ 上递增，图像过 (0,1)，向右无限增大、向左趋近 0。<br><span class="hl">0 &lt; a &lt; 1</span>：在 ℝ 上递减，图像过 (0,1)，向右趋近 0、向左无限增大。<br>值域：<span class="formula">(0, +∞)</span>。' },
+      { title: '对数函数 y = log_a x', body: '定义域 <span class="formula">(0, +∞)</span>，值域 ℝ，图像过 (1, 0)。<br><span class="hl">a &gt; 1</span>：单调递增。<br><span class="hl">0 &lt; a &lt; 1</span>：单调递减。' },
+      { title: '对数运算法则', body: '<span class="formula">log_a(MN) = log_a M + log_a N</span><br><span class="formula">log_a(M/N) = log_a M − log_a N</span><br><span class="formula">log_a(Mⁿ) = n log_a M</span><br>换底公式：<span class="formula">log_a b = log_c b / log_c a</span>。' },
+      { title: '幂函数 y = xᵅ', body: '形如 y = x^α，α 为实常数。<br>α &gt; 0：图像过 (0,0) 和 (1,1)；<br>α &lt; 0：图像过 (1,1)，但不过原点；<br>α = 1/2: y = √x；α = -1: y = 1/x。' },
+      { title: '常见错点', body: 'log_a 1 = 0、log_a a = 1（任何允许的 a）。<br>a^(log_a N) = N（消去律）。<br>底数限制：<span class="hl">a &gt; 0 且 a ≠ 1</span>。<br>真数要 &gt; 0。' }
+    ],
+    pet: { name: '对数灵', symbol: 'log' }, boss: { name: '指对之主 Exponent', emoji: '🔥', hp: 13 }
+  },
+  {
+    id: 4, phase: '必修一', icon: 'sin', title: '第四座峰 · 三角圆环', sub: '弧度 · 三角函数 · 公式',
+    speaker: '三角天使 Trigonia',
+    story: [
+      { speaker: '三角天使 Trigonia', text: '<span class="hl">弧度制</span>：半径为 r 的圆，长度为 r 的弧所对的圆心角是 1 弧度。<span class="formula">π 弧度 = 180°</span>。' },
+      { speaker: '三角天使 Trigonia', text: '在单位圆上 (r=1)，点 (cos α, sin α) 的横纵坐标就是 cos α、sin α。' },
+      { speaker: '三角天使 Trigonia', text: '<span class="hl">三大恒等式</span>：<br>① <span class="formula">sin²α + cos²α = 1</span><br>② <span class="formula">tan α = sin α / cos α</span><br>③ 诱导公式 / 和差化积 / 倍角公式' },
+      { speaker: '三角天使 Trigonia', text: '函数 y = A sin(ωx + φ) + B：A 振幅、ω 角频率、φ 初相、B 上下平移。' }
+    ],
+    concepts: [
+      { title: '弧度制', body: '<span class="formula">180° = π 弧度</span>。换算：<br>30° = π/6, 45° = π/4, 60° = π/3<br>90° = π/2, 180° = π, 270° = 3π/2, 360° = 2π。<br>弧长公式：<span class="formula">L = αr</span>（α 用弧度）。' },
+      { title: '单位圆定义', body: '在以原点为圆心、半径为 1 的圆上，角 α 的终边与圆的交点是 (cos α, sin α)。<br>由此：<br>第一象限：sin, cos, tan 都正<br>第二象限：sin 正其余负<br>第三象限：tan 正其余负<br>第四象限：cos 正其余负<br>(口诀：一全二正三切四余)' },
+      { title: '基本恒等式', body: '<span class="formula">sin²α + cos²α = 1</span><br><span class="formula">tan α = sin α / cos α</span><br>诱导公式 (k ∈ ℤ)：<br><span class="formula">sin(2kπ + α) = sin α</span><br><span class="formula">sin(π − α) = sin α</span>、<span class="formula">sin(π + α) = −sin α</span>。' },
+      { title: '两角和差', body: '<span class="formula">sin(α ± β) = sin α cos β ± cos α sin β</span><br><span class="formula">cos(α ± β) = cos α cos β ∓ sin α sin β</span><br><span class="formula">tan(α ± β) = (tan α ± tan β) / (1 ∓ tan α tan β)</span>' },
+      { title: '倍角公式', body: '<span class="formula">sin 2α = 2 sin α cos α</span><br><span class="formula">cos 2α = cos²α − sin²α = 2cos²α − 1 = 1 − 2sin²α</span><br><span class="formula">tan 2α = 2 tan α / (1 − tan²α)</span>' }
+    ],
+    pet: { name: '正弦舞者', symbol: 'sin' }, boss: { name: '三角神王 Trigonix', emoji: '🌊', hp: 14 }
+  },
+  {
+    id: 5, phase: '必修二', icon: '→', title: '第五座峰 · 向量平原', sub: '平面向量',
+    speaker: '向量战士 Vectorius',
+    story: [
+      { speaker: '向量战士 Vectorius', text: '<span class="hl">向量</span>：既有大小又有方向的量。用箭头表示，可记作 <span class="formula">a⃗</span>。' },
+      { speaker: '向量战士 Vectorius', text: '加法：首尾相连，平行四边形法则。减法：a⃗ − b⃗ = a⃗ + (−b⃗)。' },
+      { speaker: '向量战士 Vectorius', text: '坐标 (x, y)：模 <span class="formula">|a⃗| = √(x² + y²)</span>。两向量 a⃗ = (x₁, y₁)、b⃗ = (x₂, y₂)。' },
+      { speaker: '向量战士 Vectorius', text: '<span class="hl">数量积</span>（点积）：<span class="formula">a⃗ · b⃗ = x₁x₂ + y₁y₂ = |a⃗||b⃗| cos θ</span>。θ 是两向量夹角。' }
+    ],
+    concepts: [
+      { title: '向量与坐标', body: '向量 a⃗ = (x, y)。<br>模长：<span class="formula">|a⃗| = √(x² + y²)</span>。<br>单位向量：模为 1 的向量。<br>零向量 <span class="formula">0⃗</span>：方向任意。<br>相反向量：模相同方向相反。' },
+      { title: '向量运算', body: '<span class="hl">加法</span>：(x₁+x₂, y₁+y₂)<br><span class="hl">减法</span>：(x₁−x₂, y₁−y₂)<br><span class="hl">数乘</span>：λa⃗ = (λx, λy)<br>共线判定：a⃗ ∥ b⃗ ⇔ x₁y₂ − x₂y₁ = 0。' },
+      { title: '数量积（点积）', body: '<span class="formula">a⃗ · b⃗ = |a⃗||b⃗| cos θ = x₁x₂ + y₁y₂</span><br>θ 是 a⃗ 与 b⃗ 的夹角，0 ≤ θ ≤ π。<br>结果是<span class="hl">标量</span>（数），不是向量。' },
+      { title: '常用性质', body: '<span class="hl">垂直</span>：a⃗ ⊥ b⃗ ⇔ a⃗ · b⃗ = 0 ⇔ x₁x₂ + y₁y₂ = 0。<br><span class="hl">夹角</span>：<span class="formula">cos θ = (a⃗ · b⃗) / (|a⃗||b⃗|)</span>。<br><span class="hl">投影</span>：a⃗ 在 b⃗ 方向上的投影 = |a⃗| cos θ = (a⃗ · b⃗) / |b⃗|。' },
+      { title: '基本定理', body: '平面向量基本定理：在平面内，任意一向量都可<span class="hl">唯一</span>地表示为<span class="hl">两个不共线向量</span>的线性组合。<br>即 ∃ 唯一 λ, μ：<span class="formula">v⃗ = λa⃗ + μb⃗</span>，{a⃗, b⃗} 称为一组基。' }
+    ],
+    pet: { name: '向量箭', symbol: '→' }, boss: { name: '方向之主 Vectorus', emoji: '🏹', hp: 12 }
+  },
+  {
+    id: 6, phase: '必修二', icon: 'i', title: '第六座峰 · 复数岛', sub: '复数 i² = −1',
+    speaker: '虚数之主 Imagius',
+    story: [
+      { speaker: '虚数之主 Imagius', text: '方程 x² = −1 在实数中无解。引入<span class="formula">i</span>，定义 <span class="hl">i² = −1</span>。' },
+      { speaker: '虚数之主 Imagius', text: '复数 <span class="formula">z = a + bi</span>，a 实部、b 虚部。复数集 ℂ 包含 ℝ。' },
+      { speaker: '虚数之主 Imagius', text: '复数对应坐标 (a, b)，叫<span class="hl">复平面</span>上的点。模 <span class="formula">|z| = √(a² + b²)</span>。' },
+      { speaker: '虚数之主 Imagius', text: '共轭复数 <span class="formula">z̄ = a − bi</span>。z · z̄ = a² + b² = |z|²。' }
+    ],
+    concepts: [
+      { title: '复数的形式', body: '<span class="hl">代数形式</span>：z = a + bi（a, b 实）<br>a：<span class="hl">实部</span> Re z；b：<span class="hl">虚部</span> Im z。<br>b = 0：实数；a = 0 且 b ≠ 0：纯虚数。<br>i 单位虚数：i² = −1，i³ = −i，i⁴ = 1（每 4 次循环）。' },
+      { title: '复数相等', body: '<span class="formula">a + bi = c + di ⇔ a = c 且 b = d</span><br>实部对实部，虚部对虚部。<br>z = 0 ⇔ a = 0 且 b = 0。' },
+      { title: '复数运算', body: '加减：实部 / 虚部分别加减。<br>乘法：(a+bi)(c+di) = (ac−bd) + (ad+bc)i。<br>除法：分子分母同乘分母的共轭，把虚单位移到分子。<br>例：<span class="formula">(1+i)/(1−i) = (1+i)²/2 = i</span>。' },
+      { title: '模与共轭', body: '<span class="formula">|z| = √(a²+b²)</span> = 复平面上 z 到原点的距离。<br><span class="formula">z̄ = a − bi</span>（虚部取反）。<br>性质：<span class="formula">z + z̄ = 2a, z − z̄ = 2bi, z · z̄ = |z|²</span>。' },
+      { title: '复平面', body: '复数 z = a + bi 对应点 (a, b)：x 轴为实轴，y 轴为虚轴。<br>两个复数的和、差，对应两个向量加减，与平面向量完全一样。' }
+    ],
+    pet: { name: '虚数蛇', symbol: 'i' }, boss: { name: '复数之神 Complexor', emoji: '🌌', hp: 13 }
+  },
+  {
+    id: 7, phase: '必修二', icon: '∡', title: '第七座峰 · 立体峰', sub: '空间几何 · 直观图 · 向量法 · 体积',
+    speaker: '立体大师 Solidus',
+    story: [
+      { speaker: '立体大师 Solidus', text: '几何从二维走向三维：<span class="hl">点 — 线 — 面 — 体</span>。' },
+      { speaker: '立体大师 Solidus', text: '空间两直线关系：<span class="hl">相交、平行、异面</span>。异面：不在同一平面内。' },
+      { speaker: '立体大师 Solidus', text: '直线与平面：在面内、与面相交、与面平行。<span class="hl">线面垂直</span>：直线垂直于平面内过垂足的任意一条直线。' },
+      { speaker: '立体大师 Solidus', text: '常见体的体积：柱 <span class="formula">V = Sh</span>、锥 <span class="formula">V = Sh/3</span>、球 <span class="formula">V = 4πr³/3</span>。' }
+    ],
+    concepts: [
+      { title: '空间点线面关系', body: '<span class="hl">点</span>：构成空间最基本对象。<br><span class="hl">两直线关系</span>：相交、平行、异面。<br><span class="hl">直线与平面</span>：直线在面内 / 与面相交 / 与面平行。<br><span class="hl">两平面</span>：相交（有公共直线）或平行。' },
+      { title: '线面平行 / 垂直', body: '<span class="hl">线面平行判定</span>：面外一直线与面内一直线平行 ⇒ 线面平行。<br><span class="hl">线面垂直判定</span>：直线与面内两条相交直线都垂直 ⇒ 与面垂直。<br>线面垂直 ⇒ 与面内<span class="hl">任意</span>直线都垂直。' },
+      { title: '常见几何体的体积', body: '<span class="hl">柱体</span>（棱柱、圆柱）：<span class="formula">V = Sh</span>，S 底面积，h 高。<br><span class="hl">锥体</span>（棱锥、圆锥）：<span class="formula">V = Sh/3</span>。<br><span class="hl">球</span>：<span class="formula">V = (4/3)πr³</span>，表面积 <span class="formula">S = 4πr²</span>。' },
+      { title: '表面积', body: '圆柱：<span class="formula">S = 2πr(r + h)</span><br>圆锥：<span class="formula">S = πr² + πrl</span>（l 为母线长）<br>球：<span class="formula">S = 4πr²</span>。<br>正方体棱长 a：表面积 6a²，体积 a³。' },
+      { title: '直观图（斜二测画法）', body: '必修立体几何要求会用<span class="hl">斜二测画法</span>画空间图形的直观图：<br>① x 轴方向长度<span class="hl">不变</span>；<br>② y 轴画成与 x 轴成 <span class="hl">45°</span>，且平行于 y 轴的线段长度<span class="hl">减半</span>；<br>③ 竖直方向（z）长度不变。<br>这样画出的图既保留形状感、又便于作图。（三视图作为了解，重点是直观图。）' },
+      { title: '空间向量法（选必·几何与代数）', body: '到选择性必修，立体几何升级为<span class="hl">坐标法</span>：建立<span class="hl">空间直角坐标系</span>，把点、向量都写成坐标 (x, y, z)。<br><span class="hl">法向量</span>：与平面垂直的向量 n。<br>用向量算角与距离：<br>· <span class="hl">线面角</span> 的正弦 = |直线方向向量与法向量夹角的余弦|；<br>· <span class="hl">二面角</span> 由两个半平面的法向量夹角求（注意取正确的角或其补角）；<br>· <span class="hl">点到平面距离</span> = 向量在法向量方向上的投影长。' },
+      { title: '三视图（了解）', body: '正视图：从前往后看；侧视图（左视图）：从左往右看；俯视图：从上往下看。<br>"长对正、高平齐、宽相等"——三视图的尺寸关系。' }
+    ],
+    pet: { name: '立体灵', symbol: '∡' }, boss: { name: '立体王者 Solidux', emoji: '🟦', hp: 13 }
+  },
+  {
+    id: 8, phase: '选必一', icon: '⊙', title: '第八座峰 · 解析几何', sub: '直线 · 圆 · 圆锥曲线',
+    speaker: '坐标贤者 Cartesius',
+    story: [
+      { speaker: '坐标贤者 Cartesius', text: '用坐标系把几何问题化为代数问题——这就是<span class="hl">解析几何</span>的精髓。' },
+      { speaker: '坐标贤者 Cartesius', text: '直线：斜截式 <span class="formula">y = kx + b</span>、点斜式 <span class="formula">y − y₀ = k(x − x₀)</span>、一般式 <span class="formula">Ax + By + C = 0</span>。' },
+      { speaker: '坐标贤者 Cartesius', text: '圆：圆心 (a, b)、半径 r：<span class="formula">(x − a)² + (y − b)² = r²</span>。' },
+      { speaker: '坐标贤者 Cartesius', text: '<span class="hl">圆锥曲线</span>：椭圆、双曲线、抛物线——用平面截圆锥得到的曲线。' }
+    ],
+    concepts: [
+      { title: '直线方程', body: '<span class="hl">斜率</span>：<span class="formula">k = (y₂ − y₁)/(x₂ − x₁)</span>。<br><span class="hl">点斜式</span>：<span class="formula">y − y₀ = k(x − x₀)</span><br><span class="hl">斜截式</span>：<span class="formula">y = kx + b</span><br><span class="hl">一般式</span>：<span class="formula">Ax + By + C = 0</span>（A, B 不全为 0）<br>当两条直线斜率都存在时：平行且不重合 ⇔ k₁ = k₂、b₁ ≠ b₂；垂直 ⇔ k₁·k₂ = −1。垂直于 x 轴的直线与斜率为 0 的直线也互相垂直。' },
+      { title: '点到直线距离', body: '点 (x₀, y₀) 到直线 Ax + By + C = 0 的距离：<br><span class="formula">d = |Ax₀ + By₀ + C| / √(A² + B²)</span>' },
+      { title: '圆的方程', body: '<span class="hl">标准式</span>：(x − a)² + (y − b)² = r²<br><span class="hl">一般式</span>：x² + y² + Dx + Ey + F = 0<br>（D² + E² − 4F &gt; 0 时为圆）<br>圆心 (−D/2, −E/2)，半径 √(D²+E²−4F)/2。' },
+      { title: '椭圆 · 双曲线 · 抛物线', body: '<span class="hl">椭圆</span>：<span class="formula">x²/a² + y²/b² = 1</span>（a &gt; b &gt; 0）<br>到两焦点距离之和为 2a。<br><span class="hl">双曲线</span>：<span class="formula">x²/a² − y²/b² = 1</span>，到两焦点距离之差的绝对值为 2a。<br><span class="hl">抛物线</span>：<span class="formula">y² = 2px</span>（p &gt; 0），焦点 (p/2, 0)，准线 x = −p/2。' },
+      { title: '离心率 e', body: '椭圆：<span class="formula">e = c/a，0 &lt; e &lt; 1</span>；越接近 0 越圆。<br>双曲线：<span class="formula">e = c/a, e &gt; 1</span>；越大开口越大。<br>抛物线：<span class="formula">e = 1</span>。<br>(c 为半焦距，c² = a² − b² 椭圆 / a² + b² 双曲)' }
+    ],
+    pet: { name: '椭圆环', symbol: '⊙' }, boss: { name: '圆锥之主 Conicus', emoji: '🥚', hp: 14 }
+  },
+  {
+    id: 9, phase: '选必二', icon: 'Σ', title: '第九座峰 · 数列高原', sub: '等差 · 等比 · 求和',
+    speaker: '数列大师 Sequenza',
+    story: [
+      { speaker: '数列大师 Sequenza', text: '数列：按一定次序排列的一列数 <span class="formula">a₁, a₂, a₃, …</span>。' },
+      { speaker: '数列大师 Sequenza', text: '<span class="hl">等差数列</span>：相邻项之差为常数 d。通项 <span class="formula">aₙ = a₁ + (n−1)d</span>。' },
+      { speaker: '数列大师 Sequenza', text: '<span class="hl">等比数列</span>：相邻项之比为常数 q（q ≠ 0）。通项 <span class="formula">aₙ = a₁qⁿ⁻¹</span>。' },
+      { speaker: '数列大师 Sequenza', text: '前 n 项和：等差 <span class="formula">Sₙ = n(a₁ + aₙ)/2 = na₁ + n(n−1)d/2</span>；等比 <span class="formula">Sₙ = a₁(1−qⁿ)/(1−q)</span>（q ≠ 1）。' }
+    ],
+    concepts: [
+      { title: '等差数列', body: '通项公式：<span class="formula">aₙ = a₁ + (n−1)d</span><br>前 n 项和：<span class="formula">Sₙ = n(a₁+aₙ)/2 = na₁ + n(n−1)d/2</span><br>性质：① 若 m+n = p+q，则 aₘ + aₙ = aₚ + a_q；② Sₙ/n 也是等差数列。' },
+      { title: '等比数列', body: '通项：<span class="formula">aₙ = a₁qⁿ⁻¹</span><br>前 n 项和：<span class="formula">Sₙ = a₁(1−qⁿ)/(1−q)</span>（q ≠ 1）；q = 1 时 Sₙ = na₁。<br>性质：若 m+n = p+q，则 aₘ·aₙ = aₚ·a_q。' },
+      { title: '判定方法', body: '判断等差：aₙ₊₁ − aₙ = d（常数）。<br>判断等比：aₙ₊₁ / aₙ = q（非零常数）。<br>中项公式：等差中项 b = (a + c)/2；等比中项 b² = ac。' },
+      { title: '求和技巧', body: '常用方法：<br>① <span class="hl">公式法</span>（等差等比直接套）<br>② <span class="hl">裂项相消</span>：1/(n(n+1)) = 1/n − 1/(n+1)<br>③ <span class="hl">错位相减</span>：等差 × 等比型<br>④ <span class="hl">分组求和</span>：拆成几部分各自求和' }
+    ],
+    pet: { name: '数列环', symbol: 'Σ' }, boss: { name: '序列之主 Sequencix', emoji: '🌌', hp: 13 }
+  },
+  {
+    id: 10, phase: '选必二', icon: "f'", title: '第十座峰 · 导数巅', sub: '瞬时变化率 · 求导 · 应用',
+    speaker: '微分宗师 Differentius',
+    story: [
+      { speaker: '微分宗师 Differentius', text: '当 Δx 趋近 0，<span class="formula">(f(x+Δx) − f(x)) / Δx</span> 的极限叫 f 在 x 处的<span class="hl">导数</span> f′(x)。' },
+      { speaker: '微分宗师 Differentius', text: '导数的几何意义：曲线 y = f(x) 在 x₀ 处的<span class="hl">切线斜率</span>。' },
+      { speaker: '微分宗师 Differentius', text: '基本导数：<span class="formula">(xⁿ)′ = n xⁿ⁻¹</span>、<span class="formula">(sin x)′ = cos x</span>、<span class="formula">(eˣ)′ = eˣ</span>、<span class="formula">(ln x)′ = 1/x</span>。' },
+      { speaker: '微分宗师 Differentius', text: 'f′ &gt; 0 ⇒ f 增；f′ &lt; 0 ⇒ f 减；<span class="hl">可导的极值点处 f′ = 0</span>。这是函数分析的利器。' }
+    ],
+    concepts: [
+      { title: '导数定义', body: '<span class="formula">f′(x₀) = lim_{Δx→0} [f(x₀+Δx) − f(x₀)] / Δx</span><br>几何意义：曲线在 (x₀, f(x₀)) 处<span class="hl">切线的斜率</span>。<br>物理意义：位置对时间的导数 = 速度；速度的导数 = 加速度。' },
+      { title: '基本求导公式', body: '<span class="formula">(C)′ = 0</span><br><span class="formula">(xⁿ)′ = n xⁿ⁻¹</span><br><span class="formula">(sin x)′ = cos x, (cos x)′ = −sin x</span><br><span class="formula">(eˣ)′ = eˣ, (aˣ)′ = aˣ ln a</span><br><span class="formula">(ln x)′ = 1/x, (log_a x)′ = 1/(x ln a)</span>' },
+      { title: '求导法则', body: '<span class="hl">和差</span>：(u ± v)′ = u′ ± v′<br><span class="hl">积</span>：(uv)′ = u′v + uv′<br><span class="hl">商</span>：(u/v)′ = (u′v − uv′)/v²<br><span class="hl">链式</span>：[f(g(x))]′ = f′(g(x)) · g′(x)' },
+      { title: '单调性与导数', body: '<span class="hl">f′(x) &gt; 0 在 (a, b) 内</span> ⇒ f 在 (a, b) 上单调递增。<br><span class="hl">f′(x) &lt; 0 在 (a, b) 内</span> ⇒ f 在 (a, b) 上单调递减。<br>临界点：f′(x) = 0 或 f′ 不存在的点。' },
+      { title: '极值与最值', body: '极值点处 f′ = 0（必要条件，不是充分）。<br>极小值：f′ 由负变正（先减后增）。<br>极大值：f′ 由正变负（先增后减）。<br>闭区间 [a, b] 上的<span class="hl">最值</span>：比较端点 a、b 和内部临界点的 f 值。' }
+    ],
+    pet: { name: '切线灵', symbol: "f'" }, boss: { name: '导数之神 Derivex', emoji: '⚡', hp: 14 }
+  },
+  {
+    id: 11, phase: '选必三', icon: 'P', title: '第十一座峰 · 概率统计', sub: '古典概型 · 随机变量 · 分布',
+    speaker: '统计之母 Bayesia',
+    story: [
+      { speaker: '统计之母 Bayesia', text: '<span class="hl">随机变量</span>：取值由随机现象决定的变量，分离散与连续两种。' },
+      { speaker: '统计之母 Bayesia', text: '<span class="hl">二项分布</span> B(n, p)：n 次独立试验，每次成功概率 p，成功次数的分布。' },
+      { speaker: '统计之母 Bayesia', text: '<span class="hl">正态分布</span> N(μ, σ²)：自然界最常见的分布，钟形曲线。<span class="formula">68−95−99.7</span> 规则。' },
+      { speaker: '统计之母 Bayesia', text: '<span class="hl">线性回归</span>：用一条直线 ŷ = bx + a 拟合两组数据，最小化平方误差。' }
+    ],
+    concepts: [
+      { title: '抽样与统计（必修）', body: '必修阶段的统计基础：<br>· <span class="hl">抽样</span>：简单随机抽样、<span class="hl">分层随机抽样</span>（按比例从各层抽取，注意样本代表性）。<br>· <span class="hl">用样本估计总体</span>：用样本的平均数/方差估计总体；画<span class="hl">频率分布直方图</span>（纵轴是"频率/组距"，各小矩形<span class="hl">面积之和 = 1</span>）。<br>· <span class="hl">成对数据</span>：散点图看相关性，<span class="hl">最小二乘法</span>求回归直线，相关系数 r（|r| 越接近 1 线性越强）。<br>（排列组合见第十二峰）' },
+      { title: '条件概率', body: '在事件 A 发生条件下 B 发生的概率：<br><span class="formula">P(B|A) = P(AB) / P(A)</span>（P(A) &gt; 0）<br>独立性：P(AB) = P(A)P(B) ⇔ A 与 B 独立 ⇔ P(B|A) = P(B)。' },
+      { title: '期望与方差', body: '离散随机变量 X 取值 x₁, …, xₙ，概率 p₁, …, pₙ：<br>期望 <span class="formula">E(X) = Σ xᵢpᵢ</span><br>方差 <span class="formula">D(X) = Σ (xᵢ − E(X))² pᵢ</span><br>标准差 σ = √D(X)。' },
+      { title: '二项分布与正态分布', body: '<span class="hl">B(n, p)</span>：E(X) = np，D(X) = np(1−p)。<br><span class="hl">N(μ, σ²)</span>：钟形对称曲线，对称轴 x = μ。<br>P(μ−σ &lt; X &lt; μ+σ) ≈ 0.683<br>P(μ−2σ &lt; X &lt; μ+2σ) ≈ 0.954<br>P(μ−3σ &lt; X &lt; μ+3σ) ≈ 0.997' },
+      { title: '线性回归', body: '回归方程 <span class="formula">ŷ = b̂ x + â</span>，其中 b̂ 是斜率、â 是截距，使残差平方和最小。<br><span class="formula">b̂ = Σ(xᵢ−x̄)(yᵢ−ȳ) / Σ(xᵢ−x̄)²</span>；â = ȳ − b̂ x̄。<br>相关系数 r：|r| 越接近 1，线性关系越强。' }
+,
+      { title: '古典概型', body: '若一次试验的样本空间 Ω 中样本点<span class="hl">有限</span>且每个样本点<span class="hl">等可能</span>，称为古典概型。<br><span class="formula">P(A) = A 含的样本点数 m / 样本点总数 n</span>。<br>例：掷均匀骰子、摸球、抽签。关键是<span class="hl">数清"总数 n"和"有利 m"</span>，必要时借助列举法、树状图或排列组合。' },
+      { title: '事件的关系与运算', body: '<span class="hl">并(和) A∪B</span>：A、B 至少一个发生；<span class="hl">交(积) A∩B</span>：A、B 同时发生。<br><span class="hl">互斥</span>：A∩B=∅（不能同时发生），此时 <span class="formula">P(A∪B)=P(A)+P(B)</span>。<br><span class="hl">对立</span>：必有且仅有一个发生，<span class="formula">P(Ā)=1−P(A)</span>。<br><span class="hl">相互独立</span>：一个发生不影响另一个，<span class="formula">P(A∩B)=P(A)·P(B)</span>。' }
+    ],
+    pet: { name: '钟形之灵', symbol: 'N' }, boss: { name: '统计之神 Bayesius', emoji: '🎲', hp: 14 }
+  },
+  {
+    id: 12, phase: '选必三', icon: 'C', title: '第十二座峰 · 计数之顶', sub: '排列 · 组合 · 二项式定理',
+    speaker: '计数大师 Combinatius',
+    story: [
+      { speaker: '计数大师 Combinatius', text: '<span class="hl">分类加法</span>原理：完成一件事有 n 类不同方法，则总数 = 各类方法数之和。' },
+      { speaker: '计数大师 Combinatius', text: '<span class="hl">分步乘法</span>原理：完成一件事需要 n 个步骤，则总数 = 各步骤方法数之积。' },
+      { speaker: '计数大师 Combinatius', text: '排列 Aₙᵐ vs 组合 Cₙᵐ：<span class="hl">有序</span>用排列，<span class="hl">无序</span>用组合。' },
+      { speaker: '计数大师 Combinatius', text: '<span class="hl">二项式定理</span>：(a+b)ⁿ 的展开式中第 k+1 项是 <span class="formula">Cₙᵏ · aⁿ⁻ᵏ · bᵏ</span>。' }
+    ],
+    concepts: [
+      { title: '两个计数原理', body: '<span class="hl">加法原理</span>（分类）：N = n₁ + n₂ + … + nₘ<br><span class="hl">乘法原理</span>（分步）：N = n₁ × n₂ × … × nₘ<br>"类用加、步用乘"。' },
+      { title: '排列数 Aₙᵐ', body: '从 n 个不同元素中取出 m 个，<span class="hl">按一定顺序</span>排成一列：<br><span class="formula">Aₙᵐ = n(n−1)…(n−m+1) = n!/(n−m)!</span><br>特殊：Aₙⁿ = n!，Aₙ⁰ = 1，0! = 1。' },
+      { title: '组合数 Cₙᵐ', body: '从 n 个不同元素中取出 m 个，<span class="hl">不计顺序</span>合为一组：<br><span class="formula">Cₙᵐ = Aₙᵐ / m! = n! / [m!(n−m)!]</span><br>关系：Cₙᵐ = Cₙⁿ⁻ᵐ；Cₙ⁰ = Cₙⁿ = 1。<br>性质：<span class="formula">Cₙᵐ + Cₙᵐ⁻¹ = Cₙ₊₁ᵐ</span>。' },
+      { title: '二项式定理', body: '<span class="formula">(a+b)ⁿ = Σₖ₌₀ⁿ Cₙᵏ aⁿ⁻ᵏ bᵏ</span><br>通项公式：<span class="formula">T_{k+1} = Cₙᵏ aⁿ⁻ᵏ bᵏ</span><br>二项式系数中间最大；具体各项大小还与 a、b 的取值有关。二项式系数和 = 2ⁿ。' }
+    ],
+    pet: { name: '计数环', symbol: 'C' }, boss: { name: '组合之神 Combinex', emoji: '🌀', hp: 12 }
+  },
+  {
+    id: 13, phase: '必修二', icon: '△', title: '第十三座峰 · 解三角形', sub: '正弦定理 · 余弦定理 · 面积',
+    speaker: '测天师 Triangulus',
+    story: [
+      { speaker: '测天师 Triangulus', text: '知道三角形的几条边、几个角，就能解出其余所有边角——这就是<span class="hl">解三角形</span>。' },
+      { speaker: '测天师 Triangulus', text: '<span class="formula">正弦定理</span>：a/sinA = b/sinB = c/sinC = 2R。遇"两角一边"或"两边及一边对角"用它。' },
+      { speaker: '测天师 Triangulus', text: '<span class="formula">余弦定理</span>：c² = a² + b² − 2ab·cosC。遇"两边夹角"求第三边、或"知三边"求角用它。' },
+      { speaker: '测天师 Triangulus', text: '再加面积法宝 <span class="formula">S = ½·ab·sinC</span>。三式在手，测山量海、航海定位皆可破解。' }
+    ],
+    concepts: [
+      { title: '正弦定理', body: '<span class="formula">a/sinA = b/sinB = c/sinC = 2R</span>（R 为外接圆半径）。<br><span class="hl">适用</span>：① 已知两角与任一边（AAS / ASA）；② 已知两边与其中一边的对角（SSA，<span class="hl">可能两解</span>，需用大边对大角验证）。' },
+      { title: '余弦定理', body: '<span class="formula">c² = a² + b² − 2ab·cosC</span>（a、b 轮换同理）。<br>变形求角：<span class="formula">cosC = (a² + b² − c²) / (2ab)</span>。<br><span class="hl">适用</span>：① 两边及夹角（SAS）求第三边；② 已知三边（SSS）求角。勾股定理是 C = 90° 的特例。' },
+      { title: '三角形面积', body: '<span class="formula">S = ½·ab·sinC = ½·bc·sinA = ½·ca·sinB</span>——已知<span class="hl">两边及其夹角</span>即可求面积。<br>已知三边时可用海伦公式 <span class="formula">S = √(p(p−a)(p−b)(p−c))</span>，p = (a+b+c)/2（了解）。' },
+      { title: '大边对大角', body: '三角形中，<span class="hl">边越大，所对的角越大</span>：<span class="formula">a &gt; b ⇔ A &gt; B ⇔ sinA &gt; sinB</span>。<br>判断 SSA 情形解的个数（0/1/2 解）时常用此性质。' },
+      { title: '内角和与诱导', body: '三角形内角和 <span class="formula">A + B + C = π</span>。<br>由此：<span class="formula">sin(A+B) = sinC</span>，<span class="formula">cos(A+B) = −cosC</span>。<br>解三角形化简时极常用——遇到 A+B 先想到换成 C。' },
+      { title: '实际测量应用', body: '把现实问题画成三角形：<br>· 测<span class="hl">不可到达</span>的距离、塔高、河宽 → 选一条可测基线 + 测角，用正弦定理；<br>· <span class="hl">航海 / 航空</span>方位角、坡度 → 余弦定理求距离。<br>关键：先把"仰角、俯角、方位角"翻译成三角形里的内角。' }
+    ],
+    pet: { name: '量角龟', symbol: '∠' }, boss: { name: '测天巨像 Trigonus', emoji: '📐', hp: 12 }
+  },
+  {
+    id: 14, phase: '必修一', icon: '∿', title: '第十四座峰 · 三角函数图象', sub: 'y=Asin(ωx+φ) · 周期 · 图象变换',
+    speaker: '波动仙 Sinusia',
+    story: [
+      { speaker: '波动仙 Sinusia', text: '给 sin 装上三个旋钮——<span class="hl">振幅 A</span>、<span class="hl">角频率 ω</span>、<span class="hl">初相 φ</span>，就得到 <span class="formula">y = Asin(ωx + φ)</span>，万千波形由此而生。' },
+      { speaker: '波动仙 Sinusia', text: '<span class="hl">A</span> 管高矮（值域 [−A, A]）；<span class="hl">ω</span> 管疏密（周期 <span class="formula">T = 2π/ω</span>）；<span class="hl">φ</span> 管左右平移。' },
+      { speaker: '波动仙 Sinusia', text: '画图用<span class="hl">五点法</span>：令 ωx+φ 依次等于 0、π/2、π、3π/2、2π，求出五个关键点，描点连成一拱。' },
+      { speaker: '波动仙 Sinusia', text: '从 y=sinx 变到 y=Asin(ωx+φ)，记住"<span class="hl">先缩后移，平移量是 φ/ω 不是 φ</span>"，这是最易错的一步。' }
+    ],
+    concepts: [
+      { title: '三个参数', body: '<span class="formula">y = Asin(ωx + φ) + k</span>（设 A &gt; 0, ω &gt; 0）。<br>· <span class="hl">A 振幅</span>：决定高矮，值域 <span class="formula">[k−A, k+A]</span>，最大值 k+A、最小值 k−A；<br>· <span class="hl">ω 角频率</span>：决定疏密；<br>· <span class="hl">φ 初相</span>：决定左右平移；k 决定上下平移。' },
+      { title: '周期 T = 2π/ω', body: 'ω 越大，波越密、周期越短。<br>· y = sin2x 的周期是 <span class="formula">π</span>；<br>· y = sin(x/2) 的周期是 <span class="formula">4π</span>。<br>（注意：y = Atan(ωx+φ) 的周期是 <span class="formula">π/ω</span>，不是 2π/ω。）' },
+      { title: '五点作图法', body: '设 <span class="formula">t = ωx + φ</span>，取 t = 0、π/2、π、3π/2、2π，反解出对应的 x 与 y，得到一个周期内的五个<span class="hl">关键点</span>：起点、最高点、中点、最低点、终点，描点连线即得图象。' },
+      { title: '图象变换顺序', body: 'y = sinx <br>→ 左移 φ：y = sin(x+φ)（φ &gt; 0 左移、φ &lt; 0 右移）<br>→ 横坐标缩为 1/ω：y = sin(ωx+φ)<br>→ 纵坐标伸缩 A 倍：y = Asin(ωx+φ)。<br><span class="hl">陷阱</span>：若先把横坐标缩为 1/ω 再平移，平移量是 <span class="formula">φ/ω</span>。' },
+      { title: '对称与单调', body: '对 y = Asin(ωx+φ)：<br>· <span class="hl">对称轴</span>过最高/最低点：<span class="formula">ωx+φ = π/2 + kπ</span>；<br>· <span class="hl">对称中心</span>是图象与中线的交点：<span class="formula">ωx+φ = kπ</span>；<br>· <span class="hl">单调增区间</span>：由 −π/2+2kπ ≤ ωx+φ ≤ π/2+2kπ 解出 x。' },
+      { title: '由图象求解析式', body: '看图反求 y = Asin(ωx+φ)+k：<br>① <span class="hl">A</span> = (最大值 − 最小值)/2；② <span class="hl">k</span> = (最大值 + 最小值)/2；③ 由周期 T 定 <span class="formula">ω = 2π/T</span>；④ 把一个已知关键点（如最高点）代入求 <span class="hl">φ</span>。' }
+    ],
+    pet: { name: '正弦海豚', symbol: '∿' }, boss: { name: '波相之灵 Harmonix', emoji: '🌊', hp: 12 }
+  }
+];
+
+// 存档
+const SAVE_KEY = "math_summit_v1";
+const defaultState = () => ({ level: 1, xp: 0, unitsCompleted: [], pets: [], totalCorrect: 0, totalWrong: 0, coins: 0, streak: 0, lastPlayedDate: '', bestStreak: 0, lastDailyDate: '', bestCombo: 0 });
+let state = (() => { try { const r = localStorage.getItem(SAVE_KEY); if (r) return Object.assign(defaultState(), JSON.parse(r)); } catch(e){} return defaultState(); })();
+function saveState() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function updateStreak() { const t = todayStr(); if (state.lastPlayedDate === t) return; if (!state.lastPlayedDate) state.streak = 1; else { const last = new Date(state.lastPlayedDate); const now = new Date(t); const diff = Math.round((now - last)/86400000); if (diff===1) state.streak++; else if (diff>1) state.streak = 1; } if (state.streak > (state.bestStreak||0)) state.bestStreak = state.streak; state.lastPlayedDate = t; saveState(); }
+function checkDailyReward() { const t = todayStr(); if (state.lastDailyDate === t) return; const r = 30 + Math.min(20, (state.streak||0)*2); state.coins = (state.coins||0) + r; state.lastDailyDate = t; saveState(); setTimeout(() => toast(`📅 今日签到 +${r} 金币`, 2500), 600); }
+
+let combo = 0;
+const PRAISES = ['漂亮!','神速!','太棒了!','完美!','🎯 命中!','🌟 天才!','⚡ 闪电!','🔥 厉害!','准!','Bingo!'];
+function randomPraise() { return pick(PRAISES); }
+function incCombo() { combo++; if (combo > (state.bestCombo||0)) { state.bestCombo = combo; saveState(); } if (combo >= 3) showComboPopup(combo); if (combo === 5) { addCoins(10); addXP(10); toast('🔥 5 连击 +10/+10'); } else if (combo === 10) { addCoins(25); addXP(25); toast('🔥🔥 10 连击 +25/+25'); } else if (combo >= 15 && combo % 5 === 0) { addCoins(50); addXP(50); toast(`🔥 ${combo} 连击 +50/+50`); } }
+function breakCombo() { if (combo >= 3) toast(`💔 ${combo} 连击中断`); combo = 0; }
+function showComboPopup(n) { const d = document.createElement('div'); d.className = 'combo-popup'; d.innerHTML = `🔥 Combo × <span style="font-size:1.4em">${n}</span>`; document.body.appendChild(d); setTimeout(() => d.remove(), 1100); }
+function toast(m, ms=1800) { const d = document.createElement('div'); d.className = 'toast-popup'; d.innerHTML = m; document.body.appendChild(d); setTimeout(() => d.remove(), ms); }
+function flashScreen(c) { const d = document.createElement('div'); d.className = 'screen-flash'; d.style.background = c; document.body.appendChild(d); setTimeout(() => d.remove(), 500); }
+function playTone(f, dur=0.1, type='sine') { try { const c = new (window.AudioContext||window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(c.destination); g.gain.setValueAtTime(0.15, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur); o.start(); o.stop(c.currentTime + dur); } catch(e) {} }
+function sndCorrect() { playTone(660, 0.1); setTimeout(() => playTone(880, 0.15), 90); }
+function sndWrong() { playTone(220, 0.2, 'square'); }
+function sndBoss() { playTone(150, 0.3, 'sawtooth'); }
+function sndVictory() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => playTone(f, 0.15), i*120)); }
+function confetti() { const colors = ['#ffd700','#26c6da','#80ed99','#ff6b6b','#ba68c8']; for (let i = 0; i < 40; i++) { const c = document.createElement('div'); c.className = 'confetti'; c.style.left = Math.random()*100+'vw'; c.style.top = '-20px'; c.style.background = colors[Math.floor(Math.random()*colors.length)]; c.style.animationDuration = (1.5+Math.random()*1.5)+'s'; c.style.animationDelay = (Math.random()*0.3)+'s'; document.body.appendChild(c); setTimeout(() => c.remove(), 3500); } }
+function xpToNext(l) { return l * 80; }
+function addXP(n) { state.xp += n; while (state.xp >= xpToNext(state.level)) { state.xp -= xpToNext(state.level); state.level++; } saveState(); }
+function addCoins(n) { state.coins = (state.coins||0) + n; saveState(); return n; }
+
+const app = document.getElementById('app');
+function render(html) { let sc = app.querySelector('.scene'); if (sc) { sc.innerHTML = html; } else { app.innerHTML = `<div class="scene">${html}</div>`; } if (typeof ensureVoiceBtn==='function') ensureVoiceBtn(); if (typeof updateKbdHint==='function') updateKbdHint(); }
+/* ===== 全局键盘系统：选择题 1-N / 数字键盘 / 继续页 Enter（按键高亮 + 浮动提示条）===== */
+function kbdFlash(btn){ if(!btn) return; btn.classList.add('keyflash'); setTimeout(function(){ btn.classList.remove('keyflash'); }, 120); }
+function kbdSceneType(){
+  if (document.querySelector('.vc-mask, .llm-mask, .chat-ov-mask')) return null;
+  if (document.querySelector('.blitz-stage, .g2048-wrap, .snk-wrap')) return null;
+  const scene = document.querySelector('.scene'); if (!scene) return null;
+  if (scene.querySelector('.num-pad')) return { type:'numpad', scene };
+  const opts = Array.prototype.slice.call(scene.querySelectorAll('.opt-grid .opt-btn')).filter(function(b){ return !b.disabled; });
+  if (opts.length) return { type:'choice', scene, opts };
+  const primaries = scene.querySelectorAll('.btn-row .primary, .primary');
+  const board = scene.querySelector('.makeN-grid, .slide-board, .magic-board, .numline-wrap, .balance-wrap, .seq-display, .term-card, .game24-cards');
+  if (primaries.length === 1 && !board) return { type:'continue', scene, primary: primaries[0] };
+  return { type:'idle', scene };
+}
+function gameKeyRouter(e){
+  const t = e.target;
+  if (t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const info = kbdSceneType(); if (!info) return;
+  const k = e.key;
+  if (info.type === 'numpad'){
+    const pad = info.scene.querySelector('.num-pad');
+    const all = Array.prototype.slice.call(pad.querySelectorAll('button'));
+    const find = function(re){ return all.find(function(b){ return re.test(b.textContent.trim()); }); };
+    let btn = null;
+    if (k.length===1 && k>='0' && k<='9') btn = all.find(function(b){ return b.textContent.trim()===k; });
+    else if (k==='Backspace') btn = find(/⌫|删除|退/);
+    else if (k==='Enter') btn = find(/✓|提交/) || info.scene.querySelector('.btn-row .primary');
+    else if (k==='-' || k==='+' || k==='_') btn = find(/±|正负/);
+    else if (k==='.') btn = find(/^·$|小数/);
+    else if (k==='Escape') btn = info.scene.querySelector('.btn-row button');
+    else return;
+    if (btn){ kbdFlash(btn); btn.click(); e.preventDefault(); }
+    return;
+  }
+  if (info.type === 'choice'){
+    if (k.length===1 && k>='1' && k<='9'){ const i=+k-1; if (i<info.opts.length){ kbdFlash(info.opts[i]); info.opts[i].click(); e.preventDefault(); } return; }
+    if (k==='Escape'){ const ex=info.scene.querySelector('.btn-row button'); if (ex){ kbdFlash(ex); ex.click(); e.preventDefault(); } return; }
+    return;
+  }
+  if (info.type === 'continue'){
+    if (k==='Enter' || k===' '){ kbdFlash(info.primary); info.primary.click(); e.preventDefault(); return; }
+    if (k==='Escape'){ const ex=info.scene.querySelector('.btn-row button:not(.primary)'); if (ex){ kbdFlash(ex); ex.click(); e.preventDefault(); } return; }
+  }
+}
+function updateKbdHint(){
+  let hint = document.getElementById('kbdHint');
+  const info = kbdSceneType();
+  let txt = '';
+  if (info){
+    if (info.type==='numpad') txt = '⌨️ <kbd>0</kbd>–<kbd>9</kbd> 输入 · <kbd>Enter</kbd> 提交 · <kbd>⌫</kbd> 删除 · <kbd>−</kbd> 正负 · <kbd>.</kbd> 小数 · <kbd>Esc</kbd> 退出';
+    else if (info.type==='choice') txt = '⌨️ 按 <kbd>1</kbd>–<kbd>'+info.opts.length+'</kbd> 选择答案 · <kbd>Esc</kbd> 退出';
+    else if (info.type==='continue') txt = '⌨️ <kbd>Enter</kbd> 继续 · <kbd>Esc</kbd> 返回';
+  }
+  if (!txt){ if (hint) hint.style.display='none'; return; }
+  if (!hint){ hint = document.createElement('div'); hint.id='kbdHint'; document.body.appendChild(hint); }
+  hint.innerHTML = txt; hint.style.display='block';
+}
+window.addEventListener('keydown', gameKeyRouter);
+function hudHtml() { const badges = PEAKS.map(p => { const o = state.unitsCompleted.includes(p.id); return `<div class="badge-slot ${o?'owned':''}" title="${p.title}">${o?p.icon:'?'}</div>`; }).join(''); return `<div class="hud"><div class="item"><span class="label">Lv.</span><span class="value">${state.level}</span></div><div class="item"><span class="label">XP</span><span class="value">${state.xp}/${xpToNext(state.level)}</span></div><div class="item"><span class="label">💰</span><span class="value">${state.coins||0}</span></div><div class="item"><div class="badges-bar">${badges}</div></div></div>`; }
+
+function sceneMenu() {
+  const hasSave = state.unitsCompleted.length > 0 || state.xp > 0;
+  render(`<div class="menu-content">
+    <h1>高中数学之巅</h1>
+    <div class="subtitle">Summit · 12 座山峰</div>
+    <div class="summit-crystal">∑</div>
+    <p style="color:var(--text-dim);margin-bottom:6px;">${PEAKS.length} 座山峰，覆盖必修与选必</p>
+    <p style="color:var(--text-dim);font-size:13px;">集合 / 函数 / 三角 / 解三角形 / 三角图象 / 向量 / 复数 / 立体 / 解析 / 数列 / 导数 / 概率 / 计数</p>
+    ${hasSave ? `<p style="margin-top:14px;color:var(--gold);">📜 Lv.${state.level} · 登顶 ${state.unitsCompleted.length}/${PEAKS.length} · 💰 ${state.coins||0}</p>` : ''}
+    ${state.streak>0 ? `<p style="margin-top:6px;color:var(--gold-soft);font-size:13px;">🔥 连续 ${state.streak} 天</p>` : ''}
+    <div class="btn-row">
+      ${hasSave?`<button class="primary" onclick="sceneMap()">继续登峰</button>`:''}
+      <button class="${hasSave?'':'primary'}" onclick="${hasSave?'confirmReset()':'sceneMap()'}">${hasSave?'重新开始':'开始登峰'}</button>
+      <button onclick="sceneFun()">🎲 奇趣馆</button><button class="ask-entry" onclick="sceneAsk()">💬 问数学家</button>
+    </div>
+  </div>`);
+}
+function confirmReset() { if (confirm('确定要清空存档？')) { state = defaultState(); saveState(); sceneMap(); } else sceneMap(); }
+function sceneMap() {
+  const grouped = {};
+  PEAKS.forEach(p => (grouped[p.phase] = grouped[p.phase] || []).push(p));
+  const sections = Object.keys(grouped).map(phase => {
+    const done = grouped[phase].filter(p => state.unitsCompleted.includes(p.id)).length;
+    const cards = grouped[phase].map(p => {
+      const c = state.unitsCompleted.includes(p.id);
+      const lk = p.id > 1 && !state.unitsCompleted.includes(p.id - 1);
+      return `<div class="peak-card ${c?'completed':''} ${lk?'locked':''}" ${lk?'':`onclick="startPeak(${p.id})"`}>${c?'<div class="peak-check">✓</div>':''}<div class="peak-num ${lk?'locked-num':''}">${lk?'🔒':p.id}</div><div class="peak-icon">${p.icon}</div><div class="peak-info"><div class="peak-title">${p.title}</div><div class="peak-sub">${p.sub}</div></div></div>`;
+    }).join('');
+    return `<div class="phase-section"><h3 class="phase-header">⛰️ ${phase} <span style="color:var(--text-dim);font-size:13px;">(${done}/${grouped[phase].length})</span></h3><div class="peak-grid">${cards}</div></div>`;
+  }).join('');
+  render(`${hudHtml()}<h2>🏔️ 高中数学之巅 · 12 座峰</h2><div class="peak-map">${sections}</div><div class="btn-row"><button onclick="sceneMenu()">主菜单</button></div>`);
+}
+
+let currentPeak = null, storyStep = 0;
+function startPeak(id) { currentPeak = PEAKS.find(p => p.id === id); storyStep = 0; sceneStory(); }
+function sceneStory() {
+  const p = currentPeak;
+  const dialogues = p.story.slice(0, storyStep+1).map((d, i) => `<div class="dialogue"><div class="speaker">${d.speaker}${i===storyStep?` <button class="speak-btn" onclick="speakStoryLine(${i})">🔊</button>`:''}</div><div class="text">${d.text}</div></div>`).join('');
+  const last = storyStep >= p.story.length - 1;
+  render(`${hudHtml()}<h2>${p.icon} ${p.title}</h2><div class="story-box">${dialogues}</div><div class="btn-row">${last?`<button class="primary" onclick="sceneConcepts()">概念图谱 →</button>`:`<button class="primary" onclick="storyStep++;sceneStory()">继续 →</button>`}<button onclick="sceneMap()">返回</button></div>`);
+  if (typeof speech !== 'undefined' && speech.on) { const d = p.story[storyStep]; if (d) speech.speak(`${d.speaker}：${d.text}`); }
+}
+function speakStoryLine(i) { const d = currentPeak && currentPeak.story && currentPeak.story[i]; if (d) speech.speak(`${d.speaker}：${d.text}`); }
+function sceneConcepts() {
+  const p = currentPeak;
+  window._curConcepts = p.concepts;
+  const cards = p.concepts.map((c, i) => `<div class="concept-card"><div class="concept-title">📖 ${c.title} <button class="speak-btn" onclick="speakConcept(${i})">🔊</button></div><div class="concept-body">${c.body}</div></div>`).join('');
+  render(`${hudHtml()}<h2>📚 ${p.title} · 概念</h2><div style="flex:1;overflow-y:auto;padding:4px;">${cards}</div><div class="btn-row"><button onclick="sceneStory()">← 故事</button><button onclick="speakAllConcepts()">🔊 全部</button><button class="primary" onclick="startQuiz()">开始练习 →</button></div>`);
+}
+function speakConcept(i) { const k = window._curConcepts && window._curConcepts[i]; if (k) speech.speak(`${k.title}。${k.body}`); }
+function speakAllConcepts() { if (!window._curConcepts) return; speech.speak(window._curConcepts.map(k => `${k.title}。${k.body}`).join('。 下一个：')); }
+
+// 选择题安全网：去重 + 保证答案在选项内 + 重新洗牌（练习与 BOSS 共用）
+function fixChoice(o) {
+  if (o && Array.isArray(o.opts)) {
+    const seen = new Set();
+    const uniq = [];
+    for (const x of o.opts) { const k = String(x); if (!seen.has(k)) { seen.add(k); uniq.push(x); } }
+    if (o.answer !== undefined && o.answer !== null && !seen.has(String(o.answer))) uniq.push(o.answer);
+    o.opts = shuffle(uniq);
+  }
+  return o;
+}
+// 通用 quickChoice + numPad
+let qcState = null;
+function quickChoice(cfg) {
+  fixChoice(cfg);
+  qcState = { cfg, submitted: false };
+  const opts = cfg.opts.map((o,i) => `<button class="opt-btn" onclick="qcPick(${i})">${o}</button>`).join('');
+  render(`${hudHtml()}<h2>${cfg.title}</h2><div class="q-progress">${cfg.progress}</div>${cfg.extraHtml||''}<div class="q-expr">${cfg.q}</div>${cfg.hint?`<div class="q-hint">💡 ${cfg.hint}</div>`:''}<div class="opt-grid">${opts}</div><div class="feedback" id="fb"></div><div class="btn-row"><button onclick="sceneMap()">退出</button></div>`);
+}
+function qcPick(idx) {
+  const s = qcState; if (s.submitted) return; s.submitted = true;
+  const picked = s.cfg.opts[idx]; const ok = picked === s.cfg.answer;
+  const btns = document.querySelectorAll('.opt-btn'); btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (ok) { btns[idx].classList.add('correct'); fb.innerHTML = `✓ ${randomPraise()}`; fb.className = 'feedback correct'; sndCorrect(); flashScreen('rgba(128,237,153,0.25)'); addXP(5); addCoins(6); incCombo(); state.totalCorrect++; }
+  else { btns[idx].classList.add('wrong'); btns.forEach(b => { if (b.textContent === s.cfg.answer) b.classList.add('correct'); }); fb.innerHTML = `✗ 正确：<span style="color:var(--gold)">${s.cfg.answer}</span>`; fb.className = 'feedback wrong'; sndWrong(); flashScreen('rgba(255,107,107,0.25)'); state.totalWrong++; breakCombo(); }
+  saveState(); setTimeout(() => s.cfg.onDone(ok), 1500);
+}
+let npState = null;
+function numPadAnswer(cfg) { npState = { cfg, current: '', submitted: false }; renderNumPad(); }
+function renderNumPad() {
+  const s = npState; const cfg = s.cfg;
+  const disp = s.current === '' ? '_ _ _' : s.current;
+  render(`${hudHtml()}<h2>${cfg.title}</h2><div class="q-progress">${cfg.progress}</div><div class="q-expr">${cfg.q}</div>${cfg.hint?`<div class="q-hint">💡 ${cfg.hint}</div>`:''}<div class="num-display ${s.current===''?'empty':''}">${disp}</div><div class="num-pad"><button onclick="npPress('7')">7</button><button onclick="npPress('8')">8</button><button onclick="npPress('9')">9</button><button class="fn" onclick="npPress('-')">±</button><button onclick="npPress('4')">4</button><button onclick="npPress('5')">5</button><button onclick="npPress('6')">6</button><button class="fn" onclick="npPress('.')">·</button><button onclick="npPress('1')">1</button><button onclick="npPress('2')">2</button><button onclick="npPress('3')">3</button><button class="clear" onclick="npClear()">⌫</button><button onclick="npPress('0')">0</button><button class="submit" onclick="npSubmit()">✓ 提交</button></div><div class="feedback" id="fb"></div><div class="btn-row"><button onclick="sceneMap()">退出</button></div>`);
+}
+function npPress(ch) {
+  const s = npState; if (s.submitted) return;
+  if (ch === '-') { if (s.current.startsWith('-')) s.current = s.current.slice(1); else if (s.current === '') s.current = '-'; else s.current = '-' + s.current; }
+  else if (ch === '.') { if (s.current === '' || s.current === '-') s.current += '0.'; else if (!s.current.includes('.')) s.current += '.'; }
+  else { if (s.current === '0') s.current = ch; else if (s.current === '-0') s.current = '-' + ch; else s.current += ch; }
+  const d = document.querySelector('.num-display'); if (d) { d.textContent = s.current||'_ _ _'; d.classList.toggle('empty', s.current === ''); }
+}
+function npClear() { const s = npState; if (s.submitted) return; s.current = s.current.slice(0, -1); const d = document.querySelector('.num-display'); if (d) { d.textContent = s.current||'_ _ _'; d.classList.toggle('empty', s.current===''); } }
+function npSubmit() {
+  const s = npState; if (s.submitted) return;
+  if (s.current === '' || s.current === '-' || s.current === '0.') return;
+  s.submitted = true;
+  const val = parseFloat(s.current);
+  const ok = Math.abs(val - s.cfg.expected) < 1e-6;
+  const fb = document.getElementById('fb');
+  if (ok) { fb.innerHTML = `✓ ${randomPraise()}`; fb.className = 'feedback correct'; sndCorrect(); flashScreen('rgba(128,237,153,0.25)'); addXP(5); addCoins(6); incCombo(); state.totalCorrect++; }
+  else { fb.innerHTML = `✗ 正确答案：<span style="color:var(--gold);font-size:22px;">${s.cfg.expected}</span>`; fb.className = 'feedback wrong'; sndWrong(); flashScreen('rgba(255,107,107,0.25)'); state.totalWrong++; breakCombo(); }
+  saveState(); setTimeout(() => s.cfg.onDone(ok), 1500);
+}
+
+// 题型生成器（每峰一组）
+const QUIZ_BANK = {
+  1: [
+    () => { const a = pick([{q:'A = {1,2,3}, B = {2,3,4}, A ∩ B = ?', opts:['{2,3}','{1,2,3,4}','{1,4}','{}'], a:'{2,3}'},{q:'A = {1,2}, B = {3,4}, A ∪ B = ?', opts:['{1,2,3,4}','{}','{1,2}','{3,4}'], a:'{1,2,3,4}'},{q:'U={1,2,3,4,5}, A={2,3}, ∁ᵤA = ?', opts:['{1,4,5}','{2,3}','{4,5}','{}'], a:'{1,4,5}'}]); return { q: a.q, opts: shuffle(a.opts), answer: a.a }; },
+    () => { const a = pick([{q:'∅ ⊆ {1,2}?', opts:['是','不是','无法判断','只在 ∅ 时'], a:'是'},{q:'集合 {1,2,3} 的真子集有几个？', opts:['7','8','6','5'], a:'7'},{q:'"x > 3" 是 "x > 5" 的什么条件？', opts:['必要不充分','充分不必要','充要','既不充分也不必要'], a:'必要不充分'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'命题"∀x∈ℝ, x²≥0"的否定是？', opts:['∃x₀∈ℝ, x₀²<0','∃x₀∈ℝ, x₀²≥0','∀x∈ℝ, x²<0','∀x∈ℝ, x²>0'], a:'∃x₀∈ℝ, x₀²<0'},{q:'∁(A ∩ B) 等于？', opts:['∁A ∪ ∁B','∁A ∩ ∁B','A ∪ B','A − B'], a:'∁A ∪ ∁B'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  2: [
+    () => { const a = pick([{q:'函数 y = √(x-2) 的定义域是？', opts:['x ≥ 2','x > 2','x ≤ 2','x ≠ 2'], a:'x ≥ 2'},{q:'y = 1/(x-3) 的定义域是？', opts:['x ≠ 3','x > 3','x ≥ 3','x ≤ 3'], a:'x ≠ 3'},{q:'y = lg(x+1) 的定义域是？', opts:['x > -1','x ≥ -1','x < -1','x ≠ -1'], a:'x > -1'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'下列哪个是奇函数？', opts:['y = x³','y = x²','y = |x|','y = x + 1'], a:'y = x³'},{q:'下列哪个是偶函数？', opts:['y = x²','y = x³','y = x','y = 1/x'], a:'y = x²'},{q:'y = sin x 是？', opts:['奇函数','偶函数','非奇非偶','既奇又偶'], a:'奇函数'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'y = x² 在 [0, +∞) 上是？', opts:['单调递增','单调递减','先增后减','先减后增'], a:'单调递增'},{q:'y = 1/x 在 (0, +∞) 上是？', opts:['单调递减','单调递增','先增后减','无单调性'], a:'单调递减'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'x² − 5x + 6 > 0 的解集是？', opts:['x < 2 或 x > 3','2 < x < 3','x > 3','全体实数'], a:'x < 2 或 x > 3'},{q:'x² − 4 < 0 的解集是？', opts:['−2 < x < 2','x < −2 或 x > 2','x > 2','x < 2'], a:'−2 < x < 2'},{q:'基本不等式 a + b ≥ 2√(ab) 取等号的条件是？', opts:['a = b','a > b','ab = 1','a + b = 0'], a:'a = b'},{q:'x > 0 时，x + 1/x 的最小值是？', opts:['2','1','0','4'], a:'2'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'函数 f(x) = x² − 5x + 6 的零点个数是？', e:2},{q:'函数 f(x) = x² − 4 的零点个数是？', e:2},{q:'函数 f(x) = x² + 1 的零点个数是？', e:0},{q:'函数 f(x) = x² − 6x + 9 的零点个数是？', e:1},{q:'函数 f(x) = x² − 2x − 3 较大的零点是？', e:3}]); return { q:a.q, hint:'零点即 f(x)=0 的根；二次看判别式 Δ', expected:a.e }; },
+    () => { const a = pick([{q:'若 f 在 [a,b] 上连续且 f(a)·f(b) < 0，则 (a,b) 内？', opts:['至少有一个零点','恰有一个零点','一定没有零点','一定有两个零点'], a:'至少有一个零点'},{q:'"函数的零点"等价于下列哪个？', opts:['方程 f(x)=0 的根','函数的最大值','导数为 0 的点','图象的对称轴'], a:'方程 f(x)=0 的根'},{q:'二分法求近似解，每一步把含零点的区间？', opts:['对半缩小','扩大一倍','保持不变','随机选取'], a:'对半缩小'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  3: [
+    () => { const a = pick([{q:'log₂ 8 = ?', e:3},{q:'log₃ 27 = ?', e:3},{q:'log₁₀ 100 = ?', e:2},{q:'log₂ 16 = ?', e:4},{q:'log₅ 25 = ?', e:2}]); return { q:a.q, expected:a.e }; },
+    () => { const k = rnd(2,4); return { q:`2^${k} = ?`, expected: Math.pow(2,k) }; },
+    () => { const a = pick([{q:'lg 100 + lg 10 = ?', e:3},{q:'log₂ 4 + log₂ 8 = ?', e:5},{q:'log₃ 9 - log₃ 3 = ?', e:1}]); return { q:a.q, expected:a.e }; },
+    () => { const a = pick([{q:'指数函数 y = aˣ 的图像必过点？', opts:['(0, 1)','(1, 0)','(1, 1)','(0, 0)'], a:'(0, 1)'},{q:'对数函数 y = log_a x 的图像必过点？', opts:['(1, 0)','(0, 1)','(0, 0)','(a, 1)'], a:'(1, 0)'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  4: [
+    () => { const a = pick([{q:'30° 等于多少弧度？', opts:['π/6','π/3','π/4','π/2'], a:'π/6'},{q:'90° 等于多少弧度？', opts:['π/2','π','π/3','π/4'], a:'π/2'},{q:'180° 等于多少弧度？', opts:['π','2π','π/2','3π/2'], a:'π'},{q:'60° 等于多少弧度？', opts:['π/3','π/6','π/4','2π/3'], a:'π/3'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([['sin 30°','1/2'],['cos 60°','1/2'],['sin 45°','√2/2'],['cos 30°','√3/2'],['tan 45°','1']]); const pool = ['1/2','√2/2','√3/2','1','√3','√3/3']; const others = pool.filter(v => v !== a[1]); return { q:`${a[0]} = ?`, opts: shuffle([a[1], ...shuffle(others).slice(0,3)]), answer: a[1] }; },
+    () => { const a = pick([{q:'sin²θ + cos²θ = ?', opts:['1','0','2','sin 2θ'], a:'1'},{q:'sin 2α = ?', opts:['2 sin α cos α','sin α cos α','2 cos α','cos²α - sin²α'], a:'2 sin α cos α'},{q:'cos 2α 不等于哪个？', opts:['2 sin α cos α','cos²α - sin²α','2 cos²α - 1','1 - 2 sin²α'], a:'2 sin α cos α'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  5: [
+    () => { const x1=rnd(-5,5)||1, y1=rnd(-5,5)||2, x2=rnd(-5,5)||3, y2=rnd(-5,5)||4; return { q:`a⃗=(${x1},${y1}), b⃗=(${x2},${y2})，a⃗ + b⃗ = ?`, opts: shuffle([`(${x1+x2},${y1+y2})`,`(${x1-x2},${y1-y2})`,`(${x1*x2},${y1*y2})`,`(${x1+x2},${y1-y2})`]), answer: `(${x1+x2},${y1+y2})` }; },
+    () => { const x=rnd(-5,5)||3, y=rnd(-5,5)||4; const m = Math.sqrt(x*x+y*y); if (!Number.isInteger(m)) return { q:`向量 (3, 4) 的模 = ?`, expected: 5 }; return { q:`向量 (${x}, ${y}) 的模 = ?`, expected: m }; },
+    () => { const x1=rnd(1,5), y1=rnd(1,5), x2=rnd(1,5), y2=rnd(1,5); const d = x1*x2 + y1*y2; return { q:`a⃗=(${x1},${y1}), b⃗=(${x2},${y2})，a⃗ · b⃗ = ?`, expected: d }; },
+    () => { const a = pick([{q:'两向量垂直的充要条件是？', opts:['数量积为 0','模相等','方向相同','和为零向量'], a:'数量积为 0'},{q:'两向量平行（共线）的充要条件是？', opts:['存在 λ 使 a⃗ = λb⃗','数量积为 0','模相等','和为零向量'], a:'存在 λ 使 a⃗ = λb⃗'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  6: [
+    () => { const a = pick([{q:'i² = ?', e:-1},{q:'i⁴ = ?', e:1},{q:'i³ = ?', opts:['-i','i','1','-1'], a:'-i'}]); if (a.opts) return { q:a.q, opts:shuffle(a.opts), answer:a.a }; return { q:a.q, expected:a.e }; },
+    () => { const a=rnd(-5,5)||1, b=rnd(-5,5)||2; return { q:`复数 ${a} + ${b}i 的实部是？`, expected: a }; },
+    () => { const a=rnd(-5,5)||1, b=rnd(-5,5)||2; const f=(re,im)=>`${re} ${im<0?'−':'+'} ${Math.abs(im)}i`; return { q:`复数 ${f(a,b)} 的共轭复数是？`, opts: shuffle([f(a,-b), f(a,b), f(-a,-b), f(-a,b)]), answer: f(a,-b) }; },
+    () => { const a = pick([3, 4, 5]); const b = a === 3 ? 4 : (a === 4 ? 3 : 12); return { q:`复数 ${a} + ${b}i 的模 = ?`, expected: Math.sqrt(a*a+b*b) }; }
+  ],
+  7: [
+    () => { const r = rnd(2,5); return { q:`半径 ${r} 的球的体积 = ? × π（保留两位小数）`, hint: 'V = (4/3)πr³', expected: +((4/3)*r*r*r).toFixed(2) }; },
+    () => { const r=rnd(2,6), h=rnd(2,8); return { q:`底面半径 ${r}、高 ${h} 的圆柱体积 = ? × π`, hint: 'V = πr²h', expected: r*r*h }; },
+    () => { const r=rnd(2,6), h=rnd(2,8); return { q:`底面半径 ${r}、高 ${h} 的圆锥体积 = ? × π`, hint: 'V = πr²h/3', expected: +(r*r*h/3).toFixed(2) }; },
+    () => { const a = pick([{q:'空间中两直线的位置关系不可能是？', opts:['同向','相交','平行','异面'], a:'同向'},{q:'线面平行的判定需要？', opts:['面外直线与面内一直线平行','面外直线与面内任意直线平行','面外直线垂直于面','面外直线在面内'], a:'面外直线与面内一直线平行'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'空间向量 a = (1, 2, 2) 的模 |a| = ?', opts:['3','5','√5','9'], a:'3'},{q:'a = (1, 0, 0), b = (0, 1, 0)，a · b = ?', opts:['0','1','2','3'], a:'0'},{q:'两平面的法向量满足 n₁ · n₂ = 0，则这两个平面？', opts:['垂直','平行','重合','相交成 45°'], a:'垂直'},{q:'斜二测画法中，平行于 y 轴的线段长度要？', opts:['减半','不变','加倍','变成原来的 √2 倍'], a:'减半'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  8: [
+    () => { const x1=rnd(-3,3), y1=rnd(-3,3), x2=rnd(-3,3)+5, y2=rnd(-3,3)+5; const k=(y2-y1)/(x2-x1); if (!Number.isInteger(k)) return { q:`过 (0,0) 和 (2,4) 的直线斜率 k = ?`, expected: 2 }; return { q:`过 (${x1}, ${y1}) 和 (${x2}, ${y2}) 的直线斜率 k = ?`, expected: k }; },
+    () => { const a=rnd(-5,5)||2, b=rnd(-5,5)||3, r=rnd(2,6); const t=(v)=>`${v<0?'+':'−'} ${Math.abs(v)}`; return { q:`圆 (x ${t(a)})² + (y ${t(b)})² = ${r*r}，圆心 = ?`, opts: shuffle([`(${a}, ${b})`, `(${-a}, ${-b})`, `(${a}, ${-b})`, `(${-a}, ${b})`]), answer: `(${a}, ${b})` }; },
+    () => { const a = pick([{q:'椭圆 x²/9 + y²/4 = 1 的长半轴 a = ?', e:3},{q:'椭圆 x²/16 + y²/9 = 1 的短半轴 b = ?', e:3},{q:'抛物线 y² = 4x 的焦点在哪一象限的轴上？', opts:['正 x 轴上','负 x 轴上','正 y 轴上','负 y 轴上'], a:'正 x 轴上'}]); if (a.opts) return { q:a.q, opts:shuffle(a.opts), answer:a.a }; return { q:a.q, expected:a.e }; },
+    () => { const a = pick([{q:'两条斜率都存在的直线垂直的充要条件是？', opts:['k₁·k₂ = -1','k₁ = k₂','k₁ + k₂ = 0','b₁ = b₂'], a:'k₁·k₂ = -1'},{q:'椭圆离心率 e 的范围？', opts:['0 < e < 1','e > 1','e = 1','e < 0'], a:'0 < e < 1'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  9: [
+    () => { const a1=rnd(1,5), d=rnd(2,5), n=rnd(3,10); const an = a1+(n-1)*d; return { q:`等差数列 a₁=${a1}, d=${d}，a${n} = ?`, expected: an }; },
+    () => { const a1=rnd(1,5), q=rnd(2,3), n=rnd(2,5); const an = a1*Math.pow(q, n-1); return { q:`等比数列 a₁=${a1}, q=${q}，a${n} = ?`, expected: an }; },
+    () => { const a1=rnd(1,5), d=rnd(1,5), n=rnd(3,8); const sn = n*a1 + n*(n-1)*d/2; return { q:`等差数列 a₁=${a1}, d=${d}，S${n} = ?`, expected: sn }; },
+    () => { const a = pick([{q:'判断 1,3,5,7,9,… 是？', opts:['等差数列','等比数列','常数列','非数列'], a:'等差数列'},{q:'判断 2,4,8,16,… 是？', opts:['等比数列','等差数列','常数列','非数列'], a:'等比数列'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  10: [
+    () => { const n=rnd(2,6); return { q:`(x^${n})' = ?`, opts: shuffle([`${n}x^${n-1}`, `x^${n-1}`, `${n}x^${n}`, `${n-1}x^${n}`]), answer: `${n}x^${n-1}` }; },
+    () => { const a = pick([{q:"(sin x)' = ?", opts:['cos x','-cos x','sin x','-sin x'], a:'cos x'},{q:"(cos x)' = ?", opts:['-sin x','sin x','cos x','-cos x'], a:'-sin x'},{q:"(eˣ)' = ?", opts:['eˣ','x eˣ⁻¹','xeˣ','1'], a:'eˣ'},{q:"(ln x)' = ?", opts:['1/x','x','-1/x','x ln x'], a:'1/x'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a=rnd(2,8), b=rnd(-5,5); return { q:`f(x) = ${a}x² + ${b}x，f'(x) = ?`, opts: shuffle([`${2*a}x + ${b}`, `${a}x + ${b}`, `${a}x² + ${b}`, `${2*a}x`]), answer: `${2*a}x + ${b}` }; },
+    () => { const a = pick([{q:"可导函数在极值点处 f'(x) = ?", opts:['0','正数','负数','不存在'], a:'0'},{q:"f'(x) > 0 在 (a,b) 内说明 f 在 (a,b) 上？", opts:['单调递增','单调递减','常数','无单调性'], a:'单调递增'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  11: [
+    () => { const a = pick([{q:'掷一枚均匀骰子，点数为 6 的概率？', opts:['1/6','1/3','1/2','5/6'], a:'1/6'},{q:'掷两枚骰子，点数和为 7 的概率？', opts:['1/6','1/12','1/4','1/3'], a:'1/6'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const n=rnd(5,10), p=pick([0.3,0.4,0.5]); return { q:`X ~ B(${n}, ${p})，则 E(X) = ?`, hint: 'E(X) = np', expected: n*p }; },
+    () => { const a = pick([{q:'X ~ N(μ, σ²)，P(μ-σ < X < μ+σ) ≈ ?', opts:['0.683','0.954','0.997','0.5'], a:'0.683'},{q:'X ~ N(μ, σ²)，P(μ-2σ < X < μ+2σ) ≈ ?', opts:['0.954','0.683','0.997','0.5'], a:'0.954'},{q:'条件概率 P(B|A) = ?', opts:['P(AB)/P(A)','P(A)/P(B)','P(A)P(B)','P(A∪B)'], a:'P(AB)/P(A)'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'掷一枚均匀骰子，出现偶数点的概率？', opts:['1/2','1/3','1/6','2/3'], a:'1/2'},{q:'掷一枚均匀骰子，点数大于 4 的概率？', opts:['1/3','1/2','1/6','2/3'], a:'1/3'},{q:'袋中有 3 红 2 白共 5 球，任取 1 个是红球的概率？', opts:['3/5','2/5','1/2','3/2'], a:'3/5'},{q:'从 1,2,3,4 中任取两个不同的数，和为奇数的概率？', opts:['2/3','1/2','1/3','1/6'], a:'2/3'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'事件 A 与 B 互斥，则 P(A∪B) = ?', opts:['P(A)+P(B)','P(A)·P(B)','P(A)−P(B)','1'], a:'P(A)+P(B)'},{q:'事件 A 的对立事件 Ā 满足 P(Ā) = ?', opts:['1−P(A)','P(A)−1','1/P(A)','1'], a:'1−P(A)'},{q:'A 与 B 相互独立，则 P(A∩B) = ?', opts:['P(A)·P(B)','P(A)+P(B)','0','P(A)'], a:'P(A)·P(B)'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  12: [
+    () => { const n=rnd(5,8), m=rnd(2,3); let A=1; for(let i=0;i<m;i++) A*=(n-i); return { q:`A_${n}^${m} = ?`, expected: A }; },
+    () => { const n=rnd(5,8), m=rnd(2,3); function fact(k){let r=1;for(let i=2;i<=k;i++)r*=i;return r;} const C = fact(n)/(fact(m)*fact(n-m)); return { q:`C_${n}^${m} = ?`, expected: C }; },
+    () => { const a = pick([{q:'C₅⁰ = ?', e:1},{q:'C₅⁵ = ?', e:1},{q:'A₃³ = ?', e:6},{q:'4! = ?', e:24},{q:'5! = ?', e:120}]); return { q:a.q, expected:a.e }; },
+    () => { const a = pick([{q:'(a+b)ⁿ 展开中第 (k+1) 项是？', opts:['Cₙᵏ aⁿ⁻ᵏ bᵏ', 'Cₙᵏ aᵏ bⁿ⁻ᵏ', 'aⁿ⁻ᵏ bᵏ', 'n! aⁿ⁻ᵏ bᵏ'], a:'Cₙᵏ aⁿ⁻ᵏ bᵏ'},{q:'二项式系数之和 ΣCₙᵏ (k=0..n) = ?', opts:['2ⁿ','nⁿ','n!','n²'], a:'2ⁿ'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  13: [
+    () => { const a = pick([{x:3,y:5,deg:120,c:7},{x:5,y:8,deg:60,c:7},{x:3,y:8,deg:60,c:7},{x:7,y:8,deg:120,c:13},{x:5,y:16,deg:120,c:19}]); return { q:`在 △ABC 中，a = ${a.x}，b = ${a.y}，夹角 C = ${a.deg}°，则边 c = ?`, hint: '余弦定理 c² = a² + b² − 2ab·cosC（cos60°=½, cos120°=−½）', expected: a.c }; },
+    () => { const a = pick([{x:4,y:6,deg:30,s:6},{x:8,y:10,deg:30,s:20},{x:6,y:10,deg:30,s:15},{x:3,y:4,deg:90,s:6},{x:5,y:6,deg:90,s:15},{x:4,y:6,deg:150,s:6}]); return { q:`在 △ABC 中，a = ${a.x}，b = ${a.y}，夹角 C = ${a.deg}°，则三角形面积 S = ?`, hint: 'S = ½·ab·sinC（sin30°=½, sin90°=1, sin150°=½）', expected: a.s }; },
+    () => { const a = pick([{q:'在 △ABC 中，A = 30°，a = 1，B = 90°，则 b = ?', opts:['2','1','√3','½'], a:'2'},{q:'在 △ABC 中，a = 2，b = 3，则 A 与 B 的大小关系是？', opts:['A < B','A > B','A = B','无法确定'], a:'A < B'},{q:'正弦定理 a/sinA = b/sinB = c/sinC 等于？', opts:['2R（外接圆半径）','R','πR','S'], a:'2R（外接圆半径）'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'已知"两边及其夹角"求第三边，应用？', opts:['余弦定理','正弦定理','面积公式','勾股定理'], a:'余弦定理'},{q:'已知"两角及一边"求其余边，应用？', opts:['正弦定理','余弦定理','海伦公式','两点距离公式'], a:'正弦定理'},{q:'余弦定理 c² = a² + b² − 2ab·cosC 当 C = 90° 时变为？', opts:['c² = a² + b²（勾股定理）','c² = a² − b²','c = a + b','c² = 2ab'], a:'c² = a² + b²（勾股定理）'},{q:'在 △ABC 中 A + B + C = π，故 sin(A+B) = ?', opts:['sinC','−sinC','cosC','sinA'], a:'sinC'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ],
+  14: [
+    () => { const a = pick([{q:'y = 3sin(2x + 1) 的振幅 A = ?', e:3},{q:'y = 5sin(x/2 − 1) 的振幅 A = ?', e:5},{q:'y = 4sinx + 2 的最大值 = ?', e:6},{q:'y = 2sinx − 1 的最小值 = ?', e:-3},{q:'y = 3sinx + 1 的最大值 = ?', e:4},{q:'图象最高点 y = 3、最低点 y = −1，则振幅 A =(max−min)/2 = ?', e:2}]); return { q:a.q, hint:'振幅 A=|A|；最大值 k+A、最小值 k−A', expected:a.e }; },
+    () => { const a = pick([{q:'y = sin2x 的最小正周期是？', opts:['π','2π','π/2','4π'], a:'π'},{q:'y = sin(x/2) 的最小正周期是？', opts:['4π','2π','π','π/2'], a:'4π'},{q:'y = sin3x 的最小正周期是？', opts:['2π/3','3π','2π','π/3'], a:'2π/3'},{q:'y = 2sin(2x + 1) 的最小正周期是？', opts:['π','2π','π/2','1'], a:'π'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'把 y = sinx 的图象向左平移 π/3，得到？', opts:['y = sin(x + π/3)','y = sin(x − π/3)','y = sinx + π/3','y = sin(πx/3)'], a:'y = sin(x + π/3)'},{q:'y = Asin(ωx + φ) 中，决定周期的是？', opts:['ω','A','φ','k'], a:'ω'},{q:'y = Asin(ωx + φ) 中，决定值域的是？', opts:['A','ω','φ','x'], a:'A'},{q:'由 y = sinx 先把横坐标缩为 1/2、再左移得 y = sin(2x + π/3)，则平移量是？', opts:['π/6','π/3','2π/3','π'], a:'π/6'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; },
+    () => { const a = pick([{q:'五点法画 y = Asin(ωx+φ) 时，令 ωx+φ 依次取？', opts:['0, π/2, π, 3π/2, 2π','0, 1, 2, 3, 4','0, π, 2π, 3π, 4π','−π, 0, π, 2π, 3π'], a:'0, π/2, π, 3π/2, 2π'},{q:'y = Asin(ωx+φ) 的对称轴满足 ωx+φ = ?', opts:['π/2 + kπ','kπ','2kπ','π/4 + kπ'], a:'π/2 + kπ'},{q:'某正弦型函数最大值 3、最小值 −1，则振幅 A 与中线 k 为？', opts:['A = 2, k = 1','A = 1, k = 2','A = 3, k = 0','A = 4, k = 1'], a:'A = 2, k = 1'},{q:'y = Asin(ωx+φ) 的最小正周期 T = π，则 ω = ?', opts:['2','1','π','½'], a:'2'}]); return { q:a.q, opts:shuffle(a.opts), answer:a.a }; }
+  ]
+};
+
+let quizIdx = 0, quizCorrect = 0; const quizTotal = 7;
+function startQuiz() { quizIdx = 0; quizCorrect = 0; nextQuizQ(); }
+function nextQuizQ() {
+  if (quizIdx >= quizTotal) return finishStage();
+  const gens = QUIZ_BANK[currentPeak.id]; const Q = pick(gens)();
+  const t = `🎯 ${currentPeak.title} · ${quizIdx+1}/${quizTotal}`;
+  if (Q.expected !== undefined) {
+    numPadAnswer({ title: t, progress: '已答对 ' + quizCorrect, q: Q.q, hint: Q.hint||'', expected: Q.expected, onDone: ok => { if (ok) quizCorrect++; quizIdx++; nextQuizQ(); } });
+  } else {
+    quickChoice({ title: t, progress: '已答对 ' + quizCorrect, q: Q.q, hint: Q.hint||'', opts: Q.opts, answer: Q.answer, onDone: ok => { if (ok) quizCorrect++; quizIdx++; nextQuizQ(); } });
+  }
+}
+function finishStage() {
+  const pass = quizCorrect >= Math.ceil(quizTotal * 0.6);
+  render(`${hudHtml()}<h2>${pass?'🎉 练习通过！':'🤔 再练一遍'}</h2><div class="concept-card" style="text-align:center;"><div style="font-size:64px;">${pass?'✨':'📖'}</div><p style="font-size:20px;margin:12px 0;">答对 <span style="color:var(--gold);font-size:28px;">${quizCorrect}</span> / ${quizTotal}</p></div><div class="btn-row">${pass?`<button class="primary" onclick="startBoss()">⚔️ BOSS →</button><button onclick="startQuiz()">再练</button>`:`<button onclick="sceneConcepts()">← 概念</button><button class="primary" onclick="startQuiz()">再来</button>`}</div>`);
+}
+
+// Boss 战
+let bossHp = 0, bossMax = 0, playerHp = 100, bossQ = null;
+function startBoss() { bossMax = currentPeak.boss.hp; bossHp = bossMax; playerHp = 100; sndBoss(); nextBoss(); }
+function nextBoss() {
+  if (bossHp <= 0) return sceneVictory();
+  if (playerHp <= 0) return sceneDefeat();
+  const gens = QUIZ_BANK[currentPeak.id];
+  const Q = pick(gens)();
+  if (Q.expected !== undefined) {
+    // 把数字键盘题转成选择题
+    const ans = String(Q.expected);
+    bossQ = { q: Q.q, opts: shuffle([ans, String(Q.expected + pick([-3,-2,-1,1,2,3])), String(Q.expected + pick([-5,-4,4,5])), String(Q.expected * 2)]), answer: ans };
+  } else {
+    bossQ = Q;
+  }
+  // 确保答案在 opts、去掉重复选项
+  fixChoice(bossQ);
+  renderBoss('');
+}
+function renderBoss(feedback) {
+  const p = currentPeak; const hpPct = (bossHp / bossMax) * 100;
+  const enraged = bossHp <= Math.ceil(bossMax/2);
+  const opts = bossQ.opts.map((o,i) => `<button class="opt-btn" onclick="bossAns(${i})">${o}</button>`).join('');
+  render(`<div class="hud"><div class="item"><span class="label">HP</span></div><div class="hp-bar"><div class="hp-fill" style="width:${playerHp}%"></div></div><div class="item"><span class="value">${playerHp}/100</span></div><div class="item"><span class="label">💰</span><span class="value">${state.coins||0}</span></div></div><h2>⚔️ ${p.boss.name}${enraged?' <span style="color:var(--red);font-size:16px;">(暴怒!)</span>':''}</h2><div style="text-align:center;font-size:80px;margin:8px 0;filter:drop-shadow(0 0 25px var(--red));" id="bi">${p.boss.emoji}</div><div class="boss-name">${p.boss.name}</div><div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${hpPct}%"></div></div><div class="q-expr">${bossQ.q}</div><div class="opt-grid">${opts}</div><div class="feedback" id="fb">${feedback||''}</div>`);
+  if (!feedback && typeof speech !== 'undefined' && speech.on) setTimeout(() => speech.speak(bossQ.q), 200);
+}
+function bossAns(idx) {
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  const picked = bossQ.opts[idx];
+  const enraged = bossHp <= Math.ceil(bossMax/2);
+  if (picked === bossQ.answer) {
+    document.querySelectorAll('.opt-btn')[idx].classList.add('correct');
+    bossHp--; document.getElementById('bi').style.animation = 'bossHit 0.4s';
+    fb.innerHTML = `⚡ ${randomPraise()} -1 HP`; fb.className = 'feedback correct';
+    sndCorrect(); flashScreen('rgba(128,237,153,0.25)');
+    addXP(enraged?10:6); addCoins(enraged?15:10); incCombo(); state.totalCorrect++;
+  } else {
+    document.querySelectorAll('.opt-btn')[idx].classList.add('wrong');
+    document.querySelectorAll('.opt-btn').forEach(b => { if (b.textContent === bossQ.answer) b.classList.add('correct'); });
+    const dmg = enraged ? 38 : 25; playerHp -= dmg;
+    fb.innerHTML = `💥 被反击 ${dmg} HP！正确：<span style="color:var(--gold)">${bossQ.answer}</span>`; fb.className = 'feedback wrong';
+    sndWrong(); flashScreen('rgba(255,107,107,0.3)'); state.totalWrong++; breakCombo();
+  }
+  saveState();
+  setTimeout(() => nextBoss(), 1500);
+}
+
+function sceneVictory() {
+  const p = currentPeak;
+  if (!state.unitsCompleted.includes(p.id)) state.unitsCompleted.push(p.id);
+  if (!state.pets.find(x => x.name === p.pet.name)) state.pets.push(p.pet);
+  addXP(40); saveState(); sndVictory(); confetti();
+  const all = state.unitsCompleted.length === PEAKS.length;
+  render(`${hudHtml()}<div class="victory-content"><h1>🎊 登顶！</h1><p style="color:var(--gold);font-size:20px;">${p.title} 完成</p><div class="trophy">🏆</div><div class="reward-pet"><div class="pet-icon">${p.pet.symbol}</div><div class="pet-name">${p.pet.name}</div><p style="color:var(--text-dim);font-size:13px;margin-top:8px;">+ 40 XP</p></div>${all?`<p style="color:var(--gold);font-size:18px;">🌟 12 座峰全登顶！</p>`:''}<div class="btn-row"><button class="primary" onclick="sceneMap()">返回</button>${p.id<PEAKS.length?`<button onclick="startPeak(${p.id+1})">下一峰 →</button>`:''}</div></div>`);
+}
+function sceneDefeat() {
+  render(`${hudHtml()}<div class="victory-content"><h2>😵 战败</h2><div style="font-size:80px;margin:20px 0;">💔</div><p style="color:var(--text-dim);">复习一下概念，再战！</p><div class="btn-row"><button onclick="sceneConcepts()">← 概念</button><button class="primary" onclick="startBoss()">再战</button><button onclick="sceneMap()">返回</button></div></div>`);
+}
+
+// ============== 🔊 Voice / TTS ==============
+const speech = {
+  on: localStorage.getItem('math_voice_on') !== '0', voice: null,
+  init() { if (!('speechSynthesis' in window)) { this.on = false; return; }
+    const sv = () => { const vs = speechSynthesis.getVoices();
+      this.voice = vs.find(v=>/zh-CN/i.test(v.lang)&&/xiaoxiao|yaoyao|huihui|tingting|female|woman/i.test(v.name))||vs.find(v=>/zh-CN|cmn-Hans/i.test(v.lang))||vs.find(v=>/zh/i.test(v.lang))||null; };
+    sv(); if (speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=sv; },
+  clean(t) { return String(t).replace(/<[^>]+>/g,' ').replace(/[（()【】\[\]「」]/g,' ').replace(/×/g,'乘').replace(/÷/g,'除以').replace(/π/g,'派').replace(/²/g,'的平方').replace(/³/g,'的立方').replace(/√/g,'根号').replace(/∠/g,'角').replace(/°/g,'度').replace(/−/g,'负').replace(/≤/g,'小于等于').replace(/≥/g,'大于等于').replace(/∑/g,'西格玛').replace(/∫/g,'积分').replace(/∞/g,'无穷').replace(/\s+/g,' ').trim(); },
+  speak(t, o={}) { if (!this.on||!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const c=this.clean(t); if (!c) return; const u=new SpeechSynthesisUtterance(c); u.lang='zh-CN'; if (this.voice) u.voice=this.voice; u.rate=o.rate||1.0; u.pitch=o.pitch||1.0; speechSynthesis.speak(u); },
+  stop() { if ('speechSynthesis' in window) speechSynthesis.cancel(); },
+  toggle() { this.on=!this.on; localStorage.setItem('math_voice_on',this.on?'1':'0'); if (!this.on) this.stop(); return this.on; }
+};
+speech.init();
+function voiceToggle() { const on=speech.toggle(); toast(on?'🔊 语音开':'🔇 语音关',1000); const b=document.getElementById('voiceBtn'); if (b) b.textContent=on?'🔊':'🔇'; }
+function ensureVoiceBtn() { if (document.getElementById('voiceBtn')) return; const b=document.createElement('button'); b.id='voiceBtn'; b.className='voice-btn'; b.textContent=speech.on?'🔊':'🔇'; b.title='语音朗读'; b.onclick=voiceToggle; document.body.appendChild(b); }
+function speakItemById(arr, i) { const it=MATH_FUN[arr]&&MATH_FUN[arr][i]; if (!it) return; speech.speak(typeof it==='string'?it:(it.story||(it.q+'。答案：'+it.a))); }
+
+// ============== 🎲 Fun ==============
+const MATH_FUN = {
+  facts: [
+    "圆周率 π 是无理数也是超越数 —— 不仅写不成分数，连任何整系数多项式都无法把它做成根。",
+    "椭圆有两个焦点；它的离心率 e = c/a 越大越扁、越接近 0 越圆，e = 0 时就退化成圆。",
+    "三角函数的本质：sin 是单位圆上点的纵坐标，cos 是横坐标。",
+    "e ≈ 2.71828 是欧拉数 —— (1+1/n)^n 当 n→∞ 时的极限，复利与衰变都离不开它。",
+    "黄金角约 137.5° 常用于解释一些植物叶序，它有助于让叶片减少彼此遮挡。",
+    "导数的几何意义：函数图像在该点的切线斜率。",
+    "复数 i² = −1 把数从一维数轴扩展到二维平面 —— 在复数范围内，每个非常数复系数多项式都有根。",
+    "球面三角形内角和 > 180°，多出的部分（盈余）与面积成正比。",
+    "Fibonacci 数列里相邻两项的比值越来越接近黄金比 φ。",
+    "许多自然与社会数据近似呈现正态分布的钟形曲线，背后常能看到中心极限定理的影子。",
+  ],
+  mathematicians: [
+    { name: "欧拉", emoji: "🦉", years: "1707-1783", story: "欧拉公式 e^(iπ) + 1 = 0 把数学最重要的五个常数 0, 1, π, e, i 联到一行里。" },
+    { name: "牛顿", emoji: "🍎", years: "1643-1727", story: "23 岁前后的两年里，他发展了微积分思想、研究万有引力、分解白光，这段时期后来常被称为他的\"奇迹年\"。" },
+    { name: "笛卡儿", emoji: "📐", years: "1596-1650", story: "传说他从定位房间里物体的位置受到启发，发展了用坐标描述位置的方法 —— 解析几何由此兴起。" },
+    { name: "费马", emoji: "✒️", years: "1607-1665", story: "费马大定理：x^n + y^n = z^n 在 n>2 时无正整数解。他在书页边写下证明却没空写下，世人等了 358 年才被怀尔斯证出。" },
+    { name: "高斯", emoji: "👑", years: "1777-1855", story: "数学王子。他证明了正 17 边形可以用尺规作图，并以此选择了数学作为终身职业。" },
+    { name: "黎曼", emoji: "🌀", years: "1826-1866", story: "39 岁早逝。他留下的黎曼假设至今未解，是悬赏 100 万美元的千禧年问题之一。" },
+  ],
+  jokes: [
+    { q: "为什么数学老师常常陷入绝望？", a: "因为黑板上有太多解决不了的 problem。" },
+    { q: "圆和正方形吵架，正方形赢了，为什么？", a: "因为它有理（有 4 条边都直角，圆没有边）。" },
+    { q: "为什么 π 总是孤独？", a: "因为它无理，没人能完全理解它。" },
+    { q: "为什么常数 e 永不改变？", a: "因为 d/dx (e^x) = e^x，求导都不变。" },
+    { q: "导数和原函数吵架，谁先说话？", a: "原函数 —— 求导是后来的事。" },
+  ],
+  riddles: [
+    { q: "如果 f(x) = x²，f'(3) = ?", a: "f'(x) = 2x，所以 f'(3) = 6。" },
+    { q: "log₂ 32 = ?", a: "5，因为 2^5 = 32。" },
+    { q: "sin² θ + cos² θ = ?", a: "1（恒等式）。" },
+    { q: "向量 (3,4) 的模长是多少？", a: "√(3² + 4²) = 5。" },
+    { q: "复数 (1+i)² = ?", a: "1 + 2i + i² = 2i。" },
+  ]
+};
+function sceneFun() { speech.stop(); render(`${hudHtml()}<h2>🎲 数学奇趣馆</h2><p style="color:var(--text-dim);margin-bottom:14px;">不考你，只带你玩。</p><div class="fun-grid"><div class="fun-card" onclick="sceneFacts()"><div class="fun-ic">💡</div><div class="fun-tt">冷知识</div><div class="fun-sub">${MATH_FUN.facts.length} 条</div></div><div class="fun-card" onclick="sceneMathHist()"><div class="fun-ic">📜</div><div class="fun-tt">数学家</div><div class="fun-sub">${MATH_FUN.mathematicians.length} 位</div></div><div class="fun-card" onclick="sceneJokes()"><div class="fun-ic">🃏</div><div class="fun-tt">笑话</div><div class="fun-sub">${MATH_FUN.jokes.length} 条</div></div><div class="fun-card" onclick="sceneRiddles()"><div class="fun-ic">🧩</div><div class="fun-tt">脑筋急转</div><div class="fun-sub">${MATH_FUN.riddles.length} 题</div></div></div><div class="btn-row"><button onclick="sceneMenu()">返回</button></div>`); }
+function sceneFacts() { const it=MATH_FUN.facts.map((f,i)=>`<div class="info-card"><div class="info-h"><span>💡 #${i+1}</span><button class="speak-btn" onclick="speakItemById('facts',${i})">🔊</button></div><div class="info-b">${f}</div></div>`).join(''); render(`${hudHtml()}<h2>💡 冷知识</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneMathHist() { const it=MATH_FUN.mathematicians.map((m,i)=>`<div class="info-card"><div class="info-h"><span>${m.emoji} ${m.name}</span><button class="speak-btn" onclick="speakItemById('mathematicians',${i})">🔊</button></div><div class="info-meta">${m.years}</div><div class="info-b">${m.story}</div></div>`).join(''); render(`${hudHtml()}<h2>📜 数学家</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneJokes() { const it=MATH_FUN.jokes.map((j,i)=>`<div class="info-card"><div class="info-h"><span>🃏 #${i+1}</span><button class="speak-btn" onclick="speakItemById('jokes',${i})">🔊</button></div><div class="info-b"><strong>${j.q}</strong></div><div class="riddle-toggle" onclick="this.nextElementSibling.classList.toggle('show')">👉 看答案</div><div class="riddle-ans">${j.a}</div></div>`).join(''); render(`${hudHtml()}<h2>🃏 笑话</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneRiddles() { const it=MATH_FUN.riddles.map((r,i)=>`<div class="info-card"><div class="info-h"><span>🧩 #${i+1}</span><button class="speak-btn" onclick="speakItemById('riddles',${i})">🔊</button></div><div class="info-b">${r.q}</div><div class="riddle-toggle" onclick="this.nextElementSibling.classList.toggle('show')">👉 看答案</div><div class="riddle-ans">${r.a}</div></div>`).join(''); render(`${hudHtml()}<h2>🧩 脑筋急转</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+
+// ============================================
+// 💬 问数学家 · AI 对话子系统
+// ============================================
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function $(sel, root = document) { return root.querySelector(sel); }
+
+// ---- 历代数学家阵容（真实名言为主） ----
+const MATHEMATICIANS = [
+  { id:'gauss',      name:'高斯',         face:'🧮', years:'1777–1855',   field:'数论·代数',   quote:'数学是科学的皇后，而数论是数学的皇后。' },
+  { id:'euler',      name:'欧拉',         face:'✍️', years:'1707–1783',   field:'分析·图论',   quote:'失去一只眼睛后我说：这下我能更专心了。' },
+  { id:'archimedes', name:'阿基米德',     face:'⚙️', years:'前287–前212', field:'几何·力学',   quote:'给我一个支点，我就能撬动整个地球。' },
+  { id:'euclid',     name:'欧几里得',     face:'📐', years:'约前330–前275',field:'几何',        quote:'几何之中，没有专为国王铺设的道路。' },
+  { id:'pythagoras', name:'毕达哥拉斯',   face:'🔺', years:'约前570–前495',field:'数与几何',    quote:'万物皆数。' },
+  { id:'descartes',  name:'笛卡尔',       face:'🧭', years:'1596–1650',   field:'解析几何',    quote:'我思，故我在。' },
+  { id:'newton',     name:'牛顿',         face:'🍎', years:'1643–1727',   field:'微积分',      quote:'如果我看得更远，那是因为我站在巨人的肩膀上。' },
+  { id:'leibniz',    name:'莱布尼茨',     face:'🔢', years:'1646–1716',   field:'微积分·二进制',quote:'音乐，是心灵在不知不觉中进行的算术练习。' },
+  { id:'cantor',     name:'康托尔',       face:'♾️', years:'1845–1918',   field:'集合论',      quote:'数学的本质，在于它的自由。' },
+  { id:'hilbert',    name:'希尔伯特',     face:'🏛️', years:'1862–1943',   field:'公理化',      quote:'我们必须知道，我们必将知道。' },
+  { id:'poincare',   name:'庞加莱',       face:'🌀', years:'1854–1912',   field:'拓扑·混沌',   quote:'数学，是给不同的事物以相同名称的艺术。' },
+  { id:'ramanujan',  name:'拉马努金',     face:'🌟', years:'1887–1920',   field:'数论',        quote:'一个方程对我毫无意义，除非它表达了神的一个念头。' },
+  { id:'noether',    name:'埃米·诺特',    face:'🔗', years:'1882–1935',   field:'抽象代数',    quote:'每一种对称，背后都藏着一个守恒定律。' },
+  { id:'huluogeng',  name:'华罗庚',       face:'📘', years:'1910–1985',   field:'数论·应用数学',quote:'聪明在于勤奋，天才在于积累。' },
+  { id:'zuchongzhi', name:'祖冲之',       face:'🀄', years:'429–500',     field:'圆周率·历法', quote:'我把圆周率算到了小数点后第七位。' },
+  { id:'liuhui',     name:'刘徽',         face:'➗', years:'约225–约295', field:'割圆术',      quote:'割之弥细，所失弥少；割之又割，以至于不可割。' },
+];
+
+const LLM_PRESETS = [
+  { id:'deepseek', label:'⭐ DeepSeek（国内直连）', baseUrl:'https://api.deepseek.com/v1',                         model:'deepseek-chat' },
+  { id:'qwen',     label:'通义千问（阿里）',        baseUrl:'https://dashscope.aliyuncs.com/compatible-mode/v1',   model:'qwen-plus' },
+  { id:'glm',      label:'智谱 GLM-4',              baseUrl:'https://open.bigmodel.cn/api/paas/v4',               model:'glm-4-flash' },
+  { id:'kimi',     label:'Kimi（月之暗面）',        baseUrl:'https://api.moonshot.cn/v1',                         model:'moonshot-v1-8k' },
+  { id:'claudeopus',label:'⭐ Claude Opus 4.8（最聪明）',baseUrl:'https://api.anthropic.com/v1',                    model:'claude-opus-4-8' },
+  { id:'claude',   label:'Claude Haiku（便宜快·可直连）',baseUrl:'https://api.anthropic.com/v1',                   model:'claude-haiku-4-5' },
+  { id:'gemini',   label:'Gemini（需代理/中转）',   baseUrl:'https://generativelanguage.googleapis.com/v1beta/openai', model:'gemini-2.5-flash' },
+  { id:'gpt4omini',label:'GPT-4o mini（需代理·便宜）',baseUrl:'https://api.openai.com/v1',                        model:'gpt-4o-mini' },
+  { id:'gpt4o',    label:'GPT-4o（需代理）',        baseUrl:'https://api.openai.com/v1',                          model:'gpt-4o' },
+  { id:'gpt5',     label:'GPT-5（需代理）',         baseUrl:'https://api.openai.com/v1',                          model:'gpt-5' },
+];
+
+const STARTER_QS = [
+  '为什么 e 这个数这么特别？', '虚数 i（即 √-1）到底有什么用？', '微积分到底在算什么？',
+  '为什么三角函数能描述波浪和声音？', '导数为什么能求最大、最小值？', '对数是怎么把超大的数变小的？',
+  '为什么 0! 等于 1？', '概率里的"赌徒谬误"是怎么回事？', '数列求和有什么巧妙办法？',
+  '椭圆、抛物线、双曲线在生活里哪儿能见到？', '为什么说 e^(iπ)+1=0 是最美的公式？', '向量为什么既有大小又有方向？',
+  '函数和方程到底有什么区别？', '极限"无限接近却永远到不了"是什么意思？', '排列和组合怎么区分？',
+  '你当年是怎么想到那个定理的？', '高中数学里哪种思想最重要？', '数学家是怎么发现新公式的？',
+  '为什么要学这么抽象的数学？它有什么用？', '如果只教我一个高中数学技巧，你会教哪个？',
+];
+
+function mdRender(text) {
+  text = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  text = text.replace(/\*([^*]+)\*/g, '<i>$1</i>');
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+// ---- TTS（朗读） / STT（语音输入） ----
+const TTS = {
+  synth: window.speechSynthesis || null,
+  voices: [], current: null, currentBtn: null,
+  load() { if (this.synth) this.voices = this.synth.getVoices() || []; },
+  pickVoice() {
+    if (!this.voices.length) this.load();
+    let v = this.voices.find(v => /zh-CN|cmn-Hans/i.test(v.lang) && /xiao|yao|hui|ting|female|woman|女/i.test(v.name||''));
+    if (!v) v = this.voices.find(v => v.lang && /^zh/i.test(v.lang));
+    return v || this.voices[0] || null;
+  },
+  stripMd(t) {
+    return String(t||'')
+      .replace(/```[\s\S]*?```/g,'，')
+      .replace(/`([^`]+)`/g,'$1').replace(/\*\*([^*]+)\*\*/g,'$1').replace(/\*([^*]+)\*/g,'$1')
+      .replace(/<[^>]+>/g,'').replace(/\n+/g,'。').replace(/[。]{2,}/g,'。');
+  },
+  paramsFor(id) {
+    let h = 0; const s = id||'';
+    for (let i=0;i<s.length;i++) h = (h*131 + s.charCodeAt(i)) | 0;
+    h = Math.abs(h);
+    return { pitch: 0.85 + ((h % 60)/100), rate: 0.92 + (((h>>5) % 26)/100) };
+  },
+  speak(text, id, btn) {
+    if (!this.synth) { toast('当前浏览器不支持朗读，请用 Chrome/Edge'); return false; }
+    if (!this.voices.length) this.load();
+    try { this.synth.resume(); } catch(e){}
+    const wasActive = this.synth.speaking || this.synth.pending;
+    if (wasActive) { try { this.synth.cancel(); } catch(e){} }
+    if (this.currentBtn) this.currentBtn.classList.remove('playing');
+    const u = new SpeechSynthesisUtterance(this.stripMd(text));
+    u.lang = 'zh-CN';
+    const v = this.pickVoice(); if (v) u.voice = v;
+    const p = this.paramsFor(id||''); u.pitch = p.pitch; u.rate = p.rate; u.volume = 1.0;
+    u.onend = ()=>{ if (btn) btn.classList.remove('playing'); this.current=null; this.currentBtn=null; };
+    u.onerror = (ev)=>{ if (btn) btn.classList.remove('playing'); this.current=null; this.currentBtn=null; };
+    this.current = u; this.currentBtn = btn || null;
+    if (btn) btn.classList.add('playing');
+    const go = ()=>{ if (this.current!==u) return; try { this.synth.speak(u); } catch(e){} };
+    if (wasActive) setTimeout(go, 120); else go();
+    return true;
+  },
+  stop() { try { this.synth && this.synth.cancel(); } catch(e){} if (this.currentBtn) this.currentBtn.classList.remove('playing'); this.current=null; this.currentBtn=null; },
+  available() { return !!this.synth; }
+};
+if (TTS.synth) { TTS.load(); TTS.synth.onvoiceschanged = ()=>TTS.load(); }
+
+const STT = {
+  Rec: window.SpeechRecognition || window.webkitSpeechRecognition || null,
+  instance: null,
+  available() { return !!this.Rec; },
+  start(opts) {
+    if (!this.Rec) { toast('当前浏览器不支持语音输入，请用 Chrome/Edge'); return null; }
+    if (this.instance) { try { this.instance.stop(); } catch(e){} this.instance = null; }
+    const r = new this.Rec();
+    r.lang = 'zh-CN'; r.continuous = false; r.interimResults = true; r.maxAlternatives = 1;
+    r.onresult = ev=>{ let txt=''; for (let i=0;i<ev.results.length;i++) txt += ev.results[i][0].transcript; opts.onResult && opts.onResult(txt, ev.results[ev.results.length-1].isFinal); };
+    r.onerror = ev=>{ opts.onError && opts.onError(ev.error||'未知错误'); };
+    r.onend = ()=>{ this.instance = null; opts.onEnd && opts.onEnd(); };
+    try { r.start(); this.instance = r; return r; } catch(e) { opts.onError && opts.onError(e.message||String(e)); return null; }
+  },
+  stop() { if (this.instance) { try { this.instance.stop(); } catch(e){} this.instance = null; } }
+};
+
+function buildSystemPrompt(sci) {
+  return `你正在扮演数学家「${sci.name}」（${sci.years}，主要领域：${sci.field}）。\n你的一句名言："${sci.quote}"\n\n对方是一个 12 岁、对数学充满好奇的中国孩子，正在提前探索高中数学（函数、三角、向量、微积分入门等）。请：\n1. 以该数学家的口吻、第一人称回答，符合 TA 的时代与性格（如高斯严谨自信、欧拉亲切多产、阿基米德痴迷动手、华罗庚励志勤奋、祖冲之/刘徽朴实精算）；\n2. 用孩子能懂的语言、生活例子、可视化比喻来讲；\n3. 数学事实必须准确，推导要对，不能编造；不确定就坦诚说不知道；\n4. 若问题超出 TA 时代的认知，可坦诚说"以我那个年代还想不到"，再用今天的数学帮孩子理解；\n5. 适当讲 1 小段 TA 真实的小故事或时代背景，让历史变生动；\n6. 鼓励孩子继续问，末尾留 1 个引导性问题；\n7. 全程简体中文，每次回复 100~250 字；\n8. 用 **粗体** 强调关键词，公式/符号用 \`反引号\` 标注（例如 \`a²+b²=c²\`）。\n\n不要破坏角色扮演。如果孩子问"你真的是 XXX 吗"，就以那位数学家的身份回答。`;
+}
+
+async function callLLM(messages) {
+  const cfg = state.llm;
+  if (!cfg || !cfg.apiKey) throw new Error('请先点【⚙️ 设置】填入 API Key');
+  // Claude(Anthropic) 的接口格式与 OpenAI 不同，按 baseUrl/模型名自动分流
+  const isAnthropic = /anthropic\.com/i.test(cfg.baseUrl||'') || /^claude/i.test(cfg.model||'');
+  return isAnthropic ? callAnthropic(cfg, messages) : callOpenAICompat(cfg, messages);
+}
+
+// OpenAI 兼容：DeepSeek / 通义 / 智谱 / Kimi / GPT / Gemini(OpenAI兼容端点) 等
+async function callOpenAICompat(cfg, messages) {
+  const url = (cfg.baseUrl||'').replace(/\/+$/,'') + '/chat/completions';
+  const model = cfg.model || 'deepseek-chat';
+  const isNewOpenAI = /^(gpt-5|o\d)/i.test(model);
+  const body = { model, messages };
+  if (isNewOpenAI) { body.max_completion_tokens = 1200; }
+  else { body.max_tokens = 700; body.temperature = 0.8; }
+  let res;
+  try {
+    res = await fetch(url, { method:'POST', headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + cfg.apiKey }, body: JSON.stringify(body) });
+  } catch(e) {
+    throw new Error('网络/CORS 失败：'+e.message+'。提示：部分接口（如 Gemini 官方地址）不支持浏览器直连，需在 Base URL 填你自己的中转/代理地址。');
+  }
+  if (!res.ok) {
+    let detail = '';
+    try { detail = (await res.json()).error?.message || ''; } catch(e){}
+    if (res.status===400 && isNewOpenAI && /max_tokens/i.test(detail)) {
+      const res2 = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.apiKey}, body: JSON.stringify({ model, messages, max_tokens: 1200 }) });
+      if (res2.ok) { const d = await res2.json(); return d.choices?.[0]?.message?.content || '(无返回)'; }
+    }
+    throw new Error(`HTTP ${res.status} ${res.statusText}${detail?'：'+detail:''}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '(无返回)';
+}
+
+// Anthropic 原生：system 为顶层字段、messages 仅 user/assistant 且首条须 user、max_tokens 必填、回包取 content[].text
+async function callAnthropic(cfg, messages) {
+  const url = (cfg.baseUrl||'https://api.anthropic.com/v1').replace(/\/+$/,'') + '/messages';
+  const system = messages.filter(m=>m.role==='system').map(m=>m.content).join('\n\n');
+  let msgs = messages.filter(m=>m.role!=='system').map(m=>({ role: m.role==='assistant'?'assistant':'user', content: String(m.content) }));
+  while (msgs.length && msgs[0].role!=='user') msgs.shift();   // Claude 要求首条必须是 user
+  const body = { model: cfg.model || 'claude-haiku-4-5', max_tokens: 1024, temperature: 0.8, messages: msgs };
+  if (system) body.system = system;
+  let res;
+  try {
+    res = await fetch(url, {
+      method:'POST',
+      headers: { 'content-type':'application/json', 'x-api-key':cfg.apiKey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {
+    throw new Error('网络/CORS 失败：'+e.message+'。Claude 官方地址需科学上网。');
+  }
+  if (!res.ok) {
+    let detail = '';
+    try { detail = (await res.json()).error?.message || ''; } catch(e){}
+    throw new Error(`HTTP ${res.status} ${res.statusText}${detail?'：'+detail:''}`);
+  }
+  const data = await res.json();
+  return (data.content||[]).find(b=>b && b.type==='text')?.text || '(无返回)';
+}
+
+function ttsButton(text, id, label='🔊 听') {
+  const b = el('button', 'tts-btn', label);
+  b.onclick = (ev)=>{ ev.stopPropagation(); if (b.classList.contains('playing')) { TTS.stop(); return; } TTS.speak(text, id, b); };
+  return b;
+}
+
+// ---- 语音连续对话舱 ----
+const VoiceChat = {
+  active:false, state:'idle', sciId:null, rec:null, lastTranscript:'', silenceTimer:null, ui:null, silenceMs:1300,
+  enter(sciId) {
+    if (!STT.available()) { toast('当前浏览器不支持语音输入，请用 Chrome 或 Edge'); return; }
+    if (!state.llm || !state.llm.apiKey) { toast('请先在【⚙️ 设置】里填 API Key'); openLLMSettings(); return; }
+    if (!state.chatConv) state.chatConv = [];
+    this.active = true; this.sciId = sciId || state.chatSci || MATHEMATICIANS[0].id;
+    this.buildUI();
+    const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+    const greet = `你好！我是${sci.name}。我们直接说话就行——你说完我就接话。今天想聊点什么数学话题？`;
+    this.appendTurn('sci', greet, sci);
+    state.chatConv.push({ role:'assistant', content: greet }); saveState();
+    this.speakReply(greet, sci);
+  },
+  exit() { this.active=false; this.setState('idle'); this.stopRec(); TTS.stop(); if (this.silenceTimer){clearTimeout(this.silenceTimer);this.silenceTimer=null;} this.destroyUI(); },
+  setState(s) { this.state = s; this.updateUI(); },
+  startRec() {
+    if (!this.active) return;
+    this.stopRec(); this.setState('listen'); this.lastTranscript='';
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { this.exit(); return; }
+    const r = new SR(); r.lang='zh-CN'; r.continuous=true; r.interimResults=true; r.maxAlternatives=1;
+    r.onresult = (ev)=>{ if (this.state!=='listen') return; let txt=''; for (let i=0;i<ev.results.length;i++) txt += ev.results[i][0].transcript; this.lastTranscript=txt; this.updateLive(txt); this.resetSilence(); };
+    r.onerror = (ev)=>{ const err=ev?.error||'unknown'; if (err==='not-allowed'||err==='service-not-allowed'){ this.appendTurn('err','麦克风没有权限，请在浏览器地址栏开启麦克风权限再试。'); this.exit(); } };
+    r.onend = ()=>{ if (!this.active||this.state!=='listen') return; if (this.lastTranscript.trim()) this.submit(); else setTimeout(()=>{ if (this.active&&this.state==='listen') this.startRec(); }, 250); };
+    try { r.start(); this.rec=r; } catch(e) { setTimeout(()=>{ if (this.active&&this.state==='listen') this.startRec(); }, 400); }
+  },
+  stopRec() { if (this.rec){ try{this.rec.stop();}catch(e){} this.rec=null; } if (this.silenceTimer){clearTimeout(this.silenceTimer);this.silenceTimer=null;} },
+  resetSilence() { if (this.silenceTimer) clearTimeout(this.silenceTimer); this.silenceTimer = setTimeout(()=>{ if (this.state==='listen'&&this.lastTranscript.trim()&&this.active) this.submit(); }, this.silenceMs); },
+  async submit() {
+    if (!this.active) return;
+    if (this.silenceTimer){clearTimeout(this.silenceTimer);this.silenceTimer=null;}
+    const text = (this.lastTranscript||'').trim(); this.lastTranscript=''; this.stopRec();
+    if (!text) { this.startRec(); return; }
+    this.setState('thinking'); this.appendTurn('user', text);
+    state.chatConv.push({ role:'user', content:text }); saveState(); this.updateLive('');
+    const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+    try {
+      const sys = buildSystemPrompt(sci) + '\n\n【特别注意】此刻是「连续语音对话」：回复请 (a) 60~140 字；(b) 最自然口语，像面对面聊；(c) 不要列表、不要长公式，能比喻就比喻；(d) 末尾用一个开放问题反问孩子；(e) 若孩子只说"嗯""然后呢"，就主动把上个话题展开讲。';
+      const reply = await callLLM([{ role:'system', content:sys }, ...state.chatConv.map(m=>({role:m.role,content:m.content}))]);
+      if (!this.active) return;
+      state.chatConv.push({ role:'assistant', content:reply }); this.appendTurn('sci', reply, sci);
+      state.chatAsked = (state.chatAsked||0)+1; saveState();
+      this.speakReply(reply, sci);
+    } catch(e) { if (!this.active) return; this.appendTurn('err','调用失败：'+e.message); setTimeout(()=>{ if (this.active) this.startRec(); }, 800); }
+  },
+  speakReply(text, sci) {
+    this.setState('speak');
+    if (!TTS.available() || !TTS.synth) { setTimeout(()=>{ if (this.active) this.startRec(); }, 400); return; }
+    try { TTS.synth.cancel(); } catch(e){}
+    const u = new SpeechSynthesisUtterance(TTS.stripMd(text)); u.lang='zh-CN';
+    const v = TTS.pickVoice(); if (v) u.voice=v;
+    const p = TTS.paramsFor(sci.id); u.pitch=p.pitch; u.rate=p.rate; u.volume=1.0;
+    u.onend = ()=>{ if (!this.active) return; setTimeout(()=>{ if (this.active&&this.state==='speak') this.startRec(); }, 300); };
+    u.onerror = ()=>{ if (!this.active) return; setTimeout(()=>{ if (this.active&&this.state==='speak') this.startRec(); }, 300); };
+    TTS.synth.speak(u);
+    setTimeout(()=>{ if (this.active&&this.state==='speak'&&!TTS.synth.speaking) this.startRec(); }, Math.max(8000, text.length*250));
+  },
+  buildUI() {
+    const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+    const mask = el('div','vc-mask');
+    mask.innerHTML = `
+      <div class="vc-card">
+        <div class="vc-top">
+          <div class="vc-sci"><div class="vc-avatar">${sci.face}</div><div><div style="font-size:18px;font-weight:800;color:var(--gold)">${sci.name}</div><div style="font-size:12px;color:var(--text-dim)">${sci.years} · ${sci.field}</div></div></div>
+          <button id="vcExit">✖ 退出</button>
+        </div>
+        <div class="vc-orb-wrap"><div class="vc-orb" id="vcOrb"></div></div>
+        <div class="vc-status" id="vcStatus">准备开始……</div>
+        <div class="vc-transcript" id="vcTranscript"></div>
+        <div class="vc-live" id="vcLive"></div>
+        <div class="vc-bottom">
+          <button id="vcPause">⏸ 暂停</button>
+          <button id="vcSkip" title="跳过他说的，直接你说">⏭ 让我说</button>
+          <button id="vcClear">🗑 清空记忆</button>
+        </div>
+      </div>`;
+    document.body.appendChild(mask);
+    this.ui = { mask, orb:$('#vcOrb',mask), status:$('#vcStatus',mask), transcript:$('#vcTranscript',mask), live:$('#vcLive',mask) };
+    $('#vcExit',mask).onclick = ()=>this.exit();
+    $('#vcPause',mask).onclick = ()=>{ if (['listen','thinking','speak'].includes(this.state)){ TTS.stop(); this.stopRec(); this.setState('paused'); } else if (this.state==='paused'){ this.startRec(); } };
+    $('#vcSkip',mask).onclick = ()=>{ TTS.stop(); if (this.active) this.startRec(); };
+    $('#vcClear',mask).onclick = ()=>{
+      if (!confirm('清空和这位数学家的对话记忆？')) return;
+      state.chatConv = []; saveState(); this.ui.transcript.innerHTML='';
+      const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+      const greet = `好，我们重新开始。我是${sci.name}，你想聊什么？`;
+      this.appendTurn('sci', greet, sci); state.chatConv.push({ role:'assistant', content:greet }); saveState();
+      TTS.stop(); this.stopRec(); this.speakReply(greet, sci);
+    };
+  },
+  destroyUI() { if (this.ui && this.ui.mask) this.ui.mask.remove(); this.ui=null; },
+  updateUI() {
+    if (!this.ui) return;
+    ['idle','listen','thinking','speak','paused'].forEach(c=>this.ui.orb.classList.remove('vc-'+c));
+    this.ui.orb.classList.add('vc-'+this.state);
+    const msg = { idle:'', listen:'🎙️ 我在听……（你说话就行，停 1 秒我就接话）', thinking:'💭 我在想……', speak:'🗣️ 我正在说话（点 ⏭ 让我说可打断）', paused:'⏸ 已暂停（点 ▶ 继续）' };
+    this.ui.status.textContent = msg[this.state] || '';
+    if (this.state !== 'listen') this.updateLive('');
+    const pb = $('#vcPause', this.ui.mask); if (pb) pb.textContent = this.state==='paused' ? '▶ 继续' : '⏸ 暂停';
+  },
+  updateLive(text) { if (this.ui && this.ui.live) this.ui.live.textContent = text ? '「'+text+'」' : ''; },
+  appendTurn(role, content, sci) {
+    if (!this.ui) return;
+    const row = el('div','');
+    if (role==='user') row.innerHTML = `<div class="vc-bubble user">${mdRender(content)}</div>`;
+    else if (role==='sci') row.innerHTML = `<div class="vc-bubble sci"><b style="color:var(--gold)">${sci?sci.name:'数学家'}：</b>${mdRender(content)}</div>`;
+    else row.innerHTML = `<div class="vc-bubble err">⚠️ ${content}</div>`;
+    this.ui.transcript.appendChild(row); this.ui.transcript.scrollTop = this.ui.transcript.scrollHeight;
+  }
+};
+
+// ---- 问数学家 · 聊天核心（可挂到整页，也可挂到浮层）----
+function buildChatInto(host, mode) {
+  speech.stop();
+  if (!state.chatConv) state.chatConv = [];
+  if (!state.chatSci) state.chatSci = MATHEMATICIANS[0].id;
+  if (!state.llm) state.llm = { baseUrl:'https://api.deepseek.com/v1', model:'deepseek-chat', apiKey:'' };
+  const curSci = MATHEMATICIANS.find(s=>s.id===state.chatSci) || MATHEMATICIANS[0];
+  const opts = MATHEMATICIANS.map(s=>`<option value="${s.id}" ${s.id===curSci.id?'selected':''}>${s.face} ${s.name}（${s.field}）</option>`).join('');
+  const hasKey = !!(state.llm && state.llm.apiKey);
+  const voiceOn = !!state.voiceMode;
+  const ttsOk = TTS.available(), sttOk = STT.available();
+  const ov = mode === 'overlay';
+  const q = sel => host.querySelector(sel);
+  const rebuild = () => buildChatInto(host, mode);
+  host.innerHTML = `
+    ${ov ? '' : '<h2>💬 问数学家</h2>'}
+    <div class="subtitle">挑一位历代大数学家，用 TA 的口吻给你答疑。可 💬 打字、🎤 说话、或 📞 语音通话。<br>首次用请点 <b>⚙️ 设置</b> 填一个 API Key（只存在你这台电脑里）。</div>
+    <div class="ask-bar">
+      <span style="color:var(--text-dim)">导师：</span>
+      <select id="askSci" style="min-width:210px">${opts}</select>
+      <button class="mini ask-entry" id="enterVoiceChat" title="像打电话那样：你说一句他答一句、自动朗读">📞 语音通话</button>
+      <span class="voice-toggle ${voiceOn?'on':''}" id="voiceToggle" title="打字聊天时，让数学家的回答自动朗读">${voiceOn?'🔊 朗读：开':'🔊 朗读：关'}</span>
+      <button class="mini" id="askReset">🔄 重开</button>
+      <button class="mini" id="askSet">⚙️ 设置</button>
+      <button class="mini" id="askStop" title="声音停不下来时点这里">⏹ 静音</button>
+      <span class="api-pill" style="color:${hasKey?'var(--green)':'var(--red)'}">${hasKey?'● 已配置':'● 未配置 Key'}</span>
+    </div>
+    ${(!ttsOk||!sttOk) ? `<div style="font-size:12px;color:var(--gold-soft);text-align:center;margin-bottom:8px">⚠️ 你的浏览器${!ttsOk?' 不支持朗读':''}${!sttOk?' 不支持语音输入':''}，建议用 <b>Chrome</b> 或 <b>Edge</b>。</div>` : ''}
+    <div class="chat-area" id="chatArea" ${ov?'style="flex:1;height:auto;min-height:200px"':''}></div>
+    <div class="preset-row" id="presetRow"></div>
+    <div class="input-row">
+      <textarea id="askInput" placeholder="问个数学问题，例如：微积分到底在算什么？（回车发送，Shift+回车换行）也可点 🎤 用嘴问"></textarea>
+      <button class="mic-btn" id="micBtn" title="点击说话（再点一次结束）">🎤</button>
+      <button class="primary" id="askSend">发送</button>
+    </div>
+    ${ov ? '' : '<div class="btn-row"><button id="askBack">← 返回主菜单</button></div>'}
+  `;
+  const chatArea = q('#chatArea');
+  function appendMsg(role, content, sci=null) {
+    let b;
+    if (role==='user') { b = el('div','bubble user', mdRender(content)); chatArea.appendChild(b); }
+    else {
+      b = el('div','bubble sci');
+      b.innerHTML = `<div class="sci-head"><div class="face-mini">${sci?sci.face:'🧑‍🏫'}</div><div>${sci?sci.name:'数学家'} · ${sci?sci.field:''}</div></div><div class="content">${mdRender(content)}</div>`;
+      $('.sci-head', b).appendChild(ttsButton(content, sci?sci.id:'', '🔊 听'));
+      chatArea.appendChild(b);
+    }
+    chatArea.scrollTop = chatArea.scrollHeight; return b;
+  }
+  if (!state.chatConv.length) {
+    const greet = `你好！我是 **${curSci.name}**（${curSci.years}），主攻${curSci.field}。\n你想问什么数学问题？随便问，我会用我那个时代的眼光，加上你能听懂的方式，来给你讲清楚。`;
+    const b = appendMsg('sci', greet, curSci);
+    if (voiceOn && b) TTS.speak(greet, curSci.id, $('.tts-btn', b));
+  } else {
+    state.chatConv.forEach(m => m.role==='user' ? appendMsg('user', m.content) : appendMsg('sci', m.content, curSci));
+  }
+  chatArea.scrollTop = chatArea.scrollHeight;
+  // 起手问题 chips
+  const pr = q('#presetRow');
+  STARTER_QS.slice().sort(()=>Math.random()-0.5).slice(0,5).forEach(qq=>{
+    const b = el('button','', qq); b.onclick = ()=>{ const i = q('#askInput'); i.value = qq; i.focus(); }; pr.appendChild(b);
+  });
+  const dice = el('button','','🎲 换一组'); dice.onclick = ()=>rebuild(); pr.appendChild(dice);
+  // 事件
+  q('#askSci').onchange = ev=>{ TTS.stop(); state.chatSci=ev.target.value; state.chatConv=[]; saveState(); rebuild(); };
+  q('#askReset').onclick = ()=>{ TTS.stop(); state.chatConv=[]; saveState(); rebuild(); };
+  q('#askSet').onclick = openLLMSettings;
+  q('#askStop').onclick = ()=>{ TTS.stop(); STT.stop(); const mb=q('#micBtn'); if (mb) mb.classList.remove('recording'); };
+  q('#voiceToggle').onclick = ()=>{ state.voiceMode = !state.voiceMode; saveState(); TTS.stop(); STT.stop(); rebuild(); };
+  q('#enterVoiceChat').onclick = ()=>{ TTS.stop(); STT.stop(); VoiceChat.enter(state.chatSci); };
+  const backBtn = q('#askBack'); if (backBtn) backBtn.onclick = ()=>sceneMenu();
+  const input = q('#askInput');
+  input.onkeydown = ev=>{ if (ev.key==='Enter' && !ev.shiftKey) { ev.preventDefault(); send(); } };
+  q('#askSend').onclick = send;
+  const micBtn = q('#micBtn');
+  micBtn.onclick = ()=>{
+    if (STT.instance) { STT.stop(); return; }
+    if (!sttOk) { toast('当前浏览器不支持语音输入'); return; }
+    TTS.stop(); micBtn.classList.add('recording');
+    let finalText = '';
+    STT.start({
+      onResult: (text, isFinal)=>{ input.value = text; if (isFinal) finalText = text; },
+      onError: (err)=>{ toast('语音输入失败：'+err); },
+      onEnd: ()=>{ micBtn.classList.remove('recording'); if ((finalText || input.value.trim()) && state.voiceMode) setTimeout(send, 200); }
+    });
+  };
+  async function send() {
+    const text = input.value.trim(); if (!text) return;
+    if (!state.llm || !state.llm.apiKey) { openLLMSettings(); return; }
+    TTS.stop();
+    input.value=''; input.disabled=true; q('#askSend').disabled=true;
+    state.chatConv.push({ role:'user', content:text }); appendMsg('user', text);
+    const thinking = el('div','bubble sci thinking', `<div class="sci-head"><div class="face-mini">${curSci.face}</div><div>${curSci.name} 正在思考…</div></div>`);
+    chatArea.appendChild(thinking); chatArea.scrollTop = chatArea.scrollHeight;
+    try {
+      const sys = state.voiceMode
+        ? buildSystemPrompt(curSci) + '\n\n【特别注意】此刻是语音对话：回复 (a) 80~160 字；(b) 口语化、像聊天；(c) 避免长公式和列表，可用比喻；(d) 末尾留一个开放问题让孩子接话。'
+        : buildSystemPrompt(curSci);
+      const reply = await callLLM([{ role:'system', content:sys }, ...state.chatConv.map(m=>({role:m.role,content:m.content}))]);
+      thinking.remove();
+      state.chatConv.push({ role:'assistant', content:reply });
+      const b = appendMsg('sci', reply, curSci);
+      state.chatAsked = (state.chatAsked||0)+1; saveState();
+      if (state.voiceMode && b) TTS.speak(reply, curSci.id, $('.tts-btn', b));
+    } catch(e) {
+      thinking.remove();
+      appendMsg('sci', '**调用失败**：'+e.message+'\n\n点 ⚙️ 设置检查 API Key / Base URL，或换一个服务商。', curSci);
+    } finally { input.disabled=false; q('#askSend').disabled=false; input.focus(); }
+  }
+}
+// 整页版（主菜单进入）
+function sceneAsk() {
+  render('<div id="askHost" style="width:100%;display:flex;flex-direction:column;flex:1;min-height:0"></div>');
+  buildChatInto(document.getElementById('askHost'), 'scene');
+}
+// 💬 直接对话浮层（任何画面、答题中都能开，不离开当前页）
+function openChatOverlay() {
+  closeFabMenu();
+  if (document.getElementById('chatOvMask')) return;
+  const mask = el('div','chat-ov-mask'); mask.id = 'chatOvMask';
+  mask.innerHTML = `<div class="chat-ov-panel"><div class="chat-ov-head"><span>💬 问数学家</span><button class="mini chat-ov-close">✖ 关闭</button></div><div class="chat-ov-body" id="chatOvBody"></div></div>`;
+  document.body.appendChild(mask);
+  mask.querySelector('.chat-ov-close').onclick = ()=>{ TTS.stop(); STT.stop(); mask.remove(); };
+  mask.onclick = (e)=>{ if (e.target===mask) { TTS.stop(); STT.stop(); mask.remove(); } };
+  buildChatInto(mask.querySelector('#chatOvBody'), 'overlay');
+}
+// 🧑‍🏫 全局悬浮 AI 助教球：一键直达 💬 直接问 / 📞 语音通话
+function ensureChatFab() {
+  if (document.getElementById('aiFab')) return;
+  const wrap = el('div','ai-fab-wrap'); wrap.id = 'aiFab';
+  wrap.innerHTML = `
+    <div class="ai-fab-menu" id="aiFabMenu">
+      <button class="ai-fab-act" data-act="chat">💬 直接问</button>
+      <button class="ai-fab-act" data-act="call">📞 语音通话</button>
+    </div>
+    <button class="ai-fab-ball" title="问数学家 · 随时点我">🧑‍🏫</button>`;
+  document.body.appendChild(wrap);
+  const menu = wrap.querySelector('#aiFabMenu');
+  wrap.querySelector('.ai-fab-ball').onclick = (e)=>{ e.stopPropagation(); menu.classList.toggle('open'); };
+  wrap.querySelector('[data-act=chat]').onclick = (e)=>{ e.stopPropagation(); menu.classList.remove('open'); openChatOverlay(); };
+  wrap.querySelector('[data-act=call]').onclick = (e)=>{ e.stopPropagation(); menu.classList.remove('open'); if (!state.chatConv) state.chatConv = []; VoiceChat.enter(state.chatSci); };
+  document.addEventListener('click', ()=>menu.classList.remove('open'));
+}
+function closeFabMenu() { const m = document.getElementById('aiFabMenu'); if (m) m.classList.remove('open'); }
+
+function openLLMSettings() {
+  const cfg = state.llm || { baseUrl:'https://api.deepseek.com/v1', model:'deepseek-chat', apiKey:'' };
+  const presetBtns = LLM_PRESETS.map(p=>`<button data-pre="${p.id}" style="font-size:12px;padding:7px 11px;border-radius:999px">${p.label}</button>`).join(' ');
+  const mask = el('div','llm-mask');
+  mask.innerHTML = `
+    <div class="llm-modal">
+      <h2>⚙️ AI 接口设置</h2>
+      <div style="font-size:13px;color:var(--text-dim);text-align:center;margin:8px 0 14px">API Key 只保存在你本机浏览器（localStorage），不会上传任何服务器。</div>
+      <div style="font-size:13px;margin-bottom:8px">快速预设（点一下自动填好地址和模型，再粘贴你的 Key）：</div>
+      <div class="preset-row" style="justify-content:flex-start" id="lpre">${presetBtns}</div>
+      <div class="setting-grid">
+        <div><label>Base URL（OpenAI 兼容接口）</label><input id="lUrl" value="${cfg.baseUrl||''}" placeholder="https://api.deepseek.com/v1"></div>
+        <div><label>模型名 Model</label><input id="lModel" value="${cfg.model||''}" placeholder="deepseek-chat / qwen-plus / gpt-4o-mini ..."></div>
+        <div><label>API Key</label><input id="lKey" type="password" value="${cfg.apiKey||''}" placeholder="sk-..."></div>
+        <div id="lStatus" style="font-size:13px;color:var(--text-dim);min-height:18px"></div>
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button id="lTest">🔬 测试连接</button>
+        <button class="primary" id="lSave">保存</button>
+        <button id="lCancel">取消</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:14px;line-height:1.85">
+        ※ <b>国内直连·推荐</b>：DeepSeek / 通义千问 / 智谱GLM / Kimi —— 免代理、便宜、中文好，适合天天用。<br>
+        ※ <b>Claude</b>：浏览器可直连（已自动加直连授权头）；到 <b>console.anthropic.com</b> 申请 Key。最强 <code>claude-opus-4-8</code>、聪明 <code>claude-sonnet-4-6</code>、便宜快 <code>claude-haiku-4-5</code>；需科学上网。<br>
+        ※ <b>Gemini / GPT</b>：官方地址需代理；其中 Gemini 官方接口<b>不支持浏览器直连</b>（CORS），要在 Base URL 填你自己的中转/代理地址才能跑。Gemini 的 Key 可在 <b>aistudio.google.com</b> 免费申请。<br>
+        ※ <b>订阅 ≠ API</b>：ChatGPT Plus / Claude Pro / Gemini Advanced 这类网页会员<b>不能</b>直接用在这里——它们和开发者 API 是两套独立计费、额度不互通。要让这里能答题，必须单独申请一个 API Key（DeepSeek 极便宜、Gemini 有免费额度）。<br>
+        ※ Key 只存在你这台电脑的浏览器里，不上传任何服务器。本工具仅供自家本地使用，<b>别把填了 Key 的网页公开分享</b>。
+      </div>
+    </div>`;
+  document.body.appendChild(mask);
+  mask.querySelectorAll('[data-pre]').forEach(b=>b.onclick=ev=>{
+    const p = LLM_PRESETS.find(x=>x.id===ev.currentTarget.dataset.pre);
+    $('#lUrl',mask).value = p.baseUrl; $('#lModel',mask).value = p.model; $('#lKey',mask).focus();
+  });
+  $('#lCancel',mask).onclick = ()=>mask.remove();
+  $('#lSave',mask).onclick = ()=>{
+    state.llm = { baseUrl: $('#lUrl',mask).value.trim() || 'https://api.deepseek.com/v1', model: $('#lModel',mask).value.trim() || 'deepseek-chat', apiKey: $('#lKey',mask).value.trim() };
+    saveState(); mask.remove(); toast('✅ 已保存');
+    const _ov = document.getElementById('chatOvBody');
+    if (_ov) buildChatInto(_ov, 'overlay'); else if ($('#chatArea')) sceneAsk();
+  };
+  $('#lTest',mask).onclick = async ()=>{
+    const st = $('#lStatus',mask); st.style.color='var(--gold-soft)'; st.textContent='测试中…';
+    const backup = state.llm;
+    state.llm = { baseUrl: $('#lUrl',mask).value.trim(), model: $('#lModel',mask).value.trim(), apiKey: $('#lKey',mask).value.trim() };
+    try {
+      const r = await callLLM([{ role:'system', content:'你只回复两个字：你好' }, { role:'user', content:'请回复' }]);
+      st.style.color='var(--green)'; st.textContent='✅ 连接成功！示例回复：'+String(r).slice(0,40);
+    } catch(e) { st.style.color='var(--red)'; st.textContent='❌ '+e.message; }
+    finally { state.llm = backup; }
+  };
+}
+
+// 挂上全局悬浮 AI 助教球（在 body 上，跨 render 常驻）
+ensureChatFab();
+
+updateStreak(); checkDailyReward(); sceneMenu();
+</script>
+</body>
+</html>

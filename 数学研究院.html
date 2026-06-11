@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学研究院 · Graduate</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e1b; --bg-mid: #14192f; --bg-light: #232a4d;
+    --gold: #ffd700; --gold-soft: #f4c430;
+    --mauve: #d6889b; --rose: #ec407a; --teal: #4dd0e1;
+    --green: #80ed99; --red: #ff6b6b; --orange: #ffa940;
+    --text: #e8e6f0; --text-dim: #95a3c2;
+  }
+  html, body { height: 100%; font-family: 'Microsoft YaHei', sans-serif;
+    background: radial-gradient(ellipse at top, var(--bg-mid) 0%, var(--bg-deep) 70%);
+    color: var(--text); overflow: hidden; user-select: none; }
+  body::before { content: ''; position: fixed; inset: 0;
+    background-image: radial-gradient(2px 2px at 10% 20%, white, transparent),
+      radial-gradient(1px 1px at 40% 60%, var(--gold-soft), transparent),
+      radial-gradient(2px 2px at 75% 25%, var(--mauve), transparent),
+      radial-gradient(1px 1px at 90% 80%, var(--teal), transparent);
+    background-size: 100% 100%; opacity: 0.4; pointer-events: none; }
+  #app { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .scene { width: 100%; max-width: min(980px, 94vw); max-height: 95vh;
+    background: rgba(20,25,47,0.7); backdrop-filter: blur(20px);
+    border: 2px solid var(--mauve); border-radius: 24px; padding: 24px 28px;
+    box-shadow: 0 0 60px rgba(214,136,155,0.4); display: flex; flex-direction: column; overflow-y: auto; animation: fIn 0.5s ease; }
+  @keyframes fIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  h1,h2,h3 { font-family: 'Georgia', serif; color: var(--gold); text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+  h1 { font-size: 38px; text-align: center; margin-bottom: 8px; letter-spacing: 2px; }
+  h2 { font-size: 26px; margin-bottom: 14px; }
+  h3 { font-size: 18px; margin-bottom: 10px; color: var(--mauve); }
+  .subtitle { text-align: center; color: var(--text-dim); font-style: italic; margin-bottom: 24px; letter-spacing: 3px; }
+  button { font-family: inherit; font-size: 16px; padding: 12px 24px;
+    background: linear-gradient(135deg, var(--bg-light), var(--bg-mid)); color: var(--text);
+    border: 2px solid var(--mauve); border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+  button:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,215,0,0.4); border-color: var(--gold); }
+  button.primary { background: linear-gradient(135deg, var(--gold), var(--gold-soft)); color: var(--bg-deep); font-weight: bold; border-color: var(--gold); }
+  .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .menu-content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .crystal { font-size: 80px; margin: 16px 0; color: var(--mauve); text-shadow: 0 0 30px var(--mauve); font-family: 'Georgia', serif; }
+  .topic-grid { flex: 1; overflow-y: auto; padding: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  /* 仅"关卡地图"这类网格页加宽铺满；菜单/做题/故事等聚焦页保持窄宽舒适阅读 */
+  .scene:has(.tower-map), .scene:has(.peak-map), .scene:has(.course-map), .scene:has(.topic-grid), .scene:has(.gallery) { max-width: min(1400px, 95vw); }
+  .topic-card { background: linear-gradient(135deg, rgba(20,25,47,0.85), rgba(35,42,77,0.85));
+    border: 2px solid var(--mauve); border-radius: 14px; padding: 18px; cursor: pointer; transition: all 0.3s; }
+  .topic-card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(255,215,0,0.25); }
+  .topic-card.completed { border-color: var(--green); }
+  .topic-num { font-family: 'Georgia', serif; font-size: 24px; color: var(--gold); }
+  .topic-title { font-size: 18px; color: var(--gold); margin: 6px 0 4px; font-weight: bold; }
+  .topic-sub { font-size: 13px; color: var(--text-dim); }
+  .topic-icon { font-size: 36px; font-family: 'Cambria Math', serif; text-align: center; margin: 8px 0; }
+  .story-box { flex: 1; overflow-y: auto; padding: 16px; }
+  .dialogue { background: rgba(10,14,27,0.6); border-left: 4px solid var(--gold); border-radius: 8px; padding: 14px 18px; margin-bottom: 14px; }
+  .dialogue .speaker { color: var(--gold); font-weight: bold; font-size: 15px; margin-bottom: 6px; }
+  .dialogue .text { font-size: 16px; line-height: 1.7; }
+  .dialogue .formula, .concept-body .formula { color: var(--mauve); font-family: 'Cambria Math', serif; font-style: italic; background: rgba(214,136,155,0.1); padding: 0 6px; border-radius: 4px; }
+  .concept-card { background: rgba(10,14,27,0.7); border: 2px solid var(--mauve); border-radius: 14px; padding: 16px 20px; margin: 8px auto; max-width: 800px; text-align: left; }
+  .concept-title { color: var(--gold); font-size: 17px; margin-bottom: 8px; font-weight: bold; }
+  .concept-body { color: var(--text); font-size: 15px; line-height: 1.7; }
+  .concept-body .hl { color: var(--gold-soft); font-weight: bold; }
+  .timeline { background: rgba(10,14,27,0.6); border-radius: 14px; padding: 18px; margin: 8px auto; max-width: 800px; border-left: 3px solid var(--gold); }
+  .timeline-item { display: flex; gap: 14px; padding: 8px 0; border-bottom: 1px dashed rgba(214,136,155,0.3); }
+  .timeline-year { color: var(--gold); font-weight: bold; font-size: 15px; min-width: 60px; }
+  .timeline-event { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .q-expr { text-align: center; font-family: 'Cambria Math', serif; font-size: 22px; color: var(--gold); margin: 14px 0 6px; line-height: 1.4; }
+  .q-hint { text-align: center; color: var(--text-dim); font-size: 14px; margin-bottom: 12px; }
+  .q-progress { text-align: center; color: var(--text-dim); font-size: 13px; margin-bottom: 8px; }
+  .opt-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-width: 700px; margin: 8px auto; }
+  .opt-btn { padding: 14px; font-size: 15px; background: rgba(20,25,47,0.85); border: 2px solid var(--mauve); color: var(--text); border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; line-height: 1.5; }
+  .opt-btn:hover:not(:disabled) { border-color: var(--gold); }
+  .opt-btn.correct { background: rgba(128,237,153,0.3); border-color: var(--green); }
+  .opt-btn.wrong { background: rgba(255,107,107,0.3); border-color: var(--red); animation: shake 0.4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .feedback { text-align: center; margin-top: 12px; font-size: 16px; min-height: 28px; }
+  .feedback.correct { color: var(--green); } .feedback.wrong { color: var(--red); }
+  .victory-content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .hud { display: flex; justify-content: space-between; align-items: center; background: rgba(10,14,27,0.6); border: 1px solid var(--mauve); border-radius: 12px; padding: 8px 16px; margin-bottom: 14px; font-size: 14px; flex-wrap: wrap; gap: 8px; }
+  .hud .label { color: var(--text-dim); }
+  .hud .value { color: var(--gold); font-weight: bold; }
+  .toast-popup { position: fixed; bottom: 6%; left: 50%; transform: translateX(-50%); background: rgba(10,14,27,0.95); border: 2px solid var(--gold); color: var(--gold); padding: 10px 22px; border-radius: 24px; font-size: 15px; z-index: 1001; pointer-events: none; animation: ts 1.8s ease-out forwards; white-space: nowrap; }
+  @keyframes ts { 0%{opacity:0;transform:translate(-50%,20px)} 15%,85%{opacity:1;transform:translate(-50%,0)} 100%{opacity:0;transform:translate(-50%,-10px)} }
+  .voice-btn { position: fixed; top: 14px; right: 14px; z-index: 100; width: 44px; height: 44px; border-radius: 50%; background: rgba(10,14,27,0.85); border: 2px solid var(--mauve); color: var(--gold); font-size: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+  .voice-btn:hover { transform: scale(1.1); }
+  .speak-btn { background: transparent; border: 1px solid var(--mauve); color: var(--mauve); border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 13px; cursor: pointer; margin-left: 8px; display: inline-flex; align-items: center; justify-content: center; box-shadow: none; }
+  .speak-btn:hover { background: rgba(214,136,155,0.2); }
+  .fun-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 16px 0; }
+  .fun-card { background: linear-gradient(135deg, rgba(20,16,40,0.85), rgba(10,14,27,0.85)); border: 2px solid var(--mauve); border-radius: 16px; padding: 20px 16px; text-align: center; cursor: pointer; transition: all 0.25s; }
+  .fun-card:hover { transform: translateY(-6px); border-color: var(--gold); }
+  .fun-ic { font-size: 42px; margin-bottom: 8px; }
+  .fun-tt { color: var(--gold); font-weight: bold; font-size: 17px; margin-bottom: 4px; }
+  .fun-sub { color: var(--text-dim); font-size: 12px; }
+  .info-list { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; max-height: 60vh; overflow-y: auto; }
+  .info-card { background: rgba(10,14,27,0.5); border-left: 3px solid var(--gold-soft); border-radius: 8px; padding: 12px 14px; }
+  .info-h { color: var(--gold); font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .info-b { color: var(--text); line-height: 1.7; font-size: 14px; }
+  .info-meta { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+  .riddle-toggle { color: var(--mauve); cursor: pointer; font-size: 13px; margin-top: 6px; display: inline-block; }
+  .riddle-ans { display: none; margin-top: 6px; padding: 8px 10px; background: rgba(255,215,0,0.08); border-radius: 6px; color: var(--gold-soft); font-size: 13px; }
+  .riddle-ans.show { display: block; }
+  @media (max-width: 600px) { h1 { font-size: 26px; } .scene { padding: 16px; } .topic-grid { grid-template-columns: 1fr; } .voice-btn{width:38px;height:38px;top:8px;right:8px;font-size:17px} }
+</style>
+</head>
+<body>
+<a href="index.html" title="返回数学世界 · 五阶段总目录" style="position:fixed;top:13px;left:13px;z-index:9999;font:600 12px/1 'Microsoft YaHei',sans-serif;color:#ffd700;background:rgba(10,10,26,0.62);border:1px solid rgba(255,215,0,0.45);border-radius:14px;padding:6px 11px;text-decoration:none;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.3);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(255,215,0,0.2)';this.style.borderColor='#ffd700'" onmouseout="this.style.background='rgba(10,10,26,0.62)';this.style.borderColor='rgba(255,215,0,0.45)'">⌂ 数学世界</a>
+<div id="app"></div>
+<script>
+"use strict";
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+const TOPICS = [
+  {
+    id: 1, icon: 'μ', title: '一 · 测度论与积分', sub: 'Lebesgue · σ-代数 · 控制收敛',
+    story: [
+      { speaker: 'Lebesgue', text: '黎曼积分有局限：处处振荡、处处不连续的函数（如狄利克雷函数）无法处理。' },
+      { speaker: 'Lebesgue', text: '我从测度出发：先定义集合的"大小"，再用值域分层求和。' },
+      { speaker: 'Lebesgue', text: '勒贝格积分在更宽条件下支持<span class="hl">极限与积分交换</span>（控制收敛、单调收敛、Fatou），是现代分析的基石。' }
+    ],
+    timeline: [
+      { y: '1898', e: 'Borel：引入 σ-代数和波莱尔可测集' },
+      { y: '1902', e: 'Lebesgue：博士论文《积分、长度、面积》定义勒贝格测度与积分' },
+      { y: '1906', e: 'Fatou 引理' },
+      { y: '1907', e: 'Riesz-Fischer 定理：L² 完备' },
+      { y: '1914', e: 'Carathéodory 测度扩张定理' },
+      { y: '1924', e: 'Banach-Tarski 悖论' },
+      { y: '1930', e: 'Radon-Nikodym 定理（Nikodym 推广至抽象测度）' }
+    ],
+    concepts: [
+      { title: 'σ-代数', body: '集合 X 上的 σ-代数 ℱ：① ∅ ∈ ℱ；② A ∈ ℱ ⇒ Aᶜ ∈ ℱ；③ 可数并 ∪Aᵢ ∈ ℱ。<br>(X, ℱ) 叫<span class="hl">可测空间</span>；ℱ 中的集合叫可测集。<br>Borel σ-代数 ℬ(ℝⁿ)：由开集生成的最小 σ-代数。' },
+      { title: '测度', body: 'μ: ℱ → [0, ∞]，满足 μ(∅) = 0，且对互不相交可数集列 {Aᵢ}，<span class="formula">μ(∪Aᵢ) = Σμ(Aᵢ)</span>（可数可加性）。<br>勒贝格测度 m 是 ℝⁿ 上的<span class="hl">平移不变</span>测度，m([a,b]) = b − a。' },
+      { title: '三大收敛定理', body: '<span class="hl">MCT 单调收敛</span>：0 ≤ fₙ ↗ f ⇒ ∫fₙ → ∫f<br><span class="hl">Fatou</span>：fₙ ≥ 0 ⇒ ∫lim inf fₙ ≤ lim inf ∫fₙ<br><span class="hl">DCT 控制收敛</span>：|fₙ| ≤ g 可积、fₙ → f a.e. ⇒ ∫fₙ → ∫f<br>这是 Lebesgue 积分比 Riemann 积分强大的核心。' },
+      { title: '乘积测度与 Fubini', body: '若 (X, ℱ, μ), (Y, 𝒢, ν) 都是 σ-有限测度空间，则 X × Y 上有唯一<span class="hl">乘积测度</span> μ ⊗ ν。<br><span class="hl">Fubini-Tonelli</span>：可测函数（且非负或 L¹）的累次积分可交换次序。' },
+      { title: 'Radon-Nikodym 定理', body: '若 ν 关于 μ 绝对连续（μ(A) = 0 ⇒ ν(A) = 0），且二者 σ-有限，则存在<span class="hl">唯一</span>非负可测函数 f（称 R-N 导数）使得 <span class="formula">dν = f dμ</span>。<br>用于概率论的条件期望、统计的密度推断。' }
+    ],
+    quiz: [
+      { q: 'σ-代数对哪些运算封闭？', opts: ['可数并、补、可数交', '有限并', '只对补封闭', '任意并'], answer: '可数并、补、可数交' },
+      { q: '勒贝格积分相比黎曼积分的根本优势在于：', opts: ['极限与积分可交换的条件更宽泛', '计算更快', '只对连续函数有效', '不需要测度论'], answer: '极限与积分可交换的条件更宽泛' },
+      { q: '控制收敛定理（DCT）的关键假设：', opts: ['|fₙ| ≤ 可积函数 g', 'fₙ 单调', 'fₙ 连续', 'fₙ → 0'], answer: '|fₙ| ≤ 可积函数 g' },
+      { q: 'Radon-Nikodym 定理给出的对象是：', opts: ['密度函数 dν/dμ', '不动点', '特征值', 'σ-代数'], answer: '密度函数 dν/dμ' },
+      { q: 'Fubini 定理允许：', opts: ['交换累次积分次序', '交换极限与积分', '把 ℝ² 展开为 ℝ', '换元积分'], answer: '交换累次积分次序' }
+    ]
+  },
+  {
+    id: 2, icon: 'H', title: '二 · 泛函分析', sub: 'Banach · Hilbert · 算子谱',
+    story: [
+      { speaker: 'Banach', text: '把无穷维向量空间引入分析：函数本身被视为"点"。' },
+      { speaker: 'Hilbert', text: 'L² 空间是完备的<span class="hl">无穷维内积空间</span>——希尔伯特空间——量子力学的舞台。' },
+      { speaker: 'Banach', text: '三大原理：<span class="hl">Hahn-Banach 延拓、开映射定理、闭图象定理</span>，是泛函分析的支柱。' }
+    ],
+    timeline: [
+      { y: '1906', e: 'Hilbert：希尔伯特空间概念（积分方程研究）' },
+      { y: '1922', e: 'Banach：博士论文《关于抽象集合的运算》——Banach 空间' },
+      { y: '1927-29', e: 'Hahn-Banach 定理、开映射定理、闭图象定理、一致有界原理' },
+      { y: '1932', e: 'Banach《线性算子理论》出版' },
+      { y: '1950s', e: 'Grothendieck 的核空间、谱定理一般化' }
+    ],
+    concepts: [
+      { title: '赋范空间与 Banach 空间', body: '<span class="hl">范数</span> ‖·‖: V → [0, ∞)：① ‖x‖ = 0 ⇔ x = 0；② ‖αx‖ = |α|‖x‖；③ ‖x+y‖ ≤ ‖x‖ + ‖y‖（三角不等式）。<br><span class="hl">Banach 空间</span>：完备的赋范空间。<br>例：(C[a,b], ‖·‖_∞)、(L^p, ‖·‖_p)。' },
+      { title: 'Hilbert 空间', body: '内积 ⟨·, ·⟩ 诱导范数 ‖x‖ = √⟨x,x⟩。<br><span class="hl">Hilbert 空间</span>：完备的内积空间。<br>满足<span class="hl">平行四边形等式</span>：‖x+y‖² + ‖x-y‖² = 2‖x‖² + 2‖y‖²。<br>L² 是最重要的 Hilbert 空间。' },
+      { title: '正交分解与投影', body: '若 M ⊆ H 是闭线性子空间，则任意 x ∈ H 可唯一分解为 x = u + v，u ∈ M, v ∈ M⊥。<br>M⊥ = {y : ⟨y, m⟩ = 0 ∀ m ∈ M}。<br>这是<span class="hl">最佳逼近</span>的几何基础。' },
+      { title: '三大基本定理', body: '<span class="hl">Hahn-Banach</span>：定义在子空间上的有界线性泛函可保范延拓到全空间。<br><span class="hl">开映射定理</span>：Banach 空间之间的连续满射是开映射。<br><span class="hl">闭图象定理</span>：图象闭的线性映射是连续的。' },
+      { title: '算子的谱', body: '有界线性算子 T 的<span class="hl">谱</span> σ(T)：使 T − λI 不可逆的 λ 的集合。<br>有限维：σ(T) = 特征值集合。<br>无穷维：还可能有<span class="hl">连续谱、剩余谱</span>。<br><span class="hl">紧算子</span>的非零谱由至多可数个特征值组成，且唯一可能的聚点是 0。' }
+    ],
+    quiz: [
+      { q: 'Banach 空间是：', opts: ['完备的赋范空间', '完备的内积空间', '所有连续函数构成的空间', '有限维向量空间'], answer: '完备的赋范空间' },
+      { q: 'Hilbert 空间区别于 Banach 空间的关键：', opts: ['有内积（满足平行四边形等式）', '完备', '有界', '可分'], answer: '有内积（满足平行四边形等式）' },
+      { q: 'Hahn-Banach 定理保证：', opts: ['子空间上的有界线性泛函可保范延拓到全空间', '所有算子有谱', '映射可逆', '极值存在'], answer: '子空间上的有界线性泛函可保范延拓到全空间' },
+      { q: '紧算子的非零谱：', opts: ['由至多可数个特征值构成，0 是唯一可能聚点', '总为空', '为整条实轴', '与有限维完全相同'], answer: '由至多可数个特征值构成，0 是唯一可能聚点' },
+      { q: 'L² 空间为何重要？', opts: ['是 Hilbert 空间，量子力学的状态空间', '是 Banach 但非完备', '是有限维', '只研究多项式'], answer: '是 Hilbert 空间，量子力学的状态空间' }
+    ]
+  },
+  {
+    id: 3, icon: 'ℱ', title: '三 · 调和分析', sub: '傅里叶 · 小波 · 奇异积分',
+    story: [
+      { speaker: 'Fourier', text: '任何"足够好"的函数都能展开为正弦波之和——傅里叶级数。' },
+      { speaker: 'Fourier', text: '连续情形是<span class="hl">傅里叶变换</span> F[f](ξ) = ∫f(x) e^(-2πixξ) dx——频域和时域之间的桥。' },
+      { speaker: 'Wiener', text: '现代调和分析研究函数在不同尺度上的局部行为：奇异积分、小波、振荡积分。' }
+    ],
+    timeline: [
+      { y: '1822', e: 'Fourier：《热的分析理论》开创傅里叶级数' },
+      { y: '1930', e: 'Hardy-Littlewood 极大函数' },
+      { y: '1799 / 1910', e: 'Parseval 恒等式 / Plancherel 定理' },
+      { y: '1952', e: 'Calderón-Zygmund 奇异积分理论' },
+      { y: '1980s', e: 'Daubechies 等：小波分析' },
+      { y: '2003', e: '陶哲轩、Grafakos 现代调和分析教材' }
+    ],
+    concepts: [
+      { title: '傅里叶级数', body: '周期函数 f(x) (周期 2π)：<br><span class="formula">f(x) = a₀/2 + Σ(aₙ cos nx + bₙ sin nx)</span><br>系数 aₙ = (1/π)∫f cos nx dx；bₙ 类似。<br>Parseval：‖f‖² = π[a₀²/2 + Σ(aₙ² + bₙ²)]——能量守恒。' },
+      { title: '傅里叶变换', body: '<span class="formula">f̂(ξ) = ∫_{-∞}^{∞} f(x) e^{-2πixξ} dx</span><br>逆变换：<span class="formula">f(x) = ∫f̂(ξ) e^{2πixξ} dξ</span>。<br>Plancherel：‖f‖_{L²} = ‖f̂‖_{L²}。<br>把卷积变成乘积：(f * g)^ = f̂ · ĝ。' },
+      { title: '主要不等式', body: '<span class="hl">Hardy-Littlewood 极大函数</span> Mf：测控函数的"局部平均"的最大值。<br><span class="hl">Calderón-Zygmund 分解</span>：把可积函数分解为"好"部分和"坏"部分。<br><span class="hl">Marcinkiewicz 插值</span>：弱型 (p,p) 与 (q,q) 可推出强型。' },
+      { title: '小波变换', body: '小波是<span class="hl">局部</span>振荡的"基"。<br><span class="hl">连续小波</span>：W_f(a, b) = (1/√a) ∫ f(x) ψ((x-b)/a) dx。<br>a 是尺度（频域），b 是位移（时域）。<br>优点：比傅里叶更适合非平稳信号、图像压缩 (JPEG2000)。' },
+      { title: '调和分析现代专题', body: 'Hardy 空间 Hᵖ、BMO 空间（John-Nirenberg、Fefferman）。<br>Littlewood-Paley 理论：分解信号成不同频率带。<br>Restriction 猜想、Kakeya 猜想——21 世纪最活跃的方向之一。' }
+    ],
+    quiz: [
+      { q: 'Parseval / Plancherel 定理说：', opts: ['傅里叶变换保持 L² 范数（能量守恒）', '保持 L¹ 范数', '保持最大值', '保持连续性'], answer: '傅里叶变换保持 L² 范数（能量守恒）' },
+      { q: '卷积在傅里叶变换下变为：', opts: ['乘积 f̂ ĝ', '商', '导数', '不变'], answer: '乘积 f̂ ĝ' },
+      { q: 'Calderón-Zygmund 算子是：', opts: ['具有特定核条件的奇异积分算子', '紧算子', '线性微分算子', '有限秩算子'], answer: '具有特定核条件的奇异积分算子' },
+      { q: '小波相对傅里叶的优势：', opts: ['可同时刻画时域和频域局部特征', '计算更快', '处理整数序列', '只对周期函数有效'], answer: '可同时刻画时域和频域局部特征' },
+      { q: 'BMO 空间是哪位数学家的工作？', opts: ['John-Nirenberg / Fefferman', 'Banach', 'Cauchy', 'Lebesgue'], answer: 'John-Nirenberg / Fefferman' }
+    ]
+  },
+  {
+    id: 4, icon: '∂_t', title: '四 · 偏微分方程', sub: '椭圆 · 抛物 · 双曲',
+    story: [
+      { speaker: 'Laplace', text: '物理由 PDE 描述：热传导、波动、引力、量子。' },
+      { speaker: 'Hadamard', text: 'PDE 分三类：<span class="hl">椭圆型</span>（拉普拉斯）、<span class="hl">抛物型</span>（热方程）、<span class="hl">双曲型</span>（波动方程）。' },
+      { speaker: 'Sobolev', text: '现代 PDE 在 Sobolev 空间中求"弱解"，再讨论正则性。' }
+    ],
+    timeline: [
+      { y: '1782-1813', e: 'Laplace、Poisson 椭圆方程' },
+      { y: '1822', e: 'Fourier 热方程' },
+      { y: '1746', e: 'd\'Alembert 波动方程' },
+      { y: '1900', e: 'Hilbert 第 19、20 问题（PDE 解的正则性）' },
+      { y: '1936', e: 'Sobolev 空间' },
+      { y: '1957', e: 'De Giorgi、Nash 二阶椭圆解的正则性（Hölder 连续）' },
+      { y: '2014', e: 'Hairer：随机 PDE 正则性结构（Fields 2014）' }
+    ],
+    concepts: [
+      { title: '三大经典 PDE', body: '<span class="hl">拉普拉斯方程</span>：Δu = 0。描述稳态。<br><span class="hl">热方程</span>：∂u/∂t = αΔu。扩散过程。<br><span class="hl">波动方程</span>：∂²u/∂t² = c² Δu。振动 / 传播。<br>这三种方程数学性质迥异，对应三种几何类型。' },
+      { title: 'Sobolev 空间', body: '<span class="formula">W^{k,p}(Ω) = { u ∈ L^p : D^α u ∈ L^p, |α| ≤ k }</span>（弱导数）。<br>k 阶可微 + p 次可积。<br>嵌入定理 (Sobolev embedding)：W^{k,p} ⊂ C^j、L^q，看维数 n、k、p 关系。' },
+      { title: '弱解与变分法', body: '把 PDE 写成"对所有 test 函数 φ：∫ ... = 0"的形式 → 在 Sobolev 空间求解。<br>能量泛函 E[u]：极值即解（变分法）。<br><span class="hl">直接法</span>：取极小化序列 + 弱紧性 + 下半连续 ⇒ 极小存在。' },
+      { title: '解的正则性', body: '弱解未必光滑。<br>对椭圆方程：De Giorgi-Nash-Moser 给出 Hölder 连续；之后 Schauder 估计提升到 C^{2,α}。<br>这是 Hilbert 第 19 问题的解答（1957）。' },
+      { title: '现代分支', body: '非线性 PDE（KdV、Navier-Stokes、Einstein 方程）。<br>几何 PDE：Ricci 流（佩雷尔曼用它证庞加莱）、平均曲率流。<br>随机 PDE：Hairer 正则性结构（2014 菲尔兹奖）。' }
+    ],
+    quiz: [
+      { q: '热方程 ∂u/∂t = αΔu 属于哪类 PDE？', opts: ['抛物型', '椭圆型', '双曲型', '线性'], answer: '抛物型' },
+      { q: '波动方程 ∂²u/∂t² = c²Δu 属于哪类？', opts: ['双曲型', '椭圆型', '抛物型', '退化'], answer: '双曲型' },
+      { q: 'Sobolev 空间 W^{k,p} 的元素：', opts: ['弱导数到 k 阶都属于 L^p', '光滑到 k 阶', '可积有界', '紧支集'], answer: '弱导数到 k 阶都属于 L^p' },
+      { q: '变分法求解 PDE 的核心思想：', opts: ['转化为能量泛函的极值问题', '直接积分', '差分逼近', '特征值分解'], answer: '转化为能量泛函的极值问题' },
+      { q: 'De Giorgi-Nash 解决了 Hilbert 哪个问题？', opts: ['第 19 问题（椭圆方程解的正则性）', '第 8 问题（黎曼假设）', '第 10 问题', '第 13 问题'], answer: '第 19 问题（椭圆方程解的正则性）' }
+    ]
+  },
+  {
+    id: 5, icon: '𝒪', title: '五 · 代数几何', sub: '簇 · 概形 · 上同调',
+    story: [
+      { speaker: 'Grothendieck', text: '代数几何研究多项式方程组的解集——但用"概形"取代经典的代数簇，能涵盖更多的现象。' },
+      { speaker: 'Serre', text: '<span class="hl">层、上同调、范畴语言</span>是这门学科的灵魂。' },
+      { speaker: 'Deligne', text: 'Weil 猜想——有限域上代数簇的 zeta 函数——被 Deligne 用 ℓ-adic 上同调彻底解决（Fields 1978）。' }
+    ],
+    timeline: [
+      { y: '1851', e: 'Riemann：代数曲线、黎曼面' },
+      { y: '1900-50', e: '意大利学派：经典代数几何（Castelnuovo、Severi）' },
+      { y: '1958-65', e: 'Grothendieck：EGA、SGA，重写代数几何（概形理论）' },
+      { y: '1974', e: 'Deligne 证 Weil 猜想' },
+      { y: '1995', e: 'Wiles 证费马大定理（用模形式与代数几何）' },
+      { y: '2012', e: 'Mochizuki 宇宙际 Teichmüller 理论 (IUT)' }
+    ],
+    concepts: [
+      { title: '代数簇', body: '<span class="hl">仿射代数簇</span>：多项式方程组 V(f₁,...,fₘ) = {x ∈ kⁿ : fᵢ(x) = 0}。<br><span class="hl">射影簇</span>：射影空间 ℙⁿ 中齐次多项式的零点集。<br>例：椭圆曲线 y² = x³ + ax + b（亏格 1）。' },
+      { title: '概形', body: 'Grothendieck 把"代数簇"推广为<span class="hl">概形 (Scheme)</span>：<br>底集是<span class="hl">交换环的素谱</span> Spec(A)，<br>配以结构层 𝒪。<br>优点：① 允许整环以外的环（含零因子、含幂零元）；② 把数论与几何统一。' },
+      { title: '层与上同调', body: '<span class="hl">层</span> ℱ：把局部信息（开集 → 截面）整体化。<br>层的<span class="hl">上同调群</span> H^i(X, ℱ) 度量"层的局部到整体"障碍。<br>经典工具：Čech 上同调、导出函子。' },
+      { title: '凯勒/复几何与 Hodge 理论', body: '光滑复射影代数簇上有 Hodge 分解 H^k(X, ℂ) = ⊕ H^{p,q}，它们是一类紧致凯勒流形。<br>Hodge 猜想：特定的有理 (p,p) 类来自代数闭链。<br>这是 Clay 千禧年问题之一。' },
+      { title: '当代地图', body: '<span class="hl">朗兰兹纲领</span>：连接表示论、自守形式、代数几何（费马大定理只是其中一个奇迹）。<br>导出代数几何（Lurie）、∞-范畴、p-adic Hodge 理论（Faltings、Scholze）。' }
+    ],
+    quiz: [
+      { q: 'Grothendieck 用什么取代经典代数簇？', opts: ['概形（Scheme）', '群胚', '流形', '拓扑空间'], answer: '概形（Scheme）' },
+      { q: 'Weil 猜想由谁完全证明？', opts: ['Deligne (1974)', 'Grothendieck', 'Serre', 'Wiles'], answer: 'Deligne (1974)' },
+      { q: '层（Sheaf）的作用是：', opts: ['把局部信息整体化', '定义曲线', '解 PDE', '计算特征值'], answer: '把局部信息整体化' },
+      { q: '椭圆曲线 y² = x³ + ax + b 的亏格 = ?', opts: ['1', '0', '2', '∞'], answer: '1' },
+      { q: 'Hodge 猜想是 Clay 千禧年 7 个问题之一，关于：', opts: ['Hodge 类是否都是代数类', '黎曼假设', 'P=NP', '杨-米尔斯'], answer: 'Hodge 类是否都是代数类' }
+    ]
+  },
+  {
+    id: 6, icon: '𝓜', title: '六 · 微分流形与黎曼几何', sub: '光滑流形 · 联络 · 曲率',
+    story: [
+      { speaker: 'Riemann', text: '把曲面推广到任意维数：n 维流形的内蕴几何由<span class="hl">度量张量</span> g 决定。' },
+      { speaker: 'Levi-Civita', text: '在黎曼流形上有<span class="hl">唯一</span>的无挠率、保度量的<span class="hl">联络</span>——Levi-Civita 联络。' },
+      { speaker: 'Einstein', text: '时空的弯曲就是引力。物质告诉时空如何弯曲（场方程），时空告诉物质如何运动（测地线）。' }
+    ],
+    timeline: [
+      { y: '1854', e: 'Riemann 就职演说《关于几何基础的假设》' },
+      { y: '1900-15', e: 'Ricci-Curbastro、Levi-Civita 张量分析 → Einstein 广义相对论 (1915)' },
+      { y: '1950s', e: 'Whitney 嵌入定理；Hodge 理论' },
+      { y: '1982', e: 'Donaldson 利用规范场论研究 4 维流形' },
+      { y: '2003', e: 'Perelman 用 Ricci 流证庞加莱猜想' }
+    ],
+    concepts: [
+      { title: '光滑流形', body: '<span class="hl">n 维拓扑流形</span>：每点有邻域同胚于 ℝⁿ 开集（局部欧氏）。<br><span class="hl">微分结构</span>：相邻图卡的转换映射是 C^∞ 光滑。<br>Whitney 嵌入定理：任意 n 维流形可嵌入 ℝ^{2n}。' },
+      { title: '切丛与微分形式', body: '点 p 处的<span class="hl">切空间</span> T_p M：所有切向量构成的 n 维向量空间。<br>切丛 TM = ⋃ T_p M。<br><span class="hl">微分 k-形式</span>：在每点指派一个反对称 k-线性形式。dω：外微分；∫ω 用斯托克斯定理。' },
+      { title: '联络与平行移动', body: '<span class="hl">联络 ∇</span>：在切丛上定义"如何把向量沿曲线移动"。<br>无挠率 + 保度量 ⇒ <span class="hl">Levi-Civita 联络</span>（唯一）。<br>测地线：自身平行的曲线 ∇_v v = 0——黎曼几何中"直线"的推广。' },
+      { title: '曲率张量', body: '<span class="hl">黎曼曲率张量</span> R(X, Y)Z = ∇_X ∇_Y Z − ∇_Y ∇_X Z − ∇_{[X,Y]} Z。<br><span class="hl">Ricci 张量</span> Ric = trace R；<span class="hl">数量曲率</span> S = trace Ric。<br>2 维曲面：Ric = K g，数量曲率 S = 2K；高斯曲率 K 刻画弯曲。' },
+      { title: 'Ricci 流与庞加莱猜想', body: 'Hamilton 提出 <span class="formula">∂g/∂t = -2 Ric(g)</span>，让度量按 Ricci 演化。<br>2002-03 年 Perelman 证明：单连通 3 维闭流形必同胚 S³（解决了一百年悬案）。<br>这是 Clay 千禧年第一个被解决的问题。' }
+    ],
+    quiz: [
+      { q: 'Whitney 嵌入定理：n 维流形可嵌入 ℝ 的多少维？', opts: ['2n 维', 'n 维', '∞', 'n+1'], answer: '2n 维' },
+      { q: 'Levi-Civita 联络的特征：', opts: ['唯一无挠率且保度量的联络', '平凡', '不存在', '总是零'], answer: '唯一无挠率且保度量的联络' },
+      { q: '测地线的定义：', opts: ['自身平行（∇_v v = 0）的曲线', '直线', '最短曲线（一定意义）', '圆弧'], answer: '自身平行（∇_v v = 0）的曲线' },
+      { q: '庞加莱猜想由谁证明？', opts: ['Perelman（2003）', 'Smale', 'Donaldson', 'Hamilton'], answer: 'Perelman（2003）' },
+      { q: 'Einstein 场方程的左边几何项中包含：', opts: ['Ricci 张量与数量曲率', 'Riemann 张量', '联络', '度量本身'], answer: 'Ricci 张量与数量曲率' }
+    ]
+  },
+  {
+    id: 7, icon: 'ρ', title: '七 · 表示论', sub: '李群 · 李代数 · 自守形式',
+    story: [
+      { speaker: 'Cartan', text: '李群是<span class="hl">连续对称性</span>的载体：物理对称、几何对称、数论对称都用它。' },
+      { speaker: 'Weyl', text: '紧李群的有限维连续表示完全可约——分类清晰，根系图（Dynkin 图）完美。' },
+      { speaker: 'Langlands', text: '我提出<span class="hl">朗兰兹纲领</span>：自守形式与 Galois 表示的对应——21 世纪数学的中心。' }
+    ],
+    timeline: [
+      { y: '1870-1900', e: 'Lie 引入连续变换群；Killing-Cartan 分类单李代数' },
+      { y: '1925', e: 'Weyl：紧李群的特征公式' },
+      { y: '1950', e: 'Tate 博士论文：adele 上的 Fourier 分析与 zeta 函数（1967 发表）' },
+      { y: '1967', e: 'Langlands 提出 Langlands 函子' },
+      { y: '1994', e: 'Wiles 证半稳定椭圆曲线模性（费马大定理）' },
+      { y: '2018', e: 'Scholze + Fargues：几何朗兰兹的局部模型' }
+    ],
+    concepts: [
+      { title: '李群与李代数', body: '<span class="hl">李群</span> G：既是光滑流形又是群，且乘法、求逆光滑。<br>例：GL(n,ℝ)、O(n)、SO(n)、U(n)、SU(n)、Sp(n)。<br><span class="hl">李代数</span> 𝔤：G 在单位元的切空间，带李括号 [X, Y]。' },
+      { title: '表示的定义', body: 'G 的表示：群同态 <span class="formula">ρ: G → GL(V)</span>（V 是某向量空间）。<br>不可约：V 没有 G-不变非平凡子空间。<br><span class="hl">完全可约</span>（有限维、紧群或半单李代数等常见情形）：表示可分解为不可约表示直和。' },
+      { title: '根系与 Dynkin 图', body: '复半单李代数 𝔤 由其<span class="hl">根系</span>分类：<br>四大族 Aₙ, Bₙ, Cₙ, Dₙ + 5 个例外 G₂, F₄, E₆, E₇, E₈。<br>Dynkin 图给出根系的 combinatorial 数据，完整分类半单李代数。' },
+      { title: '特征公式', body: '<span class="hl">Weyl 特征公式</span>：紧连通李群不可约表示的特征 χ_λ 由最高权 λ 与 Weyl 群 W 决定。<br>用途：计算维数、约化乘积分解。<br>例：SU(2) 的不可约表示由非负半整数 j 标记，维数 2j + 1。' },
+      { title: '朗兰兹纲领', body: '<span class="hl">自守形式</span>（在算术群作用下的特殊函数）与<span class="hl">Galois 表示</span>之间有深刻对应。<br>这把数论、表示论、代数几何统一起来。<br>费马大定理是这套理论的副产品（Wiles）。' }
+    ],
+    quiz: [
+      { q: '李群的定义：', opts: ['光滑流形 + 群结构（运算光滑）', '只是群', '只是流形', '离散群'], answer: '光滑流形 + 群结构（运算光滑）' },
+      { q: '紧李群的有限维连续表示：', opts: ['完全可约', '总不可约', '不收敛', '无限维'], answer: '完全可约' },
+      { q: 'E₈ 是：', opts: ['例外单李代数', '一般线性群', '正交群', '辛群'], answer: '例外单李代数' },
+      { q: 'SU(2) 的不可约表示维数：', opts: ['2j + 1（j 非负半整数）', '2j', 'j²', 'j!'], answer: '2j + 1（j 非负半整数）' },
+      { q: '朗兰兹纲领核心猜想是关于：', opts: ['自守形式与 Galois 表示的对应', '不动点定理', '紧致性', '李代数分类'], answer: '自守形式与 Galois 表示的对应' }
+    ]
+  },
+  {
+    id: 8, icon: '⇒', title: '八 · 范畴论', sub: '函子 · 自然变换 · 极限',
+    story: [
+      { speaker: 'Eilenberg & Mac Lane', text: '我们 1945 年引入范畴、函子、自然变换——为同调代数提供统一语言。' },
+      { speaker: 'Grothendieck', text: '范畴论是 20 世纪后半叶代数几何与同调代数的基石——一切结构都用它表达。' },
+      { speaker: 'Lurie', text: '∞-范畴让我们以同伦不变的方式做"高阶代数"——21 世纪的语言。' }
+    ],
+    timeline: [
+      { y: '1945', e: 'Eilenberg-MacLane：范畴、函子、自然变换' },
+      { y: '1950s', e: 'Cartan-Eilenberg 同调代数；阿贝尔范畴' },
+      { y: '1954', e: 'Yoneda 引理（Yoneda 与 Mac Lane 的讨论，后由 Mac Lane 命名）' },
+      { y: '1957', e: 'Grothendieck Tôhoku 论文：导出函子' },
+      { y: '1963-67', e: '伴随函子定理（Adjoint Functor Theorem，Freyd 1964）' },
+      { y: '2009', e: 'Lurie《Higher Topos Theory》：∞-范畴系统化' }
+    ],
+    concepts: [
+      { title: '范畴的定义', body: '范畴 𝒞 = (对象, 态射, 复合)：<br>① <span class="hl">对象</span>类 Ob(𝒞)；<br>② 对每对对象 X, Y，<span class="hl">态射</span>集 Hom(X, Y)；<br>③ 复合 ∘ 满足结合律 + 单位元 id_X。<br>例：Set, Grp, Top, Vec, Ring, ModR。' },
+      { title: '函子与自然变换', body: '<span class="hl">函子</span> F: 𝒞 → 𝒟：把对象映对象，态射映态射，保持复合与单位。<br><span class="hl">自然变换</span> η: F ⇒ G：对每个 X 给 η_X: F(X) → G(X)，且自然方块交换。<br>范畴本身在"范畴的范畴"中。' },
+      { title: 'Yoneda 引理', body: '范畴论最深刻的事实之一：<br><span class="formula">Nat(Hom(X, -), F) ≅ F(X)</span><br>对象 X 完全由其"被态射进出的方式"决定。<br>把对象嵌入到自身的函子范畴里，叫 Yoneda 嵌入。' },
+      { title: '极限与余极限', body: '<span class="hl">极限</span>：从某个图表 D: J → 𝒞 来的"通用对象"。<br>例：<span class="hl">积</span> X × Y、<span class="hl">等化子</span>、<span class="hl">拉回</span>。<br>余极限对偶：<span class="hl">余积、余等化子、推出</span>。<br>(co)limit 存在性 + 函子保持它们 = 重要性质。' },
+      { title: '伴随函子与 ∞-范畴', body: '<span class="hl">伴随</span> F ⊣ G：Hom(F(X), Y) ≅ Hom(X, G(Y))。<br>"自由 vs 忘记"的所有例子都是伴随。<br><span class="hl">∞-范畴</span>：在 Hom 中允许"高阶态射"——同伦版本的范畴，是同伦类型论、导出代数几何的工具。' }
+    ],
+    quiz: [
+      { q: 'Yoneda 引理大致说：', opts: ['一个对象由它的所有态射唯一决定', '所有函子都是伴随', '极限总存在', '所有范畴等价'], answer: '一个对象由它的所有态射唯一决定' },
+      { q: '范畴的态射要求：', opts: ['可复合且复合满足结合律', '单射', '双射', '连续'], answer: '可复合且复合满足结合律' },
+      { q: '函子保持：', opts: ['复合与单位元', '不变量', '极值', '范数'], answer: '复合与单位元' },
+      { q: '伴随函子的特征：', opts: ['Hom(F(X), Y) ≅ Hom(X, G(Y)) 自然', '同构', 'F = G⁻¹', '逐点相等'], answer: 'Hom(F(X), Y) ≅ Hom(X, G(Y)) 自然' },
+      { q: '∞-范畴主要解决什么问题？', opts: ['同伦敏感的代数构造', '维数估计', '紧致性', '完备性'], answer: '同伦敏感的代数构造' }
+    ]
+  }
+];
+
+const SAVE_KEY = "math_graduate_v1";
+const defaultState = () => ({ unitsCompleted: [], totalCorrect: 0, totalWrong: 0, coins: 0 });
+let state = (() => { try { const r = localStorage.getItem(SAVE_KEY); if (r) return Object.assign(defaultState(), JSON.parse(r)); } catch(e){} return defaultState(); })();
+function saveState() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+function toast(m) { const d = document.createElement('div'); d.className = 'toast-popup'; d.innerHTML = m; document.body.appendChild(d); setTimeout(()=>d.remove(), 1800); }
+function playTone(f, dur=0.1, type='sine') { try { const c = new (window.AudioContext||window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(c.destination); g.gain.setValueAtTime(0.15, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur); o.start(); o.stop(c.currentTime + dur); } catch(e) {} }
+function sndOk() { playTone(660, 0.1); setTimeout(() => playTone(880, 0.15), 90); }
+function sndBad() { playTone(220, 0.2, 'square'); }
+
+const app = document.getElementById('app');
+function render(html) { app.innerHTML = `<div class="scene">${html}</div>`; if (typeof ensureVoiceBtn==='function') ensureVoiceBtn(); }
+function hudHtml() { return `<div class="hud"><div class="item"><span class="label">研修</span><span class="value">${state.unitsCompleted.length}/8</span></div><div class="item"><span class="label">答对</span><span class="value">${state.totalCorrect}</span></div><div class="item"><span class="label">💰</span><span class="value">${state.coins||0}</span></div></div>`; }
+
+function sceneMenu() {
+  const has = state.unitsCompleted.length > 0;
+  render(`<div class="menu-content"><h1>数学研究院</h1><div class="subtitle">Graduate · 8 个核心专题</div><div class="crystal">∮</div><p style="color:var(--text-dim);font-size:13px;">测度 / 泛函 / 调和 / PDE / 代几 / 微分几何 / 表示论 / 范畴论</p>${has?`<p style="margin-top:14px;color:var(--gold);">研修 ${state.unitsCompleted.length}/8 · 💰 ${state.coins||0}</p>`:''}<div class="btn-row"><button class="${has?'':'primary'}" onclick="sceneMap()">${has?'继续研修':'开始研修'}</button>${has?`<button onclick="confirmReset()">清空进度</button>`:''}<button onclick="sceneFun()">🎲 奇趣馆</button></div></div>`);
+}
+function confirmReset() { if (confirm('清空研修记录？')) { state = defaultState(); saveState(); sceneMap(); } }
+function sceneMap() {
+  const cards = TOPICS.map(t => `<div class="topic-card ${state.unitsCompleted.includes(t.id)?'completed':''}" onclick="startTopic(${t.id})"><div style="display:flex;align-items:center;gap:10px;"><span class="topic-num">${t.id}</span><span class="topic-icon">${t.icon}</span></div><div class="topic-title">${t.title}</div><div class="topic-sub">${t.sub}</div></div>`).join('');
+  render(`${hudHtml()}<h2>📚 8 个专题</h2><div class="topic-grid">${cards}</div><div class="btn-row"><button onclick="sceneMenu()">主菜单</button></div>`);
+}
+
+let currentT = null, sStep = 0;
+function startTopic(id) { currentT = TOPICS.find(t => t.id === id); sStep = 0; sceneStory(); }
+function sceneStory() {
+  const t = currentT;
+  const d = t.story.slice(0, sStep+1).map((x, i) => `<div class="dialogue"><div class="speaker">${x.speaker}${i===sStep?` <button class="speak-btn" onclick="speakStoryLine(${i})">🔊</button>`:''}</div><div class="text">${x.text}</div></div>`).join('');
+  const last = sStep >= t.story.length - 1;
+  render(`${hudHtml()}<h2>${t.icon} ${t.title}</h2><div class="story-box">${d}</div><div class="btn-row">${last?`<button class="primary" onclick="sceneTimeline()">时间线 →</button>`:`<button class="primary" onclick="sStep++;sceneStory()">继续 →</button>`}<button onclick="sceneMap()">返回</button></div>`);
+  if (typeof speech !== 'undefined' && speech.on) { const x = t.story[sStep]; if (x) speech.speak(`${x.speaker}：${x.text}`); }
+}
+function speakStoryLine(i) { const d = currentT && currentT.story && currentT.story[i]; if (d) speech.speak(`${d.speaker}：${d.text}`); }
+function sceneTimeline() {
+  const t = currentT;
+  const items = t.timeline.map(x => `<div class="timeline-item"><div class="timeline-year">${x.y}</div><div class="timeline-event">${x.e}</div></div>`).join('');
+  render(`${hudHtml()}<h2>📜 ${t.title} · 历史时间线</h2><div class="timeline">${items}</div><div class="btn-row"><button onclick="sceneStory()">← 故事</button><button class="primary" onclick="sceneConcepts()">概念 →</button></div>`);
+}
+function sceneConcepts() {
+  const t = currentT; window._curConcepts = t.concepts;
+  const cards = t.concepts.map((c, i) => `<div class="concept-card"><div class="concept-title">📖 ${c.title} <button class="speak-btn" onclick="speakConcept(${i})">🔊</button></div><div class="concept-body">${c.body}</div></div>`).join('');
+  render(`${hudHtml()}<h2>📚 ${t.title} · 核心概念</h2><div style="flex:1;overflow-y:auto;padding:4px;">${cards}</div><div class="btn-row"><button onclick="sceneTimeline()">← 时间线</button><button onclick="speakAllConcepts()">🔊 全部</button><button class="primary" onclick="startQuiz()">辨析题 →</button></div>`);
+}
+function speakConcept(i) { const k = window._curConcepts && window._curConcepts[i]; if (k) speech.speak(`${k.title}。${k.body}`); }
+function speakAllConcepts() { if (!window._curConcepts) return; speech.speak(window._curConcepts.map(k => `${k.title}。${k.body}`).join('。 下一个：')); }
+
+let qIdx = 0, qCorrect = 0;
+function startQuiz() { qIdx = 0; qCorrect = 0; nextQ(); }
+function nextQ() {
+  const t = currentT;
+  if (qIdx >= t.quiz.length) return finishTopic();
+  const Q = t.quiz[qIdx];
+  const opts = shuffle(Q.opts).map((o,i) => `<button class="opt-btn" onclick="qAns('${o.replace(/'/g, "\\'")}')">${o}</button>`).join('');
+  render(`${hudHtml()}<h2>🎯 ${t.title} · ${qIdx+1}/${t.quiz.length}</h2><div class="q-progress">已答对 ${qCorrect}</div><div class="q-expr">${Q.q}</div><div class="opt-grid">${opts}</div><div class="feedback" id="fb"></div><div class="btn-row"><button onclick="sceneMap()">退出</button></div>`);
+  if (typeof speech !== 'undefined' && speech.on) setTimeout(() => speech.speak(Q.q), 200);
+}
+function qAns(picked) {
+  const t = currentT; const Q = t.quiz[qIdx];
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (picked === Q.answer) { document.querySelectorAll('.opt-btn').forEach(b => { if (b.textContent === Q.answer) b.classList.add('correct'); }); fb.innerHTML = '✓ 正确'; fb.className = 'feedback correct'; sndOk(); qCorrect++; state.totalCorrect++; state.coins = (state.coins||0)+10; }
+  else { document.querySelectorAll('.opt-btn').forEach(b => { if (b.textContent === Q.answer) b.classList.add('correct'); else if (b.textContent === picked) b.classList.add('wrong'); }); fb.innerHTML = `✗ 正确：<span style="color:var(--gold)">${Q.answer}</span>`; fb.className = 'feedback wrong'; sndBad(); state.totalWrong++; }
+  saveState(); setTimeout(() => { qIdx++; nextQ(); }, 2000);
+}
+function finishTopic() {
+  const t = currentT; const pass = qCorrect >= Math.ceil(t.quiz.length * 0.6);
+  if (pass && !state.unitsCompleted.includes(t.id)) { state.unitsCompleted.push(t.id); state.coins = (state.coins||0) + 50; saveState(); toast('🎓 专题研修完成 +50 金币'); }
+  render(`${hudHtml()}<div class="victory-content"><h2>${pass?'🎓 研修完成':'🤔 再来一遍'}</h2><div style="font-size:80px;margin:14px 0;">${pass?'📜':'📖'}</div><p style="font-size:20px;color:var(--gold);">${t.title}</p><p style="margin:14px 0;font-size:18px;">答对 <span style="color:var(--gold);font-size:28px;">${qCorrect}</span> / ${t.quiz.length}</p><div class="btn-row">${pass?`<button class="primary" onclick="sceneMap()">返回</button>${t.id<TOPICS.length?`<button onclick="startTopic(${t.id+1})">下一专题 →</button>`:''}`:`<button class="primary" onclick="startQuiz()">再来</button><button onclick="sceneConcepts()">← 概念</button>`}</div></div>`);
+}
+
+// ============== 🔊 Voice / TTS ==============
+const speech = {
+  on: localStorage.getItem('math_voice_on') !== '0', voice: null,
+  init() { if (!('speechSynthesis' in window)) { this.on = false; return; }
+    const sv = () => { const vs = speechSynthesis.getVoices();
+      this.voice = vs.find(v=>/zh-CN/i.test(v.lang)&&/xiaoxiao|yaoyao|huihui|tingting|female|woman/i.test(v.name))||vs.find(v=>/zh-CN|cmn-Hans/i.test(v.lang))||vs.find(v=>/zh/i.test(v.lang))||null; };
+    sv(); if (speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=sv; },
+  clean(t) { return String(t).replace(/<[^>]+>/g,' ').replace(/[（()【】\[\]「」]/g,' ').replace(/×/g,'乘').replace(/÷/g,'除以').replace(/π/g,'派').replace(/²/g,'的平方').replace(/³/g,'的立方').replace(/√/g,'根号').replace(/∂/g,'偏').replace(/∮/g,'回路积分').replace(/∫/g,'积分').replace(/∑/g,'西格玛').replace(/∞/g,'无穷').replace(/∈/g,'属于').replace(/∀/g,'任意').replace(/∃/g,'存在').replace(/⊆/g,'包含于').replace(/∪/g,'并').replace(/∩/g,'交').replace(/≤/g,'小于等于').replace(/≥/g,'大于等于').replace(/−/g,'负').replace(/\s+/g,' ').trim(); },
+  speak(t, o={}) { if (!this.on||!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const c=this.clean(t); if (!c) return; const u=new SpeechSynthesisUtterance(c); u.lang='zh-CN'; if (this.voice) u.voice=this.voice; u.rate=o.rate||1.0; u.pitch=o.pitch||1.0; speechSynthesis.speak(u); },
+  stop() { if ('speechSynthesis' in window) speechSynthesis.cancel(); },
+  toggle() { this.on=!this.on; localStorage.setItem('math_voice_on',this.on?'1':'0'); if (!this.on) this.stop(); return this.on; }
+};
+speech.init();
+function voiceToggle() { const on=speech.toggle(); toast(on?'🔊 语音开':'🔇 语音关',1000); const b=document.getElementById('voiceBtn'); if (b) b.textContent=on?'🔊':'🔇'; }
+function ensureVoiceBtn() { if (document.getElementById('voiceBtn')) return; const b=document.createElement('button'); b.id='voiceBtn'; b.className='voice-btn'; b.textContent=speech.on?'🔊':'🔇'; b.title='语音朗读'; b.onclick=voiceToggle; document.body.appendChild(b); }
+function speakItemById(arr, i) { const it=MATH_FUN[arr]&&MATH_FUN[arr][i]; if (!it) return; speech.speak(typeof it==='string'?it:(it.story||(it.q+'。答案：'+it.a))); }
+
+const MATH_FUN = {
+  facts: [
+    "测度论解决的根本问题：什么集合可以谈\"长度\"和\"概率\"？答案是可测集 —— 几乎你能写出的集合都行。",
+    "泛函分析把函数当成无穷维向量来研究，Banach 空间和 Hilbert 空间是两座支柱。",
+    "Fourier 变换可以把任何\"好\"的函数拆成正弦波叠加 —— 这是数字信号处理的根本。",
+    "Navier-Stokes 方程描述流体运动，但谁也不知道光滑解在三维空间是否一直存在。",
+    "代数几何用方程定义的几何形状研究多项式 —— Grothendieck 把它推广到任意环上。",
+    "纤维丛是\"局部像积空间但全局可能拧的\"几何结构，规范场论离不开它。",
+    "群表示论：把抽象的群\"画\"到矩阵世界里，让代数变成线性问题。",
+    "范畴论是数学的元语言 —— 它把不同分支的相似结构抽出来。",
+  ],
+  mathematicians: [
+    { name: "Hilbert", emoji: "📜", years: "1862-1943", story: "他的 23 个问题引领了 20 世纪。Hilbert 空间是泛函分析的基石。" },
+    { name: "Lebesgue", emoji: "📏", years: "1875-1941", story: "他的积分理论让积分从 Riemann 的\"竖切\"变成了\"横切\"，可以积更广的函数。" },
+    { name: "Grothendieck", emoji: "🌐", years: "1928-2014", story: "重写了代数几何的语言（概形 / Scheme），被许多人视为 20 世纪最伟大的数学家。" },
+    { name: "Atiyah", emoji: "🎯", years: "1929-2019", story: "Atiyah-Singer 指标定理把分析和拓扑联系起来，影响了规范场论。" },
+    { name: "Noether", emoji: "💎", years: "1882-1935", story: "抽象代数之母。Noether 定理：每一个对称性对应一个守恒量。" },
+    { name: "Eilenberg-MacLane", emoji: "📚", years: "20 世纪中", story: "他们创立了范畴论，开启了数学的\"元数学\"时代。" },
+  ],
+  jokes: [
+    { q: "为什么测度论学家从不参加聚会？", a: "因为他们害怕零测集 —— 派对上有人却看不见。" },
+    { q: "为什么范畴论学家看哪都是箭头？", a: "因为他们只看 morphism，对象本身不重要。" },
+    { q: "Lebesgue 积分对 Riemann 积分说什么？", a: "\"你画竖线，我画横线 —— 我能积更多东西。\"" },
+    { q: "为什么代数几何学家最忙？", a: "因为 Grothendieck 把每个定义都\"加了 i 次推广\"。" },
+    { q: "为什么群表示论学家精神好？", a: "因为他们总能找到一个 faithful representation（忠实表示）。" },
+  ],
+  riddles: [
+    { q: "Lebesgue 测度下，[0,1] 内有理数集的测度是？", a: "0（可数集测度为零）。" },
+    { q: "Banach 空间和 Hilbert 空间最大的区别？", a: "Hilbert 空间有内积，可以谈正交。" },
+    { q: "Stokes 定理的一句话表达？", a: "∫∂M ω = ∫M dω —— 边界上的积分 = 内部上微分的积分。" },
+    { q: "群 G 的左作用与右作用通过什么相联？", a: "g·x → x·g⁻¹。" },
+    { q: "范畴论里 \"opposite category\" 的对象是什么？", a: "对象不变，箭头方向反过来。" },
+  ]
+};
+function sceneFun() { speech.stop(); render(`${hudHtml()}<h2>🎲 数学奇趣馆</h2><div class="fun-grid"><div class="fun-card" onclick="sceneFacts()"><div class="fun-ic">💡</div><div class="fun-tt">冷知识</div><div class="fun-sub">${MATH_FUN.facts.length} 条</div></div><div class="fun-card" onclick="sceneMathHist()"><div class="fun-ic">📜</div><div class="fun-tt">数学家</div><div class="fun-sub">${MATH_FUN.mathematicians.length} 位</div></div><div class="fun-card" onclick="sceneJokes()"><div class="fun-ic">🃏</div><div class="fun-tt">笑话</div><div class="fun-sub">${MATH_FUN.jokes.length} 条</div></div><div class="fun-card" onclick="sceneRiddles()"><div class="fun-ic">🧩</div><div class="fun-tt">脑筋急转</div><div class="fun-sub">${MATH_FUN.riddles.length} 题</div></div></div><div class="btn-row"><button onclick="sceneMenu()">返回</button></div>`); }
+function sceneFacts() { const it=MATH_FUN.facts.map((f,i)=>`<div class="info-card"><div class="info-h"><span>💡 #${i+1}</span><button class="speak-btn" onclick="speakItemById('facts',${i})">🔊</button></div><div class="info-b">${f}</div></div>`).join(''); render(`${hudHtml()}<h2>💡 冷知识</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneMathHist() { const it=MATH_FUN.mathematicians.map((m,i)=>`<div class="info-card"><div class="info-h"><span>${m.emoji} ${m.name}</span><button class="speak-btn" onclick="speakItemById('mathematicians',${i})">🔊</button></div><div class="info-meta">${m.years}</div><div class="info-b">${m.story}</div></div>`).join(''); render(`${hudHtml()}<h2>📜 数学家</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneJokes() { const it=MATH_FUN.jokes.map((j,i)=>`<div class="info-card"><div class="info-h"><span>🃏 #${i+1}</span><button class="speak-btn" onclick="speakItemById('jokes',${i})">🔊</button></div><div class="info-b"><strong>${j.q}</strong></div><div class="riddle-toggle" onclick="this.nextElementSibling.classList.toggle('show')">👉 看答案</div><div class="riddle-ans">${j.a}</div></div>`).join(''); render(`${hudHtml()}<h2>🃏 笑话</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneRiddles() { const it=MATH_FUN.riddles.map((r,i)=>`<div class="info-card"><div class="info-h"><span>🧩 #${i+1}</span><button class="speak-btn" onclick="speakItemById('riddles',${i})">🔊</button></div><div class="info-b">${r.q}</div><div class="riddle-toggle" onclick="this.nextElementSibling.classList.toggle('show')">👉 看答案</div><div class="riddle-ans">${r.a}</div></div>`).join(''); render(`${hudHtml()}<h2>🧩 脑筋急转</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+
+sceneMenu();
+</script>
+</body>
+</html>

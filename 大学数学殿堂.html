@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大学数学殿堂 · Pantheon</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0d0e1f; --bg-mid: #1a1c3a; --bg-light: #2a2d54;
+    --gold: #ffd700; --gold-soft: #f4c430; --cyan-light: #80deea; --purple: #b388ff;
+    --violet: #b388ff; --violet-light: #e1bee7;
+    --green: #80ed99; --red: #ff6b6b; --orange: #ffa940; --cyan: #4dd0e1;
+    --text: #e6e8ff; --text-dim: #98a0c4;
+  }
+  html, body { height: 100%; font-family: 'Microsoft YaHei', sans-serif;
+    background: radial-gradient(ellipse at top, var(--bg-mid) 0%, var(--bg-deep) 70%);
+    color: var(--text); overflow: hidden; user-select: none; }
+  body::before { content: ''; position: fixed; inset: 0;
+    background-image: radial-gradient(2px 2px at 10% 20%, white, transparent),
+      radial-gradient(1px 1px at 30% 70%, var(--gold-soft), transparent),
+      radial-gradient(2px 2px at 60% 30%, var(--violet), transparent),
+      radial-gradient(1px 1px at 80% 80%, var(--violet-light), transparent),
+      radial-gradient(2px 2px at 90% 10%, white, transparent);
+    background-size: 100% 100%; opacity: 0.4; pointer-events: none; animation: tw 5s ease-in-out infinite; }
+  @keyframes tw { 0%,100%{opacity:0.4} 50%{opacity:0.2} }
+  #app { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .scene { width: 100%; max-width: min(980px, 94vw); max-height: 95vh;
+    background: rgba(26,28,58,0.7); backdrop-filter: blur(20px);
+    border: 2px solid var(--violet); border-radius: 24px; padding: 24px 28px;
+    box-shadow: 0 0 60px rgba(179,136,255,0.4); display: flex; flex-direction: column; overflow-y: auto; animation: fIn 0.5s ease; }
+  @keyframes fIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  h1,h2,h3 { font-family: 'Georgia', serif; color: var(--gold); text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+  h1 { font-size: 40px; text-align: center; margin-bottom: 8px; letter-spacing: 2px; }
+  h2 { font-size: 26px; margin-bottom: 14px; }
+  h3 { font-size: 18px; margin-bottom: 10px; }
+  .subtitle { text-align: center; color: var(--text-dim); font-style: italic; margin-bottom: 24px; letter-spacing: 3px; }
+  button { font-family: inherit; font-size: 16px; padding: 12px 24px;
+    background: linear-gradient(135deg, var(--bg-light), var(--bg-mid)); color: var(--text);
+    border: 2px solid var(--violet); border-radius: 12px; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(179,136,255,0.3); }
+  button:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,215,0,0.4); border-color: var(--gold); }
+  button.primary { background: linear-gradient(135deg, var(--gold), var(--gold-soft)); color: var(--bg-deep); font-weight: bold; border-color: var(--gold); }
+  button.danger { background: linear-gradient(135deg, #b03060, #5a0a2a); border-color: var(--red); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .hud { display: flex; justify-content: space-between; align-items: center;
+    background: rgba(13,14,31,0.6); border: 1px solid var(--violet); border-radius: 12px;
+    padding: 8px 16px; margin-bottom: 14px; font-size: 14px; flex-wrap: wrap; gap: 8px; }
+  .hud .item { display: flex; gap: 6px; align-items: center; }
+  .hud .label { color: var(--text-dim); }
+  .hud .value { color: var(--gold); font-weight: bold; }
+  .badges-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge-slot { width: 30px; height: 30px; background: rgba(0,0,0,0.3); border: 1px dashed var(--violet); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-family: 'Cambria Math', serif; }
+  .badge-slot.owned { background: rgba(255,215,0,0.15); border: 2px solid var(--gold); color: var(--gold); }
+  .hp-bar { width: 120px; height: 10px; background: rgba(0,0,0,0.4); border-radius: 6px; overflow: hidden; border: 1px solid var(--red); }
+  .hp-fill { height: 100%; background: linear-gradient(90deg, var(--red), #ffa07a); transition: width 0.4s; }
+  .menu-content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .pantheon-crystal { font-size: 80px; margin: 16px 0; color: var(--violet); text-shadow: 0 0 30px var(--violet), 0 0 60px var(--gold); animation: float 3s ease-in-out infinite; font-family: 'Georgia', serif; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .course-map { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 14px; }
+  .stream-section { display: flex; flex-direction: column; gap: 10px; }
+  .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  /* 仅"关卡地图"这类网格页加宽铺满；菜单/做题/故事等聚焦页保持窄宽舒适阅读 */
+  .scene:has(.tower-map), .scene:has(.peak-map), .scene:has(.course-map), .scene:has(.topic-grid), .scene:has(.gallery) { max-width: min(1400px, 95vw); }
+  .stream-header { color: var(--violet-light); font-size: 16px; text-shadow: none; border-bottom: 1px dashed var(--violet); padding-bottom: 6px; }
+  .course-card { background: linear-gradient(90deg, rgba(26,28,58,0.85), rgba(42,45,84,0.85));
+    border: 2px solid var(--violet); border-radius: 14px; padding: 14px 18px; cursor: pointer;
+    transition: all 0.3s; display: flex; align-items: center; gap: 14px; position: relative; }
+  .course-card:hover:not(.locked) { border-color: var(--gold); transform: translateX(6px); box-shadow: 0 8px 24px rgba(255,215,0,0.25); }
+  .course-card.locked { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6); }
+  .course-card.completed { border-color: var(--green); background: linear-gradient(90deg, rgba(34,78,45,0.85), rgba(45,94,60,0.85)); }
+  .course-num { font-family: 'Georgia', serif; font-size: 32px; color: var(--gold); font-weight: bold; min-width: 50px; text-align: center; text-shadow: 0 0 12px var(--gold); }
+  .course-num.locked-num { color: var(--text-dim); text-shadow: none; }
+  .course-info { flex: 1; }
+  .course-title { font-size: 17px; color: var(--gold); margin-bottom: 4px; font-weight: bold; }
+  .course-sub { font-size: 13px; color: var(--text-dim); }
+  .course-icon { font-size: 30px; font-family: 'Cambria Math', serif; }
+  .course-check { position: absolute; top: 8px; right: 12px; color: var(--green); font-size: 20px; font-weight: bold; }
+  .story-box { flex: 1; overflow-y: auto; padding: 16px; }
+  .dialogue { background: rgba(13,14,31,0.6); border-left: 4px solid var(--gold); border-radius: 8px; padding: 14px 18px; margin-bottom: 14px; animation: sIn 0.4s ease; }
+  .dialogue .speaker { color: var(--gold); font-weight: bold; font-size: 15px; margin-bottom: 6px; }
+  .dialogue .text { font-size: 16px; line-height: 1.7; }
+  .dialogue .formula, .concept-body .formula { color: var(--violet-light); font-family: 'Cambria Math', serif; font-style: italic; background: rgba(179,136,255,0.1); padding: 0 6px; border-radius: 4px; }
+  @keyframes sIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+  .concept-card { background: rgba(13,14,31,0.7); border: 2px solid var(--violet); border-radius: 14px;
+    padding: 16px 20px; margin: 8px auto; max-width: 760px; text-align: left; }
+  .concept-title { color: var(--gold); font-size: 17px; margin-bottom: 8px; font-weight: bold; }
+  .concept-body { color: var(--text); font-size: 15px; line-height: 1.7; }
+  .concept-body .hl { color: var(--gold-soft); font-weight: bold; }
+  .q-expr { text-align: center; font-family: 'Cambria Math', serif; font-size: 26px; color: var(--gold); margin: 14px 0 6px; }
+  .q-hint { text-align: center; color: var(--text-dim); font-size: 14px; margin-bottom: 12px; }
+  .q-progress { text-align: center; color: var(--text-dim); font-size: 13px; margin-bottom: 8px; }
+  .opt-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 700px; margin: 8px auto; }
+  .opt-btn { padding: 14px; font-size: 16px; background: rgba(26,28,58,0.85); border: 2px solid var(--violet); color: var(--text); border-radius: 10px; cursor: pointer; transition: all 0.2s; font-family: 'Cambria Math', serif; line-height: 1.4; }
+  .opt-btn:hover:not(:disabled) { border-color: var(--gold); }
+  .opt-btn.correct { background: rgba(128,237,153,0.3); border-color: var(--green); }
+  .opt-btn.wrong { background: rgba(255,107,107,0.3); border-color: var(--red); animation: shake 0.4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .feedback { text-align: center; margin-top: 12px; font-size: 16px; min-height: 28px; line-height: 1.5; }
+  .feedback.correct { color: var(--green); } .feedback.wrong { color: var(--red); }
+  .boss-portrait { text-align: center; font-size: 90px; margin: 4px 0; filter: drop-shadow(0 0 25px var(--red)); transition: transform 0.3s; }
+  .boss-name { text-align: center; font-size: 20px; color: var(--red); margin-bottom: 8px; }
+  .boss-hp-bar { width: 100%; height: 14px; background: rgba(0,0,0,0.5); border-radius: 7px; overflow: hidden; border: 1px solid var(--red); margin-bottom: 14px; }
+  .boss-hp-fill { height: 100%; background: linear-gradient(90deg, var(--red), #ff8c8c); transition: width 0.5s; }
+  .victory-content { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .trophy { font-size: 80px; margin: 12px 0; animation: float 2s infinite; }
+  .reward-pet { background: rgba(255,215,0,0.1); border: 2px solid var(--gold); border-radius: 16px; padding: 16px; margin: 14px auto; max-width: 320px; }
+  .reward-pet .pet-icon { font-size: 50px; color: var(--violet); font-family: 'Cambria Math', serif; }
+  .reward-pet .pet-name { color: var(--gold); font-size: 18px; margin-top: 8px; }
+  .confetti { position: fixed; width: 10px; height: 10px; pointer-events: none; z-index: 999; animation: cf linear forwards; }
+  @keyframes cf { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+  .toast-popup { position: fixed; bottom: 6%; left: 50%; transform: translateX(-50%); background: rgba(13,14,31,0.95); border: 2px solid var(--gold); color: var(--gold); padding: 10px 22px; border-radius: 24px; font-size: 15px; z-index: 1001; pointer-events: none; animation: ts 1.8s ease-out forwards; white-space: nowrap; }
+  @keyframes ts { 0%{opacity:0;transform:translate(-50%,20px)} 15%,85%{opacity:1;transform:translate(-50%,0)} 100%{opacity:0;transform:translate(-50%,-10px)} }
+  .screen-flash { position: fixed; inset: 0; z-index: 999; pointer-events: none; animation: ff 0.5s ease-out forwards; opacity: 0.4; }
+  @keyframes ff { 0%{opacity:0.4} 100%{opacity:0} }
+  .voice-btn { position: fixed; top: 14px; right: 14px; z-index: 100; width: 44px; height: 44px; border-radius: 50%; background: rgba(13,14,31,0.85); border: 2px solid var(--violet); color: var(--gold); font-size: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+  .voice-btn:hover { transform: scale(1.1); }
+  .speak-btn { background: transparent; border: 1px solid var(--violet); color: var(--violet); border-radius: 50%; width: 28px; height: 28px; padding: 0; font-size: 13px; cursor: pointer; margin-left: 8px; display: inline-flex; align-items: center; justify-content: center; box-shadow: none; }
+  .speak-btn:hover { background: rgba(179,136,255,0.2); }
+  .fun-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 16px 0; }
+  .fun-card { background: linear-gradient(135deg, rgba(31,29,61,0.85), rgba(13,14,31,0.85)); border: 2px solid var(--violet); border-radius: 16px; padding: 20px 16px; text-align: center; cursor: pointer; transition: all 0.25s; }
+  .fun-card:hover { transform: translateY(-6px); border-color: var(--gold); }
+  .fun-ic { font-size: 42px; margin-bottom: 8px; }
+  .fun-tt { color: var(--gold); font-weight: bold; font-size: 17px; margin-bottom: 4px; }
+  .fun-sub { color: var(--text-dim); font-size: 12px; }
+  .info-list { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; max-height: 60vh; overflow-y: auto; }
+  .info-card { background: rgba(13,14,31,0.5); border-left: 3px solid var(--gold-soft); border-radius: 8px; padding: 12px 14px; }
+  .info-h { color: var(--gold); font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .info-b { color: var(--text); line-height: 1.7; font-size: 14px; }
+  .info-meta { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+  .riddle-toggle { color: var(--violet); cursor: pointer; font-size: 13px; margin-top: 6px; display: inline-block; }
+  .riddle-ans { display: none; margin-top: 6px; padding: 8px 10px; background: rgba(255,215,0,0.08); border-radius: 6px; color: var(--gold-soft); font-size: 13px; }
+  .riddle-ans.show { display: block; }
+  @media (max-width: 600px) { h1{font-size:28px} .opt-grid{grid-template-columns:1fr} .q-expr{font-size:20px} .course-num{font-size:24px;min-width:40px} .scene{padding:16px} .voice-btn{width:38px;height:38px;top:8px;right:8px;font-size:17px} }
+  /* ============ 💬 问数学家 · AI 对话 ============ */
+  @keyframes askFade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .ask-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
+  .ask-bar select { padding:9px 12px; background:var(--bg-mid); color:var(--text); border:2px solid var(--cyan); border-radius:10px; font-size:15px; font-family:inherit; cursor:pointer; }
+  .ask-bar .mini { font-size:14px; padding:9px 14px; border-radius:10px; }
+  .api-pill { font-size:13px; padding:5px 12px; border-radius:999px; border:1px solid currentColor; }
+  .chat-area { height:48vh; min-height:280px; overflow-y:auto; padding:16px; background:rgba(0,0,0,0.22); border:1px solid rgba(255,255,255,0.10); border-radius:16px; margin-bottom:12px; display:flex; flex-direction:column; gap:10px; }
+  .chat-area::-webkit-scrollbar { width:6px; } .chat-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:3px; }
+  .bubble { padding:11px 15px; border-radius:14px; max-width:82%; word-wrap:break-word; line-height:1.65; font-size:15px; animation:askFade .25s; }
+  .bubble.user { align-self:flex-end; background:linear-gradient(135deg,var(--purple),#7b5cff); color:#fff; border-bottom-right-radius:4px; }
+  .bubble.sci { align-self:flex-start; background:linear-gradient(135deg,rgba(255,215,0,0.14),rgba(255,215,0,0.05)); border:1px solid rgba(255,215,0,0.30); color:var(--text); border-bottom-left-radius:4px; }
+  .bubble.sci .sci-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; color:var(--gold); font-weight:700; font-size:14px; }
+  .bubble.sci .face-mini { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.10); display:grid; place-items:center; font-size:18px; border:1px solid rgba(255,215,0,0.5); }
+  .bubble.thinking { opacity:.7; font-style:italic; }
+  .bubble code { background:rgba(0,0,0,0.35); padding:1px 6px; border-radius:5px; font-size:14px; color:var(--cyan-light); font-family:'Courier New',monospace; }
+  .input-row { display:flex; gap:8px; }
+  .input-row textarea { flex:1; padding:12px 14px; background:var(--bg-mid); color:var(--text); border:2px solid var(--cyan); border-radius:12px; font-size:16px; resize:none; min-height:50px; font-family:inherit; }
+  .input-row button { padding:0 22px; }
+  .preset-row { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; justify-content:center; }
+  .preset-row button { padding:7px 13px; font-size:13px; border-radius:999px; }
+  .voice-toggle { display:inline-flex; align-items:center; gap:6px; padding:9px 14px; border-radius:999px; cursor:pointer; user-select:none; background:var(--bg-mid); border:2px solid var(--cyan); font-size:14px; color:var(--text); }
+  .voice-toggle.on { background:linear-gradient(135deg,var(--green),#3fb37a); border-color:var(--green); color:var(--bg-deep); font-weight:700; }
+  .mic-btn { width:50px; min-width:50px; padding:0; font-size:22px; border-radius:50%; background:linear-gradient(135deg,#ff6b6b,#ff9d6b); color:#fff; border:none; box-shadow:0 4px 14px rgba(255,107,107,0.4); }
+  .mic-btn.recording { animation:micPulse .8s infinite; }
+  @keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,.7)} 50%{box-shadow:0 0 0 12px rgba(255,107,107,0)} }
+  .tts-btn { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; margin-left:8px; font-size:12px; background:rgba(77,208,225,0.15); border:1px solid rgba(77,208,225,0.4); color:var(--cyan-light); border-radius:999px; cursor:pointer; box-shadow:none; }
+  .tts-btn:hover { background:rgba(77,208,225,0.3); transform:none; border-color:var(--cyan); }
+  .tts-btn.playing { background:var(--cyan); color:var(--bg-deep); animation:ttsWave 1.2s infinite; }
+  @keyframes ttsWave { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+  .listen-tip { display:inline-block; padding:8px 14px; background:rgba(255,107,107,0.15); border:1px dashed var(--red); color:#ff9d9d; border-radius:10px; font-size:13px; margin-bottom:8px; }
+  .ask-entry { background:linear-gradient(135deg,var(--purple),#7b5cff)!important; border-color:var(--purple)!important; color:#fff!important; font-weight:bold; }
+  /* 语音连续对话舱 */
+  .vc-mask { position:fixed; inset:0; background:rgba(8,12,28,0.94); z-index:9999; display:grid; place-items:center; backdrop-filter:blur(10px); animation:askFade .3s; }
+  .vc-card { width:min(560px,94vw); height:min(92vh,760px); background:linear-gradient(160deg,var(--bg-mid),var(--bg-deep) 75%); border:1px solid rgba(255,255,255,0.15); border-radius:24px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:0 30px 80px rgba(0,0,0,0.5); }
+  .vc-top { display:flex; align-items:center; justify-content:space-between; }
+  .vc-sci { display:flex; align-items:center; gap:12px; }
+  .vc-avatar { width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg,var(--gold),#ff9d6b); display:grid; place-items:center; font-size:30px; border:2px solid rgba(255,255,255,0.3); }
+  .vc-orb-wrap { display:grid; place-items:center; padding:6px 0; }
+  .vc-orb { width:130px; height:130px; border-radius:50%; background:radial-gradient(circle at 30% 30%,var(--cyan),#118ab2 60%,#073b4c); box-shadow:0 0 60px rgba(77,208,225,0.3); transition:.4s; }
+  .vc-orb.vc-listen { background:radial-gradient(circle at 30% 30%,#ff9d9d,var(--red) 60%,#770020); animation:vcPulse 1s infinite; }
+  .vc-orb.vc-thinking { background:radial-gradient(circle at 30% 30%,var(--gold),#f48c06 60%,#6a4202); animation:vcSpin 1.6s linear infinite; }
+  .vc-orb.vc-speak { background:radial-gradient(circle at 30% 30%,#cbb8ff,var(--purple) 60%,#3b1a8a); animation:vcWave .7s infinite; }
+  .vc-orb.vc-paused { opacity:.5; }
+  @keyframes vcPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+  @keyframes vcSpin { from{filter:hue-rotate(0)} to{filter:hue-rotate(360deg)} }
+  @keyframes vcWave { 0%,100%{transform:scale(1)} 25%{transform:scale(1.1)} 50%{transform:scale(.94)} 75%{transform:scale(1.08)} }
+  .vc-status { text-align:center; font-size:15px; color:var(--cyan-light); min-height:22px; font-weight:600; }
+  .vc-transcript { flex:1; overflow-y:auto; padding:10px 12px; background:rgba(0,0,0,0.2); border-radius:12px; display:flex; flex-direction:column; gap:6px; font-size:14px; line-height:1.6; }
+  .vc-bubble { padding:8px 12px; border-radius:12px; max-width:90%; word-break:break-word; }
+  .vc-bubble.user { background:linear-gradient(135deg,var(--purple),#7b5cff); color:#fff; align-self:flex-end; }
+  .vc-bubble.sci { background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); align-self:flex-start; }
+  .vc-bubble.err { background:rgba(255,107,107,0.2); color:#ff9d9d; align-self:center; }
+  .vc-live { min-height:30px; padding:6px 14px; font-size:14px; color:var(--text-dim); font-style:italic; text-align:center; border-top:1px dashed rgba(255,255,255,0.1); }
+  .vc-bottom { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  /* AI 设置弹窗 */
+  .llm-mask { position:fixed; inset:0; background:rgba(8,12,28,0.85); z-index:9998; display:grid; place-items:center; backdrop-filter:blur(6px); animation:askFade .25s; padding:20px; }
+  .llm-modal { width:min(560px,94vw); max-height:90vh; overflow-y:auto; background:linear-gradient(160deg,var(--bg-mid),var(--bg-deep)); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:24px; box-shadow:0 30px 80px rgba(0,0,0,0.5); }
+  .setting-grid { display:grid; gap:12px; margin:16px 0; }
+  .setting-grid label { font-size:13px; color:var(--text-dim); display:block; margin-bottom:4px; }
+  .setting-grid input { width:100%; padding:10px 12px; background:var(--bg-deep); color:var(--text); border:2px solid rgba(255,255,255,0.18); border-radius:10px; font-size:14px; font-family:'Courier New',monospace; box-sizing:border-box; }
+  /* 🧑‍🏫 悬浮 AI 助教球 + 💬 对话浮层 */
+  .ai-fab-wrap { position:fixed; right:18px; bottom:18px; z-index:9000; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .ai-fab-ball { width:62px; height:62px; min-width:62px; border-radius:50%; font-size:30px; padding:0; border:2px solid var(--gold); background:linear-gradient(135deg,var(--purple),#7b5cff); box-shadow:0 6px 22px rgba(123,92,255,0.55); cursor:pointer; display:grid; place-items:center; animation:fabFloat 3.5s ease-in-out infinite; }
+  .ai-fab-ball:hover { transform:scale(1.08); border-color:var(--gold); }
+  @keyframes fabFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  .ai-fab-menu { display:flex; flex-direction:column; gap:8px; opacity:0; pointer-events:none; transform:translateY(10px) scale(.96); transition:.18s; }
+  .ai-fab-menu.open { opacity:1; pointer-events:auto; transform:none; }
+  .ai-fab-act { font-size:14px; padding:11px 16px; border-radius:999px; white-space:nowrap; background:var(--bg-mid); border:2px solid var(--cyan); color:var(--text); box-shadow:0 4px 14px rgba(0,0,0,0.35); cursor:pointer; }
+  .ai-fab-act:hover { border-color:var(--gold); }
+  .chat-ov-mask { position:fixed; inset:0; background:rgba(8,12,28,0.78); z-index:9500; display:grid; place-items:center; backdrop-filter:blur(6px); animation:askFade .22s; padding:16px; }
+  .chat-ov-panel { width:min(680px,96vw); height:min(86vh,760px); display:flex; flex-direction:column; background:linear-gradient(160deg,var(--bg-mid),var(--bg-deep)); border:1px solid rgba(255,255,255,0.14); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,0.55); overflow:hidden; }
+  .chat-ov-head { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:17px; font-weight:800; color:var(--gold); flex-shrink:0; }
+  .chat-ov-body { flex:1; min-height:0; padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; }
+  .chat-ov-body .subtitle { margin-top:0; }
+
+  /* 全局键盘：按键高亮 + 浮动快捷键提示条 */
+  button.keyflash, .opt-btn.keyflash { outline: 2px solid var(--gold); outline-offset: 1px; filter: brightness(1.18); transform: scale(0.97); transition: transform .05s; }
+  #kbdHint { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 200;
+    background: rgba(13,27,46,0.82); border: 1px solid rgba(77,208,225,0.4); color: var(--text-dim);
+    font-size: 12px; padding: 5px 14px; border-radius: 20px; backdrop-filter: blur(6px);
+    pointer-events: none; white-space: nowrap; max-width: 94vw; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  #kbdHint kbd { background: rgba(77,208,225,0.16); border: 1px solid var(--cyan); border-radius: 4px; padding: 0 5px; color: var(--cyan-light); font-family: inherit; }
+  @media (max-width: 600px) { #kbdHint { font-size: 10px; padding: 4px 10px; bottom: 6px; } }
+</style>
+</head>
+<body>
+<a href="index.html" title="返回数学世界 · 五阶段总目录" style="position:fixed;top:13px;left:13px;z-index:9999;font:600 12px/1 'Microsoft YaHei',sans-serif;color:#ffd700;background:rgba(10,10,26,0.62);border:1px solid rgba(255,215,0,0.45);border-radius:14px;padding:6px 11px;text-decoration:none;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.3);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(255,215,0,0.2)';this.style.borderColor='#ffd700'" onmouseout="this.style.background='rgba(10,10,26,0.62)';this.style.borderColor='rgba(255,215,0,0.45)'">⌂ 数学世界</a>
+<div id="app"></div>
+<script>
+"use strict";
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+const COURSES = [
+  {
+    id: 1, stream: '分析', icon: 'ε', title: '一 · 数学分析：极限', sub: 'ε-δ · 数列 · 函数极限',
+    speaker: '极限宗师 Weierstrass',
+    story: [
+      { speaker: '极限宗师 Weierstrass', text: '微积分诞生 200 年后，柯西、魏尔斯特拉斯用 <span class="formula">ε-δ</span> 语言为它奠定了严谨基础。' },
+      { speaker: '极限宗师 Weierstrass', text: '<span class="hl">数列极限</span> aₙ → a：∀ε &gt; 0, ∃N, n &gt; N ⇒ |aₙ − a| &lt; ε。' },
+      { speaker: '极限宗师 Weierstrass', text: '<span class="hl">函数极限</span> lim_{x→x₀} f(x) = A：∀ε &gt; 0, ∃δ &gt; 0, 0 &lt; |x − x₀| &lt; δ ⇒ |f(x) − A| &lt; ε。' },
+      { speaker: '极限宗师 Weierstrass', text: '<span class="hl">连续</span>：f 在 x₀ 处连续 ⇔ lim_{x→x₀} f(x) = f(x₀)。' }
+    ],
+    concepts: [
+      { title: '数列极限的 ε-N 定义', body: '数列 {aₙ} 收敛于 a，记 <span class="formula">lim_{n→∞} aₙ = a</span>，是说：<br><span class="hl">∀ ε &gt; 0, ∃ N ∈ ℕ, ∀ n &gt; N, |aₙ − a| &lt; ε</span><br>直观：要多接近，就有多接近；从某一项起所有项都落在 (a−ε, a+ε) 内。' },
+      { title: '函数极限的 ε-δ 定义', body: '<span class="formula">lim_{x→x₀} f(x) = A</span> 意思是：<br><span class="hl">∀ ε &gt; 0, ∃ δ &gt; 0, 0 &lt; |x − x₀| &lt; δ ⇒ |f(x) − A| &lt; ε</span><br>关键："去心邻域" 0 &lt; |x − x₀| 不要求 x = x₀ 处的值。' },
+      { title: '极限的性质', body: '若 lim f = A、lim g = B，则：<br>① lim(f±g) = A ± B<br>② lim(fg) = AB<br>③ lim(f/g) = A/B（B ≠ 0）<br>④ <span class="hl">夹逼定理</span>：f ≤ g ≤ h，f → L、h → L，则 g → L。<br>⑤ <span class="hl">单调有界数列必收敛</span>。' },
+      { title: '常用极限', body: '<span class="formula">lim_{x→0} sin x / x = 1</span><br><span class="formula">lim_{x→∞} (1 + 1/x)^x = e</span><br><span class="formula">lim_{x→0} (1 + x)^{1/x} = e</span><br><span class="formula">lim_{n→∞} ⁿ√n = 1</span>' },
+      { title: '连续性', body: 'f 在 x₀ 处连续 ⇔ lim_{x→x₀} f(x) = f(x₀)。<br>三种间断：<span class="hl">可去间断</span>（极限存在但与函数值不等）、<span class="hl">跳跃间断</span>（左右极限存在但不相等）、<span class="hl">无穷间断</span>（极限为无穷）。' }
+    ],
+    pet: { name: '极限蝶', symbol: 'ε' }, boss: { name: '极限之神 Limitus', emoji: '∞', hp: 13 }
+  },
+  {
+    id: 2, stream: '分析', icon: '∫', title: '二 · 单变量微积分', sub: '导数 · 积分 · 微积分基本定理',
+    speaker: '微积分之父 Newton & Leibniz',
+    story: [
+      { speaker: '微积分之父 Newton', text: '导数 f′(x) 是函数局部的"变化率"，几何上是切线斜率。' },
+      { speaker: '微积分之父 Leibniz', text: '不定积分 ∫f(x)dx 是 f 的所有原函数；定积分 ∫_a^b f(x)dx 表示累积量，也可理解为带符号的"曲线下面积"。' },
+      { speaker: '微积分之父 Newton', text: '<span class="hl">微积分基本定理</span>把"求导"与"求积"联系起来：(∫_a^x f(t)dt)′ = f(x)。' },
+      { speaker: '微积分之父 Leibniz', text: '<span class="hl">牛顿-莱布尼茨公式</span>：∫_a^b f(x)dx = F(b) − F(a)，F 是 f 的任一原函数。' }
+    ],
+    concepts: [
+      { title: '导数', body: '<span class="formula">f′(x₀) = lim_{Δx→0} [f(x₀+Δx) − f(x₀)] / Δx</span><br>常用：<span class="formula">(xⁿ)′ = n xⁿ⁻¹</span>、<span class="formula">(eˣ)′ = eˣ</span>、<span class="formula">(ln x)′ = 1/x</span>。<br>四则：(uv)′ = u′v + uv′；链式：[f(g(x))]′ = f′(g(x))·g′(x)。' },
+      { title: '微分中值定理', body: '<span class="hl">罗尔定理</span>：f 在 [a,b] 连续、(a,b) 可导、f(a) = f(b) ⇒ ∃ξ ∈ (a,b), f′(ξ) = 0。<br><span class="hl">拉格朗日中值定理</span>：∃ξ, f′(ξ) = (f(b)−f(a))/(b−a)。<br><span class="hl">柯西中值定理</span>：(f(b)−f(a))/(g(b)−g(a)) = f′(ξ)/g′(ξ)。' },
+      { title: '不定积分与基本积分公式', body: '<span class="formula">∫xⁿdx = xⁿ⁺¹/(n+1) + C</span>（n ≠ −1）<br><span class="formula">∫(1/x)dx = ln|x| + C</span><br><span class="formula">∫eˣdx = eˣ + C</span><br><span class="formula">∫sin x dx = −cos x + C</span><br><span class="formula">∫cos x dx = sin x + C</span>' },
+      { title: '积分技巧', body: '<span class="hl">换元法</span>（变量代换）<br><span class="hl">分部积分法</span>：∫udv = uv − ∫vdu<br><span class="hl">有理函数积分</span>：部分分式分解。' },
+      { title: '微积分基本定理', body: '若 f 在 [a, b] 连续，则 <span class="formula">F(x) = ∫_a^x f(t)dt</span> 在 [a, b] 上可导且 F′(x) = f(x)。<br><span class="hl">牛顿-莱布尼茨</span>：∫_a^b f(x)dx = F(b) − F(a)，F 是 f 的任意原函数。' }
+    ],
+    pet: { name: '积分之环', symbol: '∫' }, boss: { name: '积分之王 Integralus', emoji: '🌊', hp: 14 }
+  },
+  {
+    id: 3, stream: '分析', icon: '∂', title: '三 · 多元微积分 · 级数', sub: '偏导 · 重积分 · 无穷级数',
+    speaker: '场分析师 Gauss',
+    story: [
+      { speaker: '场分析师 Gauss', text: '多元函数 z = f(x, y)：对一个变量求导而把其他视为常数，得到<span class="hl">偏导数</span> ∂z/∂x。' },
+      { speaker: '场分析师 Gauss', text: '<span class="hl">梯度</span> ∇f = (∂f/∂x, ∂f/∂y, …) 指向函数增大最快的方向。' },
+      { speaker: '场分析师 Gauss', text: '重积分把单变量"曲线下面积"推广到"曲面 / 体下的总量"。<br>极坐标、柱坐标、球坐标可大幅简化计算。' },
+      { speaker: '场分析师 Gauss', text: '<span class="hl">幂级数</span> Σ aₙxⁿ 与<span class="hl">傅里叶级数</span>把函数展开成"无穷多项式 / 三角函数之和"，是分析学的两大利器。' }
+    ],
+    concepts: [
+      { title: '偏导数与梯度', body: '偏导：<span class="formula">∂f/∂x = lim_{h→0} [f(x+h, y) − f(x, y)] / h</span><br>梯度：<span class="formula">∇f = (∂f/∂x, ∂f/∂y, ∂f/∂z)</span>，是矢量。<br>方向导数：若 v 是方向向量，则 <span class="formula">D_v f = ∇f · v / |v|</span>；若 u 是单位方向向量，则 <span class="formula">D_u f = ∇f · u</span>。' },
+      { title: '多元函数极值', body: '一阶必要条件：可微函数在内点取得极值时，所有偏导都为 0（驻点）。<br>二阶判定：用海森矩阵 H 的正定 / 负定 / 不定，对应极小 / 极大 / 鞍点。<br><span class="hl">条件极值</span>：拉格朗日乘子法 ∇f = λ∇g。' },
+      { title: '重积分', body: '<span class="formula">∬_D f(x,y) dA</span> 是 z = f(x, y) 在区域 D 上图形的体积（带符号）。<br>计算：累次积分（先 y 再 x，或先 x 再 y）。<br><span class="hl">换元雅可比</span>：∬f(x,y)dxdy = ∬f(x(u,v),y(u,v))|J|dudv。' },
+      { title: '无穷级数', body: 'Σaₙ 收敛 ⇔ 部分和 Sₙ 收敛。<br><span class="hl">比较判别法</span>、<span class="hl">比值法</span>(达朗贝尔)、<span class="hl">根值法</span>(柯西)。<br>幂级数 Σaₙxⁿ 有<span class="hl">收敛半径</span> R = 1/lim sup ⁿ√|aₙ|。' },
+      { title: '泰勒级数', body: 'f 在 x₀ 附近的展开：<span class="formula">f(x) = Σ f⁽ⁿ⁾(x₀)/n! · (x − x₀)ⁿ</span>。<br>常用：eˣ = Σ xⁿ/n!；sin x = x − x³/3! + x⁵/5! − …；<br>1/(1−x) = Σ xⁿ (|x|&lt;1)。' }
+    ],
+    pet: { name: '梯度精灵', symbol: '∇' }, boss: { name: '场之主 Gradius', emoji: '🌀', hp: 14 }
+  },
+  {
+    id: 4, stream: '代数', icon: '|A|', title: '四 · 线性代数 I：行列式 · 矩阵', sub: '矩阵 · 行列式 · 线性方程组',
+    speaker: '矩阵之祖 Cayley',
+    story: [
+      { speaker: '矩阵之祖 Cayley', text: '矩阵是数表，但更是<span class="hl">线性变换</span>的代数表示。每个矩阵对应一种几何变换。' },
+      { speaker: '矩阵之祖 Cayley', text: '<span class="hl">行列式</span> det A 是 n × n 矩阵的一个数；几何上是该变换对体积的伸缩因子（带符号）。' },
+      { speaker: '矩阵之祖 Cayley', text: '<span class="hl">克拉默法则</span>：当 det A ≠ 0，线性方程组 Ax = b 有唯一解 xⱼ = det(Aⱼ) / det(A)。' },
+      { speaker: '矩阵之祖 Cayley', text: '<span class="hl">高斯消元</span>是更通用的方法：化矩阵为行最简形，读出秩与解空间。' }
+    ],
+    concepts: [
+      { title: '行列式的定义', body: 'n 阶行列式 det A 是某些项的<span class="hl">代数和</span>，每项形如 ±a₁σ₁ · a₂σ₂ ··· aₙσₙ，符号由置换的奇偶性决定。<br>性质：① 行交换变号；② 一行乘 k 行列式乘 k；③ 一行加另一行倍数，行列式不变。' },
+      { title: '矩阵的运算', body: '加法：对应元素相加（同型）。<br>乘法：A_{m×n} · B_{n×p} = C_{m×p}，<span class="formula">cᵢⱼ = Σₖ aᵢₖ bₖⱼ</span>。<br>注意：矩阵乘法<span class="hl">不可交换</span>，AB ≠ BA 通常。' },
+      { title: '逆矩阵', body: 'AA⁻¹ = A⁻¹A = I。<br><span class="hl">A 可逆 ⇔ det A ≠ 0</span>。<br>公式：A⁻¹ = (1/det A) · adj(A)（伴随矩阵）。<br>实际计算：高斯消元 [A | I] → [I | A⁻¹]。' },
+      { title: '矩阵的秩', body: 'r(A) = 行(列)向量组的极大线性无关组的个数。<br>r(A) = 化为行最简形后非零行的数量。<br>r(A) ≤ min(m, n)。' },
+      { title: '线性方程组解的结构', body: '<span class="hl">Ax = b 的解 = 一个特解 + Ax = 0 的所有解</span>。<br><span class="hl">齐次方程组 Ax = 0</span>：解空间维数 = n − r(A)。<br>非齐次 Ax = b 有解 ⇔ r(A) = r([A|b])。' }
+    ],
+    pet: { name: '行列式灵', symbol: '|A|' }, boss: { name: '矩阵之神 Matrixus', emoji: '🔷', hp: 14 }
+  },
+  {
+    id: 5, stream: '代数', icon: 'λ', title: '五 · 线性代数 II：特征值', sub: '特征值 · 对角化 · 二次型',
+    speaker: '特征学者 Hilbert',
+    story: [
+      { speaker: '特征学者 Hilbert', text: '若 <span class="formula">Av = λv</span>（v ≠ 0），则 λ 是 A 的<span class="hl">特征值</span>，v 是对应的<span class="hl">特征向量</span>。' },
+      { speaker: '特征学者 Hilbert', text: '特征值由<span class="hl">特征多项式</span> det(A − λI) = 0 求得。' },
+      { speaker: '特征学者 Hilbert', text: '<span class="hl">对角化</span>：存在可逆 P，使得 P⁻¹AP = diag(λ₁, …, λₙ)。条件：A 有 n 个线性无关的特征向量。' },
+      { speaker: '特征学者 Hilbert', text: '<span class="hl">实对称矩阵</span>必能正交对角化，特征值都是实数；<span class="hl">二次型</span> xᵀAx 的标准型由此可得。' }
+    ],
+    concepts: [
+      { title: '特征值与特征向量', body: 'Av = λv，v ≠ 0。<br>特征多项式：<span class="formula">det(A − λI) = 0</span>。<br>在复数域上，n 阶矩阵恰有 n 个特征值（按代数重数计）；实矩阵的特征值不一定是实数，非实的会成共轭复数对出现（如旋转矩阵）。<br><span class="hl">特征值之和 = trace(A)</span>，<span class="hl">特征值之积 = det(A)</span>。' },
+      { title: '对角化', body: 'A 可对角化 ⇔ A 有 n 个线性无关的特征向量。<br>构造：P 的列向量是这 n 个特征向量，则 P⁻¹AP = diag(λᵢ)。<br>实对称矩阵<span class="hl">必</span>可对角化，且可由<span class="hl">正交矩阵</span>对角化。' },
+      { title: '二次型', body: '一般形式 <span class="formula">Q(x) = xᵀAx</span>，A 为对称矩阵。<br>用正交变换可化为<span class="hl">标准型</span> Σλᵢyᵢ²。<br>正定 ⇔ 所有特征值 &gt; 0 ⇔ 所有顺序主子式 &gt; 0。' },
+      { title: '相似与合同', body: '<span class="hl">相似</span>：B = P⁻¹AP（变换基底），保持特征值。<br><span class="hl">合同</span>：B = CᵀAC（变换二次型），保持惯性指数（正、负、零特征值的个数）。' },
+      { title: '特征空间', body: '特征值 λ 对应的特征向量加 0 向量，构成 A 的<span class="hl">特征子空间</span>。<br>不同特征值对应的特征向量线性无关。<br>实对称矩阵不同特征值对应的特征向量正交。' }
+    ],
+    pet: { name: '特征灵', symbol: 'λ' }, boss: { name: '特征之神 Eigenus', emoji: '💎', hp: 14 }
+  },
+  {
+    id: 6, stream: '代数', icon: 'G', title: '六 · 抽象代数', sub: '群 · 环 · 域',
+    speaker: '抽象之父 Galois',
+    story: [
+      { speaker: '抽象之父 Galois', text: '抽象代数研究"<span class="hl">满足某些运算法则</span>的集合"，最基本的是<span class="hl">群</span>。' },
+      { speaker: '抽象之父 Galois', text: '群 (G, ·)：封闭、结合律、单位元、每个元素有逆元。可交换的群叫<span class="hl">阿贝尔群</span>。' },
+      { speaker: '抽象之父 Galois', text: '环 (R, +, ·)：(R, +) 是阿贝尔群、乘法有结合律、乘法对加法满足分配律。' },
+      { speaker: '抽象之父 Galois', text: '域 (F, +, ·)：环 + 非零元乘法构成阿贝尔群。<span class="formula">ℚ, ℝ, ℂ, ℤₚ (p 素数)</span> 都是域。' }
+    ],
+    concepts: [
+      { title: '群的定义', body: '集合 G 与二元运算 · 构成群，若：<br>① <span class="hl">封闭性</span>：∀ a,b ∈ G, a·b ∈ G<br>② <span class="hl">结合律</span>：(a·b)·c = a·(b·c)<br>③ <span class="hl">单位元 e</span>：∀ a, e·a = a·e = a<br>④ <span class="hl">逆元</span>：∀ a, ∃ a⁻¹, a·a⁻¹ = a⁻¹·a = e' },
+      { title: '常见的群', body: '(ℤ, +)、(ℝ, +)、(ℝ*, ·)、对称群 Sₙ、循环群 Cₙ。<br>阿贝尔群（交换群）：群运算满足交换律。<br>子群、陪集、商群、正规子群——构造新群的方式。' },
+      { title: '环与域', body: '<span class="hl">环</span>：(R, +) 是阿贝尔群，(R, ·) 有结合律，分配律 a(b+c) = ab + ac。<br><span class="hl">交换环</span>：·满足交换律。<br><span class="hl">整环</span>：交换环 + 无零因子。<br><span class="hl">域</span>：每个非零元都有乘法逆。' },
+      { title: '同态与同构', body: '映射 φ: G → H 是<span class="hl">同态</span>：φ(a·b) = φ(a)·φ(b)。<br><span class="hl">同构</span>：双射的同态——本质上"同一个群"。<br>同态的核 Ker φ = φ⁻¹(eH) 是 G 的正规子群。<br><span class="hl">第一同构定理</span>：G/Ker φ ≅ Im φ。' },
+      { title: '伽罗瓦理论一瞥', body: '一个多项式方程能否用根式解出？取决于它的<span class="hl">伽罗瓦群</span>是否是<span class="hl">可解群</span>。<br>5 次以上一般方程无根式解——这是阿贝尔与伽罗瓦的伟大发现。' }
+    ],
+    pet: { name: '群灵', symbol: 'G' }, boss: { name: '抽象之主 Abstractus', emoji: '🔮', hp: 14 }
+  },
+  {
+    id: 7, stream: '分析', icon: '∫₊', title: '七 · 实变函数', sub: '测度 · 勒贝格积分',
+    speaker: '测度宗师 Lebesgue',
+    story: [
+      { speaker: '测度宗师 Lebesgue', text: '黎曼积分把<span class="hl">定义域</span>切片求和；我把<span class="hl">值域</span>切片求和——结果适用范围大大扩展。' },
+      { speaker: '测度宗师 Lebesgue', text: '为此先要定义"集合的大小"——<span class="hl">测度</span>。' },
+      { speaker: '测度宗师 Lebesgue', text: '勒贝格可测的函数远比黎曼可积函数广。狄利克雷函数（有理点 = 1，无理点 = 0）勒贝格可积但黎曼不可积。' },
+      { speaker: '测度宗师 Lebesgue', text: '核心定理：<span class="hl">单调收敛定理、控制收敛定理、Fatou 引理</span>——交换"极限"与"积分"的工具。' }
+    ],
+    concepts: [
+      { title: '勒贝格测度', body: 'ℝⁿ 上 Borel 集 / 可测集的"大小"。<br>性质：① 非负；② 可数可加性 m(∪Aᵢ) = Σm(Aᵢ)（互不相交）；③ 平移不变。<br>零测集：m(E) = 0；如 ℚ（可数集）的测度为 0。' },
+      { title: '可测函数', body: 'f: ℝ → ℝ 可测 ⇔ ∀ a, {x : f(x) &gt; a} 是可测集。<br>连续函数可测；可测函数的极限可测；可测函数的和、积可测；商在分母不为 0 的定义域上可测。' },
+      { title: '勒贝格积分', body: '简单函数 φ = Σ cᵢχ_{Eᵢ} 的积分 = Σ cᵢ m(Eᵢ)。<br>非负可测函数 f 的积分 = sup{∫φ : 0 ≤ φ ≤ f, φ 简单}。<br>一般可测函数 f：拆 f = f⁺ − f⁻，定义 ∫f = ∫f⁺ − ∫f⁻。' },
+      { title: '三大收敛定理', body: '<span class="hl">单调收敛 (MCT)</span>：fₙ ≥ 0, fₙ ↗ f ⇒ ∫fₙ → ∫f。<br><span class="hl">Fatou 引理</span>：fₙ ≥ 0 ⇒ ∫lim inf fₙ ≤ lim inf ∫fₙ。<br><span class="hl">控制收敛 (DCT)</span>：|fₙ| ≤ g，∫g &lt; ∞, fₙ → f a.e. ⇒ ∫fₙ → ∫f。' },
+      { title: 'Lᵖ 空间', body: '<span class="formula">‖f‖_p = (∫|f|^p dm)^{1/p}</span>。<br>L¹: 可积函数；L²: 平方可积，是希尔伯特空间。<br>赫尔德不等式、闵可夫斯基不等式——Lᵖ 上的基本不等式。' }
+    ],
+    pet: { name: '测度之环', symbol: 'μ' }, boss: { name: '测度之神 Measureus', emoji: '⚖️', hp: 14 }
+  },
+  {
+    id: 8, stream: '分析', icon: 'ℂ', title: '八 · 复变函数', sub: '解析函数 · 复积分 · 留数',
+    speaker: '复分析师 Cauchy',
+    story: [
+      { speaker: '复分析师 Cauchy', text: '把变量从实数推到复数 z = x + iy，函数 f(z) 的可微性比实数情况强得多——这就是<span class="hl">解析函数</span>。' },
+      { speaker: '复分析师 Cauchy', text: '<span class="hl">柯西-黎曼方程</span>：u_x = v_y、u_y = −v_x（其中 f = u + iv）。' },
+      { speaker: '复分析师 Cauchy', text: '<span class="hl">柯西积分定理</span>：若函数在单连通区域内解析，则沿该区域内闭曲线的积分为 0。' },
+      { speaker: '复分析师 Cauchy', text: '<span class="hl">留数定理</span>把复积分化为只与奇点处"留数"有关的计算，是复分析最强大的工具。' }
+    ],
+    concepts: [
+      { title: '解析函数', body: 'f 在 z₀ 解析 ⇔ f 在 z₀ 邻域内每一点都可导。<br><span class="hl">柯西-黎曼方程</span>：解析函数必满足 <span class="formula">u_x = v_y, u_y = −v_x</span>；反过来，若 u、v 在邻域内一阶偏导连续并满足该方程，则 f = u + iv 解析。<br>解析函数无穷次可微，且能展成<span class="hl">幂级数</span>。' },
+      { title: '复积分', body: '沿曲线 γ 的积分 <span class="formula">∫_γ f(z) dz</span>。<br><span class="hl">柯西积分定理</span>：f 在单连通域 D 解析 ⇒ ∮_C f dz = 0（C 是 D 内闭曲线）。<br><span class="hl">柯西积分公式</span>：f(z₀) = (1/2πi) ∮_C f(z)/(z − z₀) dz。' },
+      { title: '泰勒与洛朗级数', body: '<span class="hl">泰勒</span>：解析函数 f 在 z₀ 邻域可展为 Σ aₙ(z − z₀)ⁿ。<br><span class="hl">洛朗</span>：在以 z₀ 为中心的圆环域内，f 可展为含负幂项的 Σ aₙ(z − z₀)ⁿ (n ∈ ℤ)。<br>负幂项系数 a₋₁ 叫<span class="hl">留数 Res(f, z₀)</span>。' },
+      { title: '奇点', body: '<span class="hl">可去奇点</span>：洛朗展开无负幂项<br><span class="hl">极点</span>：负幂项有限项<br><span class="hl">本性奇点</span>：负幂项无穷多<br>极点的阶 = 负幂项最大次数。' },
+      { title: '留数定理', body: '设 f 在闭曲线 C 内除有限个孤立奇点 zₖ 外解析：<br><span class="formula">∮_C f(z) dz = 2πi · Σₖ Res(f, zₖ)</span><br>用途：计算实积分（如 ∫_{-∞}^{∞} 1/(1+x²) dx = π）。' }
+    ],
+    pet: { name: '复数之环', symbol: 'ℂ' }, boss: { name: '复分析之神 Cauchix', emoji: '🌀', hp: 14 }
+  },
+  {
+    id: 9, stream: '几何', icon: 'τ', title: '九 · 拓扑学', sub: '开集 · 连续 · 紧致 · 连通',
+    speaker: '拓扑学者 Poincaré',
+    story: [
+      { speaker: '拓扑学者 Poincaré', text: '拓扑学研究图形在<span class="hl">连续变形</span>下不变的性质——形可变，但孔不能增加。' },
+      { speaker: '拓扑学者 Poincaré', text: '<span class="hl">拓扑空间</span> (X, τ)：X 是集合，τ 是 X 的子集族（开集），满足：∅, X ∈ τ；任意并、有限交都在 τ 中。' },
+      { speaker: '拓扑学者 Poincaré', text: '<span class="hl">连续映射</span>：开集的原像是开集。' },
+      { speaker: '拓扑学者 Poincaré', text: '两大重要性质：<span class="hl">紧致性</span>（有限子覆盖）和<span class="hl">连通性</span>（无法分成两个不相交开集）。' }
+    ],
+    concepts: [
+      { title: '拓扑空间', body: '集合 X 上的<span class="hl">拓扑 τ</span>：X 的子集族，满足：<br>① ∅, X ∈ τ；<br>② 任意并 ∪Uᵢ ∈ τ；<br>③ 有限交 U ∩ V ∈ τ。<br>τ 的元素叫<span class="hl">开集</span>。补集为开集的集合叫<span class="hl">闭集</span>。' },
+      { title: '连续映射', body: 'f: X → Y 连续 ⇔ <span class="hl">∀ V ⊆ Y 开</span>, <span class="formula">f⁻¹(V) 是 X 中开集</span>。<br>等价：对每个 x，∀ V ∋ f(x) 开，∃ U ∋ x 开，f(U) ⊆ V。<br>同胚 = 双射 + 双向连续 = 拓扑等价。' },
+      { title: '紧致性', body: '空间 X 紧致 ⇔ X 的任意开覆盖都有<span class="hl">有限子覆盖</span>。<br><span class="hl">海涅-博雷尔</span>：ℝⁿ 中紧致集 ⇔ 有界闭集。<br>紧致空间上的连续函数<span class="hl">必有最大最小值</span>。' },
+      { title: '连通性', body: 'X 连通 ⇔ 不能写成两个非空不相交开集的并。<br>道路连通：任意两点可由 X 中的连续路径相连。<br>道路连通 ⇒ 连通；反之不一定。<br>连续映射保持连通性。' },
+      { title: '基本群一瞥', body: '空间 X 中以 x₀ 为基点的闭路（同伦类）构成的群叫<span class="hl">基本群 π₁(X, x₀)</span>。<br>π₁(ℝⁿ) = 0（平凡群）；π₁(S¹) = ℤ。<br>同伦不变量：拓扑等价的空间基本群同构。' }
+    ],
+    pet: { name: '拓扑灵', symbol: 'τ' }, boss: { name: '拓扑之神 Topologus', emoji: '🌐', hp: 14 }
+  },
+  {
+    id: 10, stream: '概统', icon: 'P', title: '十 · 概率论', sub: '柯尔莫哥洛夫公理体系',
+    speaker: '概率宗师 Kolmogorov',
+    story: [
+      { speaker: '概率宗师 Kolmogorov', text: '1933 年，我用测度论为概率论奠定了公理基础：(Ω, ℱ, P)。' },
+      { speaker: '概率宗师 Kolmogorov', text: 'Ω 样本空间，ℱ 事件 σ-代数，P : ℱ → [0, 1] 概率测度。' },
+      { speaker: '概率宗师 Kolmogorov', text: '<span class="hl">两大极限定理</span>：大数定律（频率 → 概率）、中心极限定理（独立同分布之和近似正态）。' },
+      { speaker: '概率宗师 Kolmogorov', text: '<span class="hl">条件概率</span>、<span class="hl">独立性</span>、<span class="hl">期望</span>构成概率论的脊柱。' }
+    ],
+    concepts: [
+      { title: '概率空间', body: '<span class="hl">(Ω, ℱ, P)</span>：<br>Ω：样本空间，所有可能结果的集合<br>ℱ：σ-代数，事件的集合，封闭于可数并 / 补<br>P：概率测度，P(Ω) = 1，对互不相交可数事件 P(∪Aᵢ) = ΣP(Aᵢ)。' },
+      { title: '条件概率与独立', body: '<span class="formula">P(A|B) = P(A∩B) / P(B)</span>（P(B) &gt; 0）<br>独立：<span class="hl">P(A∩B) = P(A)P(B)</span>。<br><span class="hl">贝叶斯公式</span>：P(A|B) = P(B|A)P(A) / P(B)。' },
+      { title: '随机变量与分布', body: '随机变量 X：Ω → ℝ 可测函数。<br>分布函数 F(x) = P(X ≤ x)。<br>离散：分布列 p_i = P(X = x_i)。<br>连续：密度函数 f(x) ≥ 0, ∫f = 1, P(a&lt;X≤b) = ∫_a^b f。' },
+      { title: '期望与方差', body: '离散：<span class="formula">E(X) = Σ xᵢ pᵢ</span><br>连续：<span class="formula">E(X) = ∫ x f(x) dx</span><br>方差 Var(X) = E[(X − E(X))²] = E(X²) − [E(X)]²<br>线性：E(aX + bY) = aE(X) + bE(Y)；独立时 Var(X+Y) = Var(X) + Var(Y)。' },
+      { title: '极限定理', body: '<span class="hl">大数定律</span>：iid 序列 Xᵢ，样本均值 X̄ₙ → μ（按概率/几乎处处）。<br><span class="hl">中心极限定理</span>：iid Xᵢ，E = μ, Var = σ²，则 <span class="formula">(X̄ₙ − μ)/(σ/√n) → N(0, 1)</span>。' }
+    ],
+    pet: { name: '概率灵', symbol: 'ℙ' }, boss: { name: '机率之神 Probaius', emoji: '🎲', hp: 14 }
+  },
+  {
+    id: 11, stream: '概统', icon: 'X̄', title: '十一 · 数理统计', sub: '估计 · 假设检验',
+    speaker: '统计鼻祖 Fisher',
+    story: [
+      { speaker: '统计鼻祖 Fisher', text: '统计的核心：用<span class="hl">样本</span>推断<span class="hl">总体</span>。' },
+      { speaker: '统计鼻祖 Fisher', text: '<span class="hl">点估计</span>给参数一个具体值；<span class="hl">区间估计</span>给一个置信区间。' },
+      { speaker: '统计鼻祖 Fisher', text: '<span class="hl">假设检验</span>：先假设原假设 H₀，看样本是否提供足够证据拒绝它。' },
+      { speaker: '统计鼻祖 Fisher', text: '常见检验：t 检验（均值）、卡方检验（独立 / 拟合优度）、F 检验（方差比）。' }
+    ],
+    concepts: [
+      { title: '总体与样本', body: '<span class="hl">总体</span>：研究对象的全体；<br><span class="hl">样本</span>：从总体中抽取的 n 个独立观测 (X₁, …, Xₙ)。<br><span class="hl">统计量</span>：样本的函数 T(X₁, …, Xₙ)，不含未知参数。<br>样本均值 X̄、样本方差 S²。' },
+      { title: '点估计', body: '<span class="hl">矩估计</span>：用样本矩去估计总体矩。<br><span class="hl">最大似然估计 (MLE)</span>：最大化似然函数 L(θ) = ∏f(xᵢ; θ) 的 θ̂。<br>常见评价指标：无偏 E(θ̂) = θ；有效（方差小）；相合 θ̂ → θ。MLE 不一定总是无偏。' },
+      { title: '区间估计', body: '<span class="hl">置信区间</span>：以 1 − α 的概率包含真值。<br>正态总体均值（σ 已知）：<span class="formula">X̄ ± z_{α/2} σ/√n</span>。<br>正态总体均值（σ 未知）：<span class="formula">X̄ ± t_{α/2}(n−1) S/√n</span>。' },
+      { title: '假设检验', body: '设原假设 H₀ 与备择假设 H₁。<br>选择检验统计量，确定<span class="hl">拒绝域</span>。<br><span class="hl">第一类错误</span> α：H₀ 真但被拒（弃真）。<br><span class="hl">第二类错误</span> β：H₀ 假但被接受（取伪）。<br>p-value &lt; α ⇒ 拒绝 H₀。' },
+      { title: '常用检验', body: '<span class="hl">t 检验</span>：单样本 / 两样本均值检验。<br><span class="hl">χ² 检验</span>：拟合优度、列联表独立性。<br><span class="hl">F 检验</span>：两正态总体方差比、方差分析 ANOVA。' }
+    ],
+    pet: { name: '估计灵', symbol: 'θ̂' }, boss: { name: '统计之神 Fisheria', emoji: '📈', hp: 13 }
+  },
+  {
+    id: 12, stream: '几何', icon: '∇', title: '十二 · 微分几何', sub: '曲线 · 曲面 · 流形',
+    speaker: '微分几何之父 Riemann',
+    story: [
+      { speaker: '微分几何之父 Riemann', text: '曲面上的几何不必和欧氏几何一样：球面、双曲面、复杂流形都有自己的几何。' },
+      { speaker: '微分几何之父 Riemann', text: '<span class="hl">曲率</span>刻画弯曲程度。直线曲率为 0，圆的曲率为 1/r。' },
+      { speaker: '微分几何之父 Riemann', text: '<span class="hl">流形</span>：局部像欧氏空间的拓扑空间。地球表面是 2 维流形（局部像平面）。' },
+      { speaker: '微分几何之父 Riemann', text: '<span class="hl">黎曼度量</span>赋予流形上长度、夹角、面积的概念；广义相对论靠它建构时空。' }
+    ],
+    concepts: [
+      { title: '曲线的弧长与曲率', body: '弧长：<span class="formula">s = ∫_a^b |r′(t)| dt</span>。<br>对参数化曲线 r(s)（自然参数）：<br>切向量 T(s) = r′(s)，单位向量。<br>曲率 <span class="formula">κ = |T′(s)|</span>。直线 κ = 0；半径 R 的圆 κ = 1/R。' },
+      { title: 'Frenet 标架', body: '三个互相正交的单位向量：<br>切向量 T；主法向量 N = T′/|T′|；副法向量 B = T × N。<br><span class="hl">Frenet-Serret 公式</span>：T′ = κN，N′ = −κT + τB，B′ = −τN。<br>τ 为<span class="hl">挠率</span>，刻画曲线偏离密切平面的程度。' },
+      { title: '曲面与第一、第二基本形式', body: '曲面 r(u, v)。<br><span class="hl">第一基本形式</span> I = Edu² + 2Fdudv + Gdv²：测量长度、面积。<br><span class="hl">第二基本形式</span> II = Ldu² + 2Mdudv + Ndv²：度量曲面弯曲程度。<br>高斯曲率 <span class="formula">K = (LN − M²)/(EG − F²)</span>。' },
+      { title: '流形', body: 'n 维<span class="hl">拓扑流形</span> M：每点 p 有邻域同胚于 ℝⁿ 的开集。<br><span class="hl">微分流形</span>：额外要求坐标变换 C^∞ 光滑。<br>切空间 T_p M：p 点的"所有切向量"，是 n 维线性空间。' },
+      { title: '黎曼度量与广义相对论', body: '黎曼流形 (M, g)：每点切空间有内积 g。<br>测地线：局部最短路径，黎曼几何中"直线"的推广。<br><span class="hl">爱因斯坦场方程</span>：Rᵤᵥ − ½ R gᵤᵥ + Λ gᵤᵥ = (8πG/c⁴) Tᵤᵥ。<br>时空就是 4 维伪黎曼流形。' }
+    ],
+    pet: { name: '曲率灵', symbol: '∇' }, boss: { name: '黎曼之神 Riemannus', emoji: '🌌', hp: 15 }
+  }
+];
+
+const SAVE_KEY = "math_pantheon_v1";
+const defaultState = () => ({ level: 1, xp: 0, unitsCompleted: [], pets: [], totalCorrect: 0, totalWrong: 0, coins: 0, streak: 0, lastPlayedDate: '', bestStreak: 0, lastDailyDate: '', bestCombo: 0 });
+let state = (() => { try { const r = localStorage.getItem(SAVE_KEY); if (r) return Object.assign(defaultState(), JSON.parse(r)); } catch(e){} return defaultState(); })();
+function saveState() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+function todayStr() { const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function updateStreak() { const t = todayStr(); if (state.lastPlayedDate === t) return; if (!state.lastPlayedDate) state.streak = 1; else { const last = new Date(state.lastPlayedDate); const now = new Date(t); const diff = Math.round((now - last)/86400000); if (diff===1) state.streak++; else if (diff>1) state.streak = 1; } if (state.streak > (state.bestStreak||0)) state.bestStreak = state.streak; state.lastPlayedDate = t; saveState(); }
+function checkDailyReward() { const t = todayStr(); if (state.lastDailyDate === t) return; const r = 30 + Math.min(20, (state.streak||0)*2); state.coins = (state.coins||0) + r; state.lastDailyDate = t; saveState(); setTimeout(() => toast(`📅 +${r} 金币`, 2200), 600); }
+let combo = 0;
+function incCombo() { combo++; if (combo > (state.bestCombo||0)) state.bestCombo = combo; if (combo >= 3) showComboPopup(combo); if (combo === 5) { addCoins(10); addXP(10); toast('🔥 5 连击'); } else if (combo === 10) { addCoins(25); addXP(25); toast('🔥🔥 10 连击'); } saveState(); }
+function breakCombo() { if (combo >= 3) toast(`💔 ${combo} 连击中断`); combo = 0; }
+function showComboPopup(n) { const d = document.createElement('div'); d.style.cssText='position:fixed;top:22%;left:50%;transform:translateX(-50%);font-size:36px;color:#ffd700;font-weight:bold;text-shadow:0 0 24px #ffd700;z-index:1000;pointer-events:none;animation:fIn 1.1s ease-out forwards'; d.innerHTML = `🔥 Combo × ${n}`; document.body.appendChild(d); setTimeout(() => d.remove(), 1100); }
+function toast(m) { const d = document.createElement('div'); d.className = 'toast-popup'; d.innerHTML = m; document.body.appendChild(d); setTimeout(() => d.remove(), 1800); }
+function flashScreen(c) { const d = document.createElement('div'); d.className = 'screen-flash'; d.style.background = c; document.body.appendChild(d); setTimeout(() => d.remove(), 500); }
+function playTone(f, dur=0.1, type='sine') { try { const c = new (window.AudioContext||window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(c.destination); g.gain.setValueAtTime(0.15, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur); o.start(); o.stop(c.currentTime + dur); } catch(e) {} }
+function sndCorrect() { playTone(660, 0.1); setTimeout(() => playTone(880, 0.15), 90); }
+function sndWrong() { playTone(220, 0.2, 'square'); }
+function sndBoss() { playTone(150, 0.3, 'sawtooth'); }
+function sndVictory() { [523,659,784,1047].forEach((f,i) => setTimeout(() => playTone(f, 0.15), i*120)); }
+function confetti() { const colors = ['#ffd700','#b388ff','#80ed99','#ff6b6b','#4dd0e1']; for(let i=0;i<40;i++){ const c=document.createElement('div'); c.className='confetti'; c.style.left=Math.random()*100+'vw'; c.style.top='-20px'; c.style.background=colors[Math.floor(Math.random()*colors.length)]; c.style.animationDuration=(1.5+Math.random()*1.5)+'s'; document.body.appendChild(c); setTimeout(()=>c.remove(), 3500);} }
+function xpToNext(l) { return l * 100; }
+function addXP(n) { state.xp += n; while (state.xp >= xpToNext(state.level)) { state.xp -= xpToNext(state.level); state.level++; } saveState(); }
+function addCoins(n) { state.coins = (state.coins||0) + n; saveState(); }
+
+const app = document.getElementById('app');
+function render(html) { let sc = app.querySelector('.scene'); if (sc) { sc.innerHTML = html; } else { app.innerHTML = `<div class="scene">${html}</div>`; } if (typeof ensureVoiceBtn==='function') ensureVoiceBtn(); if (typeof updateKbdHint==='function') updateKbdHint(); }
+/* ===== 全局键盘系统：选择题 1-N / 数字键盘 / 继续页 Enter（按键高亮 + 浮动提示条）===== */
+function kbdFlash(btn){ if(!btn) return; btn.classList.add('keyflash'); setTimeout(function(){ btn.classList.remove('keyflash'); }, 120); }
+function kbdSceneType(){
+  if (document.querySelector('.vc-mask, .llm-mask, .chat-ov-mask')) return null;
+  if (document.querySelector('.blitz-stage, .g2048-wrap, .snk-wrap')) return null;
+  const scene = document.querySelector('.scene'); if (!scene) return null;
+  if (scene.querySelector('.num-pad')) return { type:'numpad', scene };
+  const opts = Array.prototype.slice.call(scene.querySelectorAll('.opt-grid .opt-btn')).filter(function(b){ return !b.disabled; });
+  if (opts.length) return { type:'choice', scene, opts };
+  const primaries = scene.querySelectorAll('.btn-row .primary, .primary');
+  const board = scene.querySelector('.makeN-grid, .slide-board, .magic-board, .numline-wrap, .balance-wrap, .seq-display, .term-card, .game24-cards');
+  if (primaries.length === 1 && !board) return { type:'continue', scene, primary: primaries[0] };
+  return { type:'idle', scene };
+}
+function gameKeyRouter(e){
+  const t = e.target;
+  if (t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const info = kbdSceneType(); if (!info) return;
+  const k = e.key;
+  if (info.type === 'numpad'){
+    const pad = info.scene.querySelector('.num-pad');
+    const all = Array.prototype.slice.call(pad.querySelectorAll('button'));
+    const find = function(re){ return all.find(function(b){ return re.test(b.textContent.trim()); }); };
+    let btn = null;
+    if (k.length===1 && k>='0' && k<='9') btn = all.find(function(b){ return b.textContent.trim()===k; });
+    else if (k==='Backspace') btn = find(/⌫|删除|退/);
+    else if (k==='Enter') btn = find(/✓|提交/) || info.scene.querySelector('.btn-row .primary');
+    else if (k==='-' || k==='+' || k==='_') btn = find(/±|正负/);
+    else if (k==='.') btn = find(/^·$|小数/);
+    else if (k==='Escape') btn = info.scene.querySelector('.btn-row button');
+    else return;
+    if (btn){ kbdFlash(btn); btn.click(); e.preventDefault(); }
+    return;
+  }
+  if (info.type === 'choice'){
+    if (k.length===1 && k>='1' && k<='9'){ const i=+k-1; if (i<info.opts.length){ kbdFlash(info.opts[i]); info.opts[i].click(); e.preventDefault(); } return; }
+    if (k==='Escape'){ const ex=info.scene.querySelector('.btn-row button'); if (ex){ kbdFlash(ex); ex.click(); e.preventDefault(); } return; }
+    return;
+  }
+  if (info.type === 'continue'){
+    if (k==='Enter' || k===' '){ kbdFlash(info.primary); info.primary.click(); e.preventDefault(); return; }
+    if (k==='Escape'){ const ex=info.scene.querySelector('.btn-row button:not(.primary)'); if (ex){ kbdFlash(ex); ex.click(); e.preventDefault(); } return; }
+  }
+}
+function updateKbdHint(){
+  let hint = document.getElementById('kbdHint');
+  const info = kbdSceneType();
+  let txt = '';
+  if (info){
+    if (info.type==='numpad') txt = '⌨️ <kbd>0</kbd>–<kbd>9</kbd> 输入 · <kbd>Enter</kbd> 提交 · <kbd>⌫</kbd> 删除 · <kbd>−</kbd> 正负 · <kbd>.</kbd> 小数 · <kbd>Esc</kbd> 退出';
+    else if (info.type==='choice') txt = '⌨️ 按 <kbd>1</kbd>–<kbd>'+info.opts.length+'</kbd> 选择答案 · <kbd>Esc</kbd> 退出';
+    else if (info.type==='continue') txt = '⌨️ <kbd>Enter</kbd> 继续 · <kbd>Esc</kbd> 返回';
+  }
+  if (!txt){ if (hint) hint.style.display='none'; return; }
+  if (!hint){ hint = document.createElement('div'); hint.id='kbdHint'; document.body.appendChild(hint); }
+  hint.innerHTML = txt; hint.style.display='block';
+}
+window.addEventListener('keydown', gameKeyRouter);
+function hudHtml() { const b = COURSES.map(c => { const o = state.unitsCompleted.includes(c.id); return `<div class="badge-slot ${o?'owned':''}" title="${c.title}">${o?c.icon:'?'}</div>`; }).join(''); return `<div class="hud"><div class="item"><span class="label">Lv.</span><span class="value">${state.level}</span></div><div class="item"><span class="label">XP</span><span class="value">${state.xp}/${xpToNext(state.level)}</span></div><div class="item"><span class="label">💰</span><span class="value">${state.coins||0}</span></div><div class="item"><div class="badges-bar">${b}</div></div></div>`; }
+
+function sceneMenu() {
+  const has = state.unitsCompleted.length > 0 || state.xp > 0;
+  render(`<div class="menu-content"><h1>大学数学殿堂</h1><div class="subtitle">Pantheon · 12 门核心课</div><div class="pantheon-crystal">∂</div><p style="color:var(--text-dim);font-size:13px;">数学分析 / 高等代数 / 抽象代数 / 实变 / 复变 / 拓扑 / 概统 / 微分几何</p>${has?`<p style="margin-top:14px;color:var(--gold);">📜 Lv.${state.level} · 修完 ${state.unitsCompleted.length}/12 课</p>`:''}<div class="btn-row">${has?`<button class="primary" onclick="sceneMap()">继续修课</button>`:''}<button class="${has?'':'primary'}" onclick="${has?'confirmReset()':'sceneMap()'}">${has?'重新开始':'开始修课'}</button><button onclick="sceneFun()">🎲 奇趣馆</button><button class="ask-entry" onclick="sceneAsk()">💬 问数学家</button></div></div>`);
+}
+function confirmReset() { if (confirm('清空存档?')) { state = defaultState(); saveState(); sceneMap(); } else sceneMap(); }
+function sceneMap() {
+  const grouped = {};
+  COURSES.forEach(c => (grouped[c.stream] = grouped[c.stream] || []).push(c));
+  const sections = Object.keys(grouped).map(s => {
+    const done = grouped[s].filter(c => state.unitsCompleted.includes(c.id)).length;
+    const cards = grouped[s].map(c => {
+      const completed = state.unitsCompleted.includes(c.id);
+      const lk = c.id > 1 && !state.unitsCompleted.includes(c.id - 1);
+      return `<div class="course-card ${completed?'completed':''} ${lk?'locked':''}" ${lk?'':`onclick="startCourse(${c.id})"`}>${completed?'<div class="course-check">✓</div>':''}<div class="course-num ${lk?'locked-num':''}">${lk?'🔒':c.id}</div><div class="course-icon">${c.icon}</div><div class="course-info"><div class="course-title">${c.title}</div><div class="course-sub">${c.sub}</div></div></div>`;
+    }).join('');
+    return `<div class="stream-section"><h3 class="stream-header">🎓 ${s} <span style="color:var(--text-dim);font-size:13px;">(${done}/${grouped[s].length})</span></h3><div class="course-grid">${cards}</div></div>`;
+  }).join('');
+  render(`${hudHtml()}<h2>🏛️ 大学数学殿堂 · 12 门核心</h2><div class="course-map">${sections}</div><div class="btn-row"><button onclick="sceneMenu()">主菜单</button></div>`);
+}
+let currentC = null, sStep = 0;
+function startCourse(id) { currentC = COURSES.find(c => c.id === id); sStep = 0; sceneStory(); }
+function sceneStory() {
+  const c = currentC;
+  const d = c.story.slice(0, sStep+1).map((x, i) => `<div class="dialogue"><div class="speaker">${x.speaker}${i===sStep?` <button class="speak-btn" onclick="speakStoryLine(${i})">🔊</button>`:''}</div><div class="text">${x.text}</div></div>`).join('');
+  const last = sStep >= c.story.length - 1;
+  render(`${hudHtml()}<h2>${c.icon} ${c.title}</h2><div class="story-box">${d}</div><div class="btn-row">${last?`<button class="primary" onclick="sceneConcepts()">概念 →</button>`:`<button class="primary" onclick="sStep++;sceneStory()">继续 →</button>`}<button onclick="sceneMap()">返回</button></div>`);
+  if (typeof speech !== 'undefined' && speech.on) { const x = c.story[sStep]; if (x) speech.speak(`${x.speaker}：${x.text}`); }
+}
+function speakStoryLine(i) { const d = currentC && currentC.story && currentC.story[i]; if (d) speech.speak(`${d.speaker}：${d.text}`); }
+function sceneConcepts() {
+  const c = currentC; window._curConcepts = c.concepts;
+  const cards = c.concepts.map((k, i) => `<div class="concept-card"><div class="concept-title">📖 ${k.title} <button class="speak-btn" onclick="speakConcept(${i})">🔊</button></div><div class="concept-body">${k.body}</div></div>`).join('');
+  render(`${hudHtml()}<h2>📚 ${c.title} · 概念</h2><div style="flex:1;overflow-y:auto;padding:4px;">${cards}</div><div class="btn-row"><button onclick="sceneStory()">← 故事</button><button onclick="speakAllConcepts()">🔊 全部</button><button class="primary" onclick="startQuiz()">练习题 →</button></div>`);
+}
+function speakConcept(i) { const k = window._curConcepts && window._curConcepts[i]; if (k) speech.speak(`${k.title}。${k.body}`); }
+function speakAllConcepts() { if (!window._curConcepts) return; speech.speak(window._curConcepts.map(k => `${k.title}。${k.body}`).join('。 下一个：')); }
+
+let qcState = null;
+function quickChoice(cfg) {
+  qcState = { cfg, submitted: false };
+  const opts = cfg.opts.map((o,i) => `<button class="opt-btn" onclick="qcPick(${i})">${o}</button>`).join('');
+  render(`${hudHtml()}<h2>${cfg.title}</h2><div class="q-progress">${cfg.progress}</div><div class="q-expr">${cfg.q}</div>${cfg.hint?`<div class="q-hint">💡 ${cfg.hint}</div>`:''}<div class="opt-grid">${opts}</div><div class="feedback" id="fb"></div><div class="btn-row"><button onclick="sceneMap()">退出</button></div>`);
+}
+function qcPick(idx) {
+  const s = qcState; if (s.submitted) return; s.submitted = true;
+  const picked = s.cfg.opts[idx]; const ok = picked === s.cfg.answer;
+  const btns = document.querySelectorAll('.opt-btn'); btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (ok) { btns[idx].classList.add('correct'); fb.innerHTML = '✓ 正确'; fb.className='feedback correct'; sndCorrect(); flashScreen('rgba(128,237,153,0.25)'); addXP(8); addCoins(8); incCombo(); state.totalCorrect++; }
+  else { btns[idx].classList.add('wrong'); btns.forEach(b => { if (b.textContent === s.cfg.answer) b.classList.add('correct'); }); fb.innerHTML = `✗ 正确：<span style="color:var(--gold)">${s.cfg.answer}</span>`; fb.className='feedback wrong'; sndWrong(); flashScreen('rgba(255,107,107,0.25)'); state.totalWrong++; breakCombo(); }
+  saveState(); setTimeout(() => s.cfg.onDone(ok), 1800);
+}
+
+// 题库（每课 5+ 题型）
+const QB = {
+  1: [
+    () => ({ q:'数列极限 ε-N 定义中，N 一般依赖于？', opts:['ε','n','aₙ','a'], answer:'ε' }),
+    () => ({ q:'lim_{x→0} sin x / x = ?', opts:['1','0','∞','不存在'], answer:'1' }),
+    () => ({ q:'lim_{x→∞} (1 + 1/x)^x = ?', opts:['e','1','∞','0'], answer:'e' }),
+    () => ({ q:'函数 f(x) = 1/x 在 x = 0 处属于哪种间断？', opts:['无穷间断','可去间断','跳跃间断','连续点'], answer:'无穷间断' }),
+    () => ({ q:'夹逼定理要求 f ≤ g ≤ h，且：', opts:['f 与 h 极限相等','f → 0','h 单调','g 连续'], answer:'f 与 h 极限相等' }),
+    () => ({ q:'单调有界数列：', opts:['必收敛','可能发散','一定振荡','一定单调'], answer:'必收敛' })
+  ],
+  2: [
+    () => ({ q:'(xⁿ)′ = ?', opts:['n xⁿ⁻¹','xⁿ⁻¹','n xⁿ','(n−1)xⁿ'], answer:'n xⁿ⁻¹' }),
+    () => ({ q:'∫ eˣ dx = ?', opts:['eˣ + C','eˣ','x eˣ + C','x eˣ⁻¹'], answer:'eˣ + C' }),
+    () => ({ q:'∫ (1/x) dx = ?', opts:['ln|x| + C','1/x² + C','x + C','− 1/x + C'], answer:'ln|x| + C' }),
+    () => ({ q:'牛顿-莱布尼茨公式 ∫_a^b f(x)dx = ?', opts:['F(b) − F(a)','F(a) − F(b)','f(b) − f(a)','f(b) + f(a)'], answer:'F(b) − F(a)' }),
+    () => ({ q:'分部积分公式：∫u dv = ?', opts:['uv − ∫v du','uv + ∫v du','∫du · ∫dv','u/v'], answer:'uv − ∫v du' }),
+    () => ({ q:'拉格朗日中值定理：∃ξ, f′(ξ) = ?', opts:['(f(b)−f(a))/(b−a)','f(b) − f(a)','(b−a)/(f(b)−f(a))','0'], answer:'(f(b)−f(a))/(b−a)' })
+  ],
+  3: [
+    () => ({ q:'梯度 ∇f 的方向意义？', opts:['函数增长最快','函数减小最快','切线方向','法线方向'], answer:'函数增长最快' }),
+    () => ({ q:'幂级数 Σaₙxⁿ 的收敛半径 R 由什么决定？', opts:['1 / lim sup ⁿ√|aₙ|','aₙ 之和','aₙ 之积','1'], answer:'1 / lim sup ⁿ√|aₙ|' }),
+    () => ({ q:'eˣ 的泰勒级数：', opts:['Σ xⁿ/n!','Σ (−1)ⁿ xⁿ/n!','Σ xⁿ','Σ n! xⁿ'], answer:'Σ xⁿ/n!' }),
+    () => ({ q:'拉格朗日乘子法求条件极值时方程为：', opts:['∇f = λ∇g','∇f = 0','∇g = 0','f = g'], answer:'∇f = λ∇g' }),
+    () => ({ q:'二重积分换元用的雅可比 |J| 是？', opts:['偏导数行列式的绝对值','函数本身','面积','梯度'], answer:'偏导数行列式的绝对值' })
+  ],
+  4: [
+    () => ({ q:'n × n 矩阵 A 可逆 ⇔ ?', opts:['det A ≠ 0','det A = 0','秩 r(A) = 0','A 是对称'], answer:'det A ≠ 0' }),
+    () => ({ q:'交换矩阵的两行，行列式：', opts:['变号','不变','变为 0','乘以 2'], answer:'变号' }),
+    () => ({ q:'非齐次方程 Ax = b 有解 ⇔ ?', opts:['r(A) = r([A|b])','det A ≠ 0','A 对称','秩 = n'], answer:'r(A) = r([A|b])' }),
+    () => ({ q:'齐次方程 Ax = 0 的解空间维数 = ?', opts:['n − r(A)','r(A)','n','m'], answer:'n − r(A)' }),
+    () => ({ q:'矩阵乘法满足：', opts:['结合律但不交换','交换律','分配律但不结合','不满足结合律'], answer:'结合律但不交换' })
+  ],
+  5: [
+    () => ({ q:'特征值的特征多项式：', opts:['det(A − λI) = 0','det A = λ','tr A = λ','A − λI = 0'], answer:'det(A − λI) = 0' }),
+    () => ({ q:'A 的特征值之和 = ?', opts:['trace(A)','det(A)','n','0'], answer:'trace(A)' }),
+    () => ({ q:'A 的特征值之积 = ?', opts:['det(A)','trace(A)','n','1'], answer:'det(A)' }),
+    () => ({ q:'实对称矩阵的特征值：', opts:['全为实数','可以为复','全为正','全为整数'], answer:'全为实数' }),
+    () => ({ q:'A 可对角化 ⇔ ?', opts:['A 有 n 个线性无关的特征向量','det A ≠ 0','A 对称','A 可逆'], answer:'A 有 n 个线性无关的特征向量' }),
+    () => ({ q:'二次型正定 ⇔ 所有特征值：', opts:['> 0','< 0','= 0','≥ 0'], answer:'> 0' })
+  ],
+  6: [
+    () => ({ q:'群的四条公理不包括：', opts:['交换律','结合律','单位元','逆元'], answer:'交换律' }),
+    () => ({ q:'阿贝尔群 = ?', opts:['交换群','循环群','无限群','正规群'], answer:'交换群' }),
+    () => ({ q:'域比环多了什么条件？', opts:['非零元有乘法逆','加法可逆','结合律','分配律'], answer:'非零元有乘法逆' }),
+    () => ({ q:'(ℤ, +) 是？', opts:['无限循环群','有限群','环但非群','非阿贝尔群'], answer:'无限循环群' }),
+    () => ({ q:'5 次以上一般方程：', opts:['无根式解','有公式解','必有有理解','必有重根'], answer:'无根式解' }),
+    () => ({ q:'群的子集 H 是子群需要满足：', opts:['封闭、含单位元、含逆元','只需封闭','只需含单位元','只需有限'], answer:'封闭、含单位元、含逆元' })
+  ],
+  7: [
+    () => ({ q:'勒贝格积分相对黎曼积分的优势：', opts:['适用范围广，便于交换极限与积分','计算简单','只对连续函数有效','需要可微'], answer:'适用范围广，便于交换极限与积分' }),
+    () => ({ q:'狄利克雷函数（ℚ 上 1，ℝ\\ℚ 上 0）在 [0,1] 上的 Lebesgue 积分 = ?', opts:['0','1','1/2','不存在'], answer:'0' }),
+    () => ({ q:'ℚ 在 ℝ 中的 Lebesgue 测度 = ?', opts:['0','1','∞','不可测'], answer:'0' }),
+    () => ({ q:'控制收敛定理要求：', opts:['存在可积控制函数 g：|fₙ| ≤ g','fₙ ≥ 0','fₙ 单调','fₙ 连续'], answer:'存在可积控制函数 g：|fₙ| ≤ g' }),
+    () => ({ q:'L² 空间是：', opts:['希尔伯特空间','巴拿赫空间但非希尔伯特','离散','非完备'], answer:'希尔伯特空间' })
+  ],
+  8: [
+    () => ({ q:'在 u、v 偏导连续的常用前提下，f = u + iv 解析可由什么判定？', opts:['满足柯西-黎曼方程','满足拉普拉斯方程','u, v 连续','u, v 可导'], answer:'满足柯西-黎曼方程' }),
+    () => ({ q:'柯西积分定理：函数在单连通域内解析时，沿域内闭曲线积分 = ?', opts:['0','2πi','1','f(z₀)'], answer:'0' }),
+    () => ({ q:'留数 Res(f, z₀) 是洛朗展开中的：', opts:['(z−z₀)⁻¹ 系数','(z−z₀)⁰ 系数','最高次项','常数项'], answer:'(z−z₀)⁻¹ 系数' }),
+    () => ({ q:'留数定理：∮_C f dz = ?', opts:['2πi · Σ Res','πi · Σ Res','Σ Res','0'], answer:'2πi · Σ Res' }),
+    () => ({ q:'解析函数在邻域内可展为：', opts:['幂级数（泰勒）','傅里叶级数','三角级数','调和级数'], answer:'幂级数（泰勒）' })
+  ],
+  9: [
+    () => ({ q:'连续映射的定义：', opts:['开集的原像是开集','像是开集','单射','满射'], answer:'开集的原像是开集' }),
+    () => ({ q:'紧致性的定义：', opts:['任意开覆盖有有限子覆盖','是闭集','有界','可数'], answer:'任意开覆盖有有限子覆盖' }),
+    () => ({ q:'ℝⁿ 中紧致集 = ?', opts:['有界闭集','闭集','有界开集','可数集'], answer:'有界闭集' }),
+    () => ({ q:'紧致空间上的连续函数：', opts:['必有最大最小值','单调','可微','一致连续'], answer:'必有最大最小值' }),
+    () => ({ q:'π₁(S¹) = ?', opts:['ℤ','0','ℤ²','ℝ'], answer:'ℤ' }),
+    () => ({ q:'同胚 = ?', opts:['双射 + 双向连续','单射 + 连续','双射 + 可微','双射'], answer:'双射 + 双向连续' })
+  ],
+  10: [
+    () => ({ q:'柯尔莫哥洛夫概率空间是 (Ω, ℱ, P)，ℱ 叫？', opts:['σ-代数','拓扑','环','测度'], answer:'σ-代数' }),
+    () => ({ q:'P(Ω) = ?', opts:['1','0','∞','取决于 Ω'], answer:'1' }),
+    () => ({ q:'独立事件 A, B 满足：', opts:['P(A∩B) = P(A)P(B)','P(A∪B) = P(A)+P(B)','P(A) = P(B)','A ⊆ B'], answer:'P(A∩B) = P(A)P(B)' }),
+    () => ({ q:'贝叶斯公式 P(A|B) = ?', opts:['P(B|A)P(A) / P(B)','P(A)P(B)','P(A∩B)','P(A)/P(B)'], answer:'P(B|A)P(A) / P(B)' }),
+    () => ({ q:'中心极限定理结论：', opts:['(X̄ₙ − μ)/(σ/√n) → N(0,1)','X̄ₙ → 0','X̄ₙ ~ Binomial','X̄ₙ 服从均匀分布'], answer:'(X̄ₙ − μ)/(σ/√n) → N(0,1)' }),
+    () => ({ q:'方差 Var(X) = ?', opts:['E(X²) − [E(X)]²','E(X)²','E(|X|)','E(X)' ], answer:'E(X²) − [E(X)]²' })
+  ],
+  11: [
+    () => ({ q:'最大似然估计：', opts:['最大化似然函数','最小化方差','最小化偏差','最大化期望'], answer:'最大化似然函数' }),
+    () => ({ q:'置信区间 X̄ ± t·S/√n 适用于：', opts:['正态总体均值，σ 未知','σ 已知','非正态总体','离散分布'], answer:'正态总体均值，σ 未知' }),
+    () => ({ q:'第一类错误是：', opts:['H₀ 真而拒绝（弃真）','H₀ 假而接受','样本太少','σ 未知'], answer:'H₀ 真而拒绝（弃真）' }),
+    () => ({ q:'t 检验用于：', opts:['均值检验','方差检验','拟合优度','独立性'], answer:'均值检验' }),
+    () => ({ q:'χ² 检验<span style="color:var(--red)">不</span>用于：', opts:['两正态均值比较','拟合优度','列联表独立性','分类数据'], answer:'两正态均值比较' })
+  ],
+  12: [
+    () => ({ q:'半径 R 的圆的曲率 κ = ?', opts:['1/R','R','R²','0'], answer:'1/R' }),
+    () => ({ q:'直线的曲率 κ = ?', opts:['0','1','无穷','变化'], answer:'0' }),
+    () => ({ q:'Frenet 三标架不包括：', opts:['梯度向量','切向量','法向量','副法向量'], answer:'梯度向量' }),
+    () => ({ q:'高斯曲率 K 关于：', opts:['第一基本形式不变','第二基本形式不变','坐标依赖','测度依赖'], answer:'第一基本形式不变' }),
+    () => ({ q:'n 维微分流形局部同胚于：', opts:['ℝⁿ 的开集','ℂⁿ','Sⁿ','单位球'], answer:'ℝⁿ 的开集' }),
+    () => ({ q:'广义相对论的时空是：', opts:['4 维伪黎曼流形','3 维欧氏空间','2 维球面','复流形'], answer:'4 维伪黎曼流形' })
+  ]
+};
+
+let qIdx = 0, qCorrect = 0; const qTotal = 6;
+function startQuiz() { qIdx = 0; qCorrect = 0; nextQ(); }
+function nextQ() {
+  if (qIdx >= qTotal) return finishStage();
+  const Q = pick(QB[currentC.id])();
+  quickChoice({ title: `🎯 ${currentC.title} · ${qIdx+1}/${qTotal}`, progress: '已答对 ' + qCorrect, q: Q.q, hint: Q.hint||'', opts: shuffle(Q.opts), answer: Q.answer, onDone: ok => { if (ok) qCorrect++; qIdx++; nextQ(); } });
+}
+function finishStage() {
+  const pass = qCorrect >= Math.ceil(qTotal * 0.5);
+  render(`${hudHtml()}<h2>${pass?'🎉 通过':'🤔 再练'}</h2><div class="concept-card" style="text-align:center;"><div style="font-size:64px;">${pass?'✨':'📖'}</div><p style="font-size:20px;margin:12px 0;">答对 <span style="color:var(--gold);font-size:28px;">${qCorrect}</span> / ${qTotal}</p></div><div class="btn-row">${pass?`<button class="primary" onclick="startBoss()">⚔️ 期末 BOSS →</button><button onclick="startQuiz()">再练</button>`:`<button onclick="sceneConcepts()">← 概念</button><button class="primary" onclick="startQuiz()">再来</button>`}</div>`);
+}
+
+let bossHp = 0, bossMax = 0, pHp = 100, bQ = null;
+function startBoss() { bossMax = currentC.boss.hp; bossHp = bossMax; pHp = 100; sndBoss(); nextB(); }
+function nextB() {
+  if (bossHp <= 0) return sceneVictory();
+  if (pHp <= 0) return sceneDefeat();
+  bQ = pick(QB[currentC.id])();
+  renderBoss();
+}
+function renderBoss() {
+  const c = currentC; const pct = bossHp / bossMax * 100;
+  const opts = shuffle(bQ.opts).map((o,i) => `<button class="opt-btn" onclick="bAns('${o.replace(/'/g, "\\'")}')">${o}</button>`).join('');
+  render(`<div class="hud"><div class="item"><span class="label">HP</span></div><div class="hp-bar"><div class="hp-fill" style="width:${pHp}%"></div></div><div class="item"><span class="value">${pHp}/100</span></div></div><h2>⚔️ ${c.boss.name}</h2><div class="boss-portrait">${c.boss.emoji}</div><div class="boss-name">${c.boss.name}</div><div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${pct}%"></div></div><div class="q-expr">${bQ.q}</div><div class="opt-grid">${opts}</div><div class="feedback" id="fb"></div>`);
+  if (typeof speech !== 'undefined' && speech.on) setTimeout(() => speech.speak(bQ.q), 200);
+}
+function bAns(picked) {
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (picked === bQ.answer) {
+    bossHp--; fb.innerHTML = '⚡ 命中 -1 HP'; fb.className = 'feedback correct';
+    sndCorrect(); flashScreen('rgba(128,237,153,0.25)'); addXP(10); addCoins(12); incCombo(); state.totalCorrect++;
+  } else {
+    const dmg = bossHp <= Math.ceil(bossMax/2) ? 40 : 25; pHp -= dmg;
+    fb.innerHTML = `💥 -${dmg} HP！正确：<span style="color:var(--gold)">${bQ.answer}</span>`; fb.className = 'feedback wrong';
+    sndWrong(); flashScreen('rgba(255,107,107,0.3)'); state.totalWrong++; breakCombo();
+  }
+  saveState(); setTimeout(() => nextB(), 1500);
+}
+function sceneVictory() {
+  const c = currentC;
+  if (!state.unitsCompleted.includes(c.id)) state.unitsCompleted.push(c.id);
+  if (!state.pets.find(p => p.name === c.pet.name)) state.pets.push(c.pet);
+  addXP(50); saveState(); sndVictory(); confetti();
+  render(`${hudHtml()}<div class="victory-content"><h1>🎓 修完！</h1><p style="color:var(--gold);font-size:20px;">${c.title}</p><div class="trophy">🏆</div><div class="reward-pet"><div class="pet-icon">${c.pet.symbol}</div><div class="pet-name">${c.pet.name}</div><p style="color:var(--text-dim);font-size:13px;margin-top:8px;">+ 50 XP</p></div><div class="btn-row"><button class="primary" onclick="sceneMap()">返回</button>${c.id<COURSES.length?`<button onclick="startCourse(${c.id+1})">下一门 →</button>`:''}</div></div>`);
+}
+function sceneDefeat() {
+  render(`${hudHtml()}<div class="victory-content"><h2>😵 失利</h2><div style="font-size:80px;margin:20px 0;">💔</div><p style="color:var(--text-dim);">复习概念再战</p><div class="btn-row"><button onclick="sceneConcepts()">← 概念</button><button class="primary" onclick="startBoss()">再战</button><button onclick="sceneMap()">返回</button></div></div>`);
+}
+
+// ============== 🔊 Voice / TTS ==============
+const speech = {
+  on: localStorage.getItem('math_voice_on') !== '0', voice: null,
+  init() { if (!('speechSynthesis' in window)) { this.on = false; return; }
+    const sv = () => { const vs = speechSynthesis.getVoices();
+      this.voice = vs.find(v=>/zh-CN/i.test(v.lang)&&/xiaoxiao|yaoyao|huihui|tingting|female|woman/i.test(v.name))||vs.find(v=>/zh-CN|cmn-Hans/i.test(v.lang))||vs.find(v=>/zh/i.test(v.lang))||null; };
+    sv(); if (speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=sv; },
+  clean(t) { return String(t).replace(/<[^>]+>/g,' ').replace(/[（()【】\[\]「」]/g,' ').replace(/×/g,'乘').replace(/÷/g,'除以').replace(/π/g,'派').replace(/²/g,'的平方').replace(/³/g,'的立方').replace(/√/g,'根号').replace(/∂/g,'偏').replace(/∫/g,'积分').replace(/∑/g,'西格玛').replace(/∞/g,'无穷').replace(/∈/g,'属于').replace(/∀/g,'任意').replace(/∃/g,'存在').replace(/⊆/g,'包含于').replace(/∪/g,'并').replace(/∩/g,'交').replace(/≤/g,'小于等于').replace(/≥/g,'大于等于').replace(/−/g,'负').replace(/\s+/g,' ').trim(); },
+  speak(t, o={}) { if (!this.on||!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const c=this.clean(t); if (!c) return; const u=new SpeechSynthesisUtterance(c); u.lang='zh-CN'; if (this.voice) u.voice=this.voice; u.rate=o.rate||1.0; u.pitch=o.pitch||1.0; speechSynthesis.speak(u); },
+  stop() { if ('speechSynthesis' in window) speechSynthesis.cancel(); },
+  toggle() { this.on=!this.on; localStorage.setItem('math_voice_on',this.on?'1':'0'); if (!this.on) this.stop(); return this.on; }
+};
+speech.init();
+function voiceToggle() { const on=speech.toggle(); toast(on?'🔊 语音开':'🔇 语音关',1000); const b=document.getElementById('voiceBtn'); if (b) b.textContent=on?'🔊':'🔇'; }
+function ensureVoiceBtn() { if (document.getElementById('voiceBtn')) return; const b=document.createElement('button'); b.id='voiceBtn'; b.className='voice-btn'; b.textContent=speech.on?'🔊':'🔇'; b.title='语音朗读'; b.onclick=voiceToggle; document.body.appendChild(b); }
+function speakItemById(arr, i) { const it=MATH_FUN[arr]&&MATH_FUN[arr][i]; if (!it) return; speech.speak(typeof it==='string'?it:(it.story||(it.q+'。答案：'+it.a))); }
+
+const MATH_FUN = {
+  facts: [
+    "ε-δ 定义把\"接近\"翻译成了精确的数学语言，使微积分可以摆脱含混的无穷小说法而变得严谨。",
+    "实数的连续性可以由完备性公理刻画 —— Cauchy 列必收敛。",
+    "群、环、域三个层级一层比一层多结构 —— 加法、加乘、加除。",
+    "复变函数比实变函数限制大得多：在开区域内复可导（全纯）即解析，解析必无穷可导。",
+    "拓扑学关心连续变形下不变的性质：理想化的带把手咖啡杯和甜甜圈同胚，都有一个洞。",
+    "实变里的 Lebesgue 积分能积起 Riemann 积分积不起的函数，比如 [0,1] 上的 Dirichlet 函数。",
+    "数学归纳法 = 多米诺骨牌：第一个倒 + 每个能推下一个 = 全倒。",
+    "向量空间的维数等于一组基的元素数，与你选哪组基无关。",
+    "Cantor 用对角线法证明 (0,1) 区间里的实数比所有整数还多。",
+    "中心极限定理：在独立同分布且方差有限时，标准化后的样本均值趋于正态。",
+  ],
+  mathematicians: [
+    { name: "魏尔斯特拉斯", emoji: "ε", years: "1815-1897", story: "他把含混的\"无穷小\"概念整理成 ε-δ 的精确语言，被誉为现代分析之父。" },
+    { name: "黎曼", emoji: "🌀", years: "1826-1866", story: "建立了黎曼积分、黎曼曲面、黎曼几何，每一个都是一座丰碑。" },
+    { name: "希尔伯特", emoji: "📜", years: "1862-1943", story: "他的希尔伯特空间统一了向量代数与函数分析，给量子力学奠定了数学基础。" },
+    { name: "庞加莱", emoji: "🌐", years: "1854-1912", story: "拓扑学之父，他的庞加莱猜想拖了一百年才被佩雷尔曼解决。" },
+    { name: "诺特", emoji: "💎", years: "1882-1935", story: "Emmy Noether 推开了抽象代数的大门，她的诺特定理把对称性和守恒律联系起来。" },
+    { name: "陶哲轩", emoji: "🌟", years: "1975-", story: "13 岁 IMO 金牌、31 岁菲尔兹奖。研究遍及调和分析、组合、PDE 等。" },
+  ],
+  jokes: [
+    { q: "为什么拓扑学家分不清咖啡杯和甜甜圈？", a: "因为它们同胚。" },
+    { q: "为什么实分析学家从不睡觉？", a: "因为他们害怕极限不存在。" },
+    { q: "ε 对 δ 说什么？", a: "\"无论你多小，我都比你更小。\"" },
+    { q: "为什么群论家从来不孤独？", a: "因为他总能找到 identity（单位元 / 身份认同）。" },
+    { q: "数学家为什么爱喝咖啡？", a: "因为数学家是把咖啡变成定理的机器（保罗·埃尔德什名言）。" },
+  ],
+  riddles: [
+    { q: "f(x) = sin x 在 x = 0 处的泰勒展开式前两项？", a: "x − x³/6" },
+    { q: "实数集 ℝ 是开集还是闭集？", a: "都是 —— ℝ 既开又闭。" },
+    { q: "z = 1 + i 的模与辐角？", a: "|z| = √2，arg z = π/4。" },
+    { q: "一元二次方程在复数域内必有几根？", a: "2 根（重根算两次），代数基本定理。" },
+    { q: "整数加法群 (ℤ, +) 是循环群吗？由谁生成？", a: "是。由 1 生成（或 −1）。" },
+  ]
+};
+function sceneFun() { speech.stop(); render(`${hudHtml()}<h2>🎲 数学奇趣馆</h2><div class="fun-grid"><div class="fun-card" onclick="sceneFacts()"><div class="fun-ic">💡</div><div class="fun-tt">冷知识</div><div class="fun-sub">${MATH_FUN.facts.length} 条</div></div><div class="fun-card" onclick="sceneMathHist()"><div class="fun-ic">📜</div><div class="fun-tt">数学家</div><div class="fun-sub">${MATH_FUN.mathematicians.length} 位</div></div><div class="fun-card" onclick="sceneJokes()"><div class="fun-ic">🃏</div><div class="fun-tt">笑话</div><div class="fun-sub">${MATH_FUN.jokes.length} 条</div></div><div class="fun-card" onclick="sceneRiddles()"><div class="fun-ic">🧩</div><div class="fun-tt">脑筋急转</div><div class="fun-sub">${MATH_FUN.riddles.length} 题</div></div></div><div class="btn-row"><button onclick="sceneMenu()">返回</button></div>`); }
+function sceneFacts() { const it=MATH_FUN.facts.map((f,i)=>`<div class="info-card"><div class="info-h"><span>💡 #${i+1}</span><button class="speak-btn" onclick="speakItemById('facts',${i})">🔊</button></div><div class="info-b">${f}</div></div>`).join(''); render(`${hudHtml()}<h2>💡 冷知识</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneMathHist() { const it=MATH_FUN.mathematicians.map((m,i)=>`<div class="info-card"><div class="info-h"><span>${m.emoji} ${m.name}</span><button class="speak-btn" onclick="speakItemById('mathematicians',${i})">🔊</button></div><div class="info-meta">${m.years}</div><div class="info-b">${m.story}</div></div>`).join(''); render(`${hudHtml()}<h2>📜 数学家</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneJokes() { const it=MATH_FUN.jokes.map((j,i)=>`<div class="info-card"><div class="info-h"><span>🃏 #${i+1}</span><button class="speak-btn" onclick="speakItemById('jokes',${i})">🔊</button></div><div class="info-b"><strong>${j.q}</strong></div><div class="riddle-toggle" onclick="this.nextElementSibling.classList.toggle('show')">👉 看答案</div><div class="riddle-ans">${j.a}</div></div>`).join(''); render(`${hudHtml()}<h2>🃏 笑话</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+function sceneRiddles() { const it=MATH_FUN.riddles.map((r,i)=>`<div class="info-card"><div class="info-h"><span>🧩 #${i+1}</span><button class="speak-btn" onclick="speakItemById('riddles',${i})">🔊</button></div><div class="info-b">${r.q}</div><div class="riddle-toggle" onclick="this.nextElementSibling.classList.toggle('show')">👉 看答案</div><div class="riddle-ans">${r.a}</div></div>`).join(''); render(`${hudHtml()}<h2>🧩 脑筋急转</h2><div class="info-list">${it}</div><div class="btn-row"><button onclick="sceneFun()">← 返回</button></div>`); }
+
+// ============================================
+// 💬 问数学家 · AI 对话子系统
+// ============================================
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function $(sel, root = document) { return root.querySelector(sel); }
+
+// ---- 历代数学家阵容（真实名言为主） ----
+const MATHEMATICIANS = [
+  { id:'gauss',      name:'高斯',         face:'🧮', years:'1777–1855',   field:'数论·代数',   quote:'数学是科学的皇后，而数论是数学的皇后。' },
+  { id:'euler',      name:'欧拉',         face:'✍️', years:'1707–1783',   field:'分析·图论',   quote:'失去一只眼睛后我说：这下我能更专心了。' },
+  { id:'archimedes', name:'阿基米德',     face:'⚙️', years:'前287–前212', field:'几何·力学',   quote:'给我一个支点，我就能撬动整个地球。' },
+  { id:'euclid',     name:'欧几里得',     face:'📐', years:'约前330–前275',field:'几何',        quote:'几何之中，没有专为国王铺设的道路。' },
+  { id:'pythagoras', name:'毕达哥拉斯',   face:'🔺', years:'约前570–前495',field:'数与几何',    quote:'万物皆数。' },
+  { id:'descartes',  name:'笛卡尔',       face:'🧭', years:'1596–1650',   field:'解析几何',    quote:'我思，故我在。' },
+  { id:'newton',     name:'牛顿',         face:'🍎', years:'1643–1727',   field:'微积分',      quote:'如果我看得更远，那是因为我站在巨人的肩膀上。' },
+  { id:'leibniz',    name:'莱布尼茨',     face:'🔢', years:'1646–1716',   field:'微积分·二进制',quote:'音乐，是心灵在不知不觉中进行的算术练习。' },
+  { id:'cantor',     name:'康托尔',       face:'♾️', years:'1845–1918',   field:'集合论',      quote:'数学的本质，在于它的自由。' },
+  { id:'hilbert',    name:'希尔伯特',     face:'🏛️', years:'1862–1943',   field:'公理化',      quote:'我们必须知道，我们必将知道。' },
+  { id:'poincare',   name:'庞加莱',       face:'🌀', years:'1854–1912',   field:'拓扑·混沌',   quote:'数学，是给不同的事物以相同名称的艺术。' },
+  { id:'ramanujan',  name:'拉马努金',     face:'🌟', years:'1887–1920',   field:'数论',        quote:'一个方程对我毫无意义，除非它表达了神的一个念头。' },
+  { id:'noether',    name:'埃米·诺特',    face:'🔗', years:'1882–1935',   field:'抽象代数',    quote:'每一种对称，背后都藏着一个守恒定律。' },
+  { id:'huluogeng',  name:'华罗庚',       face:'📘', years:'1910–1985',   field:'数论·应用数学',quote:'聪明在于勤奋，天才在于积累。' },
+  { id:'zuchongzhi', name:'祖冲之',       face:'🀄', years:'429–500',     field:'圆周率·历法', quote:'我把圆周率算到了小数点后第七位。' },
+  { id:'liuhui',     name:'刘徽',         face:'➗', years:'约225–约295', field:'割圆术',      quote:'割之弥细，所失弥少；割之又割，以至于不可割。' },
+];
+
+const LLM_PRESETS = [
+  { id:'deepseek', label:'⭐ DeepSeek（国内直连）', baseUrl:'https://api.deepseek.com/v1',                         model:'deepseek-chat' },
+  { id:'qwen',     label:'通义千问（阿里）',        baseUrl:'https://dashscope.aliyuncs.com/compatible-mode/v1',   model:'qwen-plus' },
+  { id:'glm',      label:'智谱 GLM-4',              baseUrl:'https://open.bigmodel.cn/api/paas/v4',               model:'glm-4-flash' },
+  { id:'kimi',     label:'Kimi（月之暗面）',        baseUrl:'https://api.moonshot.cn/v1',                         model:'moonshot-v1-8k' },
+  { id:'claudeopus',label:'⭐ Claude Opus 4.8（最聪明）',baseUrl:'https://api.anthropic.com/v1',                    model:'claude-opus-4-8' },
+  { id:'claude',   label:'Claude Haiku（便宜快·可直连）',baseUrl:'https://api.anthropic.com/v1',                   model:'claude-haiku-4-5' },
+  { id:'gemini',   label:'Gemini（需代理/中转）',   baseUrl:'https://generativelanguage.googleapis.com/v1beta/openai', model:'gemini-2.5-flash' },
+  { id:'gpt4omini',label:'GPT-4o mini（需代理·便宜）',baseUrl:'https://api.openai.com/v1',                        model:'gpt-4o-mini' },
+  { id:'gpt4o',    label:'GPT-4o（需代理）',        baseUrl:'https://api.openai.com/v1',                          model:'gpt-4o' },
+  { id:'gpt5',     label:'GPT-5（需代理）',         baseUrl:'https://api.openai.com/v1',                          model:'gpt-5' },
+];
+
+const STARTER_QS = [
+  '极限的 ε-δ 定义到底在说什么？', '群、环、域是什么？为什么要这么抽象？', '拓扑学里"咖啡杯等于甜甜圈"是什么意思？',
+  '黎曼猜想为什么这么重要？', '无穷也分大小吗？', '哥德尔不完备定理到底证明了什么？',
+  '复变函数为什么反而比实变"更简单"？', '测度论是怎么重新定义"长度"的？', '矩阵和线性变换是一回事吗？',
+  '流形（manifold）到底是什么？', '傅里叶变换为什么能把信号拆成正弦波？', '概率论的公理化解决了什么问题？',
+  '√2 不是有理数的经典证明怎么走？', '伽罗瓦理论和解方程有什么关系？', '数学里的"严格证明"为什么这么重要？',
+  '你是怎么走上数学研究这条路的？', '一个猜想是怎么变成定理的？', '现代数学和高中数学最大的不同是什么？',
+  '我将来想当数学家，该怎么准备？', '数学还有哪些没解决的大难题？',
+];
+
+function mdRender(text) {
+  text = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  text = text.replace(/\*([^*]+)\*/g, '<i>$1</i>');
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+// ---- TTS（朗读） / STT（语音输入） ----
+const TTS = {
+  synth: window.speechSynthesis || null,
+  voices: [], current: null, currentBtn: null,
+  load() { if (this.synth) this.voices = this.synth.getVoices() || []; },
+  pickVoice() {
+    if (!this.voices.length) this.load();
+    let v = this.voices.find(v => /zh-CN|cmn-Hans/i.test(v.lang) && /xiao|yao|hui|ting|female|woman|女/i.test(v.name||''));
+    if (!v) v = this.voices.find(v => v.lang && /^zh/i.test(v.lang));
+    return v || this.voices[0] || null;
+  },
+  stripMd(t) {
+    return String(t||'')
+      .replace(/```[\s\S]*?```/g,'，')
+      .replace(/`([^`]+)`/g,'$1').replace(/\*\*([^*]+)\*\*/g,'$1').replace(/\*([^*]+)\*/g,'$1')
+      .replace(/<[^>]+>/g,'').replace(/\n+/g,'。').replace(/[。]{2,}/g,'。');
+  },
+  paramsFor(id) {
+    let h = 0; const s = id||'';
+    for (let i=0;i<s.length;i++) h = (h*131 + s.charCodeAt(i)) | 0;
+    h = Math.abs(h);
+    return { pitch: 0.85 + ((h % 60)/100), rate: 0.92 + (((h>>5) % 26)/100) };
+  },
+  speak(text, id, btn) {
+    if (!this.synth) { toast('当前浏览器不支持朗读，请用 Chrome/Edge'); return false; }
+    if (!this.voices.length) this.load();
+    try { this.synth.resume(); } catch(e){}
+    const wasActive = this.synth.speaking || this.synth.pending;
+    if (wasActive) { try { this.synth.cancel(); } catch(e){} }
+    if (this.currentBtn) this.currentBtn.classList.remove('playing');
+    const u = new SpeechSynthesisUtterance(this.stripMd(text));
+    u.lang = 'zh-CN';
+    const v = this.pickVoice(); if (v) u.voice = v;
+    const p = this.paramsFor(id||''); u.pitch = p.pitch; u.rate = p.rate; u.volume = 1.0;
+    u.onend = ()=>{ if (btn) btn.classList.remove('playing'); this.current=null; this.currentBtn=null; };
+    u.onerror = (ev)=>{ if (btn) btn.classList.remove('playing'); this.current=null; this.currentBtn=null; };
+    this.current = u; this.currentBtn = btn || null;
+    if (btn) btn.classList.add('playing');
+    const go = ()=>{ if (this.current!==u) return; try { this.synth.speak(u); } catch(e){} };
+    if (wasActive) setTimeout(go, 120); else go();
+    return true;
+  },
+  stop() { try { this.synth && this.synth.cancel(); } catch(e){} if (this.currentBtn) this.currentBtn.classList.remove('playing'); this.current=null; this.currentBtn=null; },
+  available() { return !!this.synth; }
+};
+if (TTS.synth) { TTS.load(); TTS.synth.onvoiceschanged = ()=>TTS.load(); }
+
+const STT = {
+  Rec: window.SpeechRecognition || window.webkitSpeechRecognition || null,
+  instance: null,
+  available() { return !!this.Rec; },
+  start(opts) {
+    if (!this.Rec) { toast('当前浏览器不支持语音输入，请用 Chrome/Edge'); return null; }
+    if (this.instance) { try { this.instance.stop(); } catch(e){} this.instance = null; }
+    const r = new this.Rec();
+    r.lang = 'zh-CN'; r.continuous = false; r.interimResults = true; r.maxAlternatives = 1;
+    r.onresult = ev=>{ let txt=''; for (let i=0;i<ev.results.length;i++) txt += ev.results[i][0].transcript; opts.onResult && opts.onResult(txt, ev.results[ev.results.length-1].isFinal); };
+    r.onerror = ev=>{ opts.onError && opts.onError(ev.error||'未知错误'); };
+    r.onend = ()=>{ this.instance = null; opts.onEnd && opts.onEnd(); };
+    try { r.start(); this.instance = r; return r; } catch(e) { opts.onError && opts.onError(e.message||String(e)); return null; }
+  },
+  stop() { if (this.instance) { try { this.instance.stop(); } catch(e){} this.instance = null; } }
+};
+
+function buildSystemPrompt(sci) {
+  return `你正在扮演数学家「${sci.name}」（${sci.years}，主要领域：${sci.field}）。\n你的一句名言："${sci.quote}"\n\n对方是一个 12 岁、对数学充满好奇的中国孩子，正在仰望和探索大学数学的世界（分析、代数、拓扑、概率论等）。请：\n1. 以该数学家的口吻、第一人称回答，符合 TA 的时代与性格（如高斯严谨自信、欧拉亲切多产、阿基米德痴迷动手、华罗庚励志勤奋、祖冲之/刘徽朴实精算）；\n2. 用孩子能懂的语言、生活例子、可视化比喻来讲；\n3. 数学事实必须准确，推导要对，不能编造；不确定就坦诚说不知道；\n4. 若问题超出 TA 时代的认知，可坦诚说"以我那个年代还想不到"，再用今天的数学帮孩子理解；\n5. 适当讲 1 小段 TA 真实的小故事或时代背景，让历史变生动；\n6. 鼓励孩子继续问，末尾留 1 个引导性问题；\n7. 全程简体中文，每次回复 100~250 字；\n8. 用 **粗体** 强调关键词，公式/符号用 \`反引号\` 标注（例如 \`a²+b²=c²\`）。\n\n不要破坏角色扮演。如果孩子问"你真的是 XXX 吗"，就以那位数学家的身份回答。`;
+}
+
+async function callLLM(messages) {
+  const cfg = state.llm;
+  if (!cfg || !cfg.apiKey) throw new Error('请先点【⚙️ 设置】填入 API Key');
+  // Claude(Anthropic) 的接口格式与 OpenAI 不同，按 baseUrl/模型名自动分流
+  const isAnthropic = /anthropic\.com/i.test(cfg.baseUrl||'') || /^claude/i.test(cfg.model||'');
+  return isAnthropic ? callAnthropic(cfg, messages) : callOpenAICompat(cfg, messages);
+}
+
+// OpenAI 兼容：DeepSeek / 通义 / 智谱 / Kimi / GPT / Gemini(OpenAI兼容端点) 等
+async function callOpenAICompat(cfg, messages) {
+  const url = (cfg.baseUrl||'').replace(/\/+$/,'') + '/chat/completions';
+  const model = cfg.model || 'deepseek-chat';
+  const isNewOpenAI = /^(gpt-5|o\d)/i.test(model);
+  const body = { model, messages };
+  if (isNewOpenAI) { body.max_completion_tokens = 1200; }
+  else { body.max_tokens = 700; body.temperature = 0.8; }
+  let res;
+  try {
+    res = await fetch(url, { method:'POST', headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + cfg.apiKey }, body: JSON.stringify(body) });
+  } catch(e) {
+    throw new Error('网络/CORS 失败：'+e.message+'。提示：部分接口（如 Gemini 官方地址）不支持浏览器直连，需在 Base URL 填你自己的中转/代理地址。');
+  }
+  if (!res.ok) {
+    let detail = '';
+    try { detail = (await res.json()).error?.message || ''; } catch(e){}
+    if (res.status===400 && isNewOpenAI && /max_tokens/i.test(detail)) {
+      const res2 = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.apiKey}, body: JSON.stringify({ model, messages, max_tokens: 1200 }) });
+      if (res2.ok) { const d = await res2.json(); return d.choices?.[0]?.message?.content || '(无返回)'; }
+    }
+    throw new Error(`HTTP ${res.status} ${res.statusText}${detail?'：'+detail:''}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '(无返回)';
+}
+
+// Anthropic 原生：system 为顶层字段、messages 仅 user/assistant 且首条须 user、max_tokens 必填、回包取 content[].text
+async function callAnthropic(cfg, messages) {
+  const url = (cfg.baseUrl||'https://api.anthropic.com/v1').replace(/\/+$/,'') + '/messages';
+  const system = messages.filter(m=>m.role==='system').map(m=>m.content).join('\n\n');
+  let msgs = messages.filter(m=>m.role!=='system').map(m=>({ role: m.role==='assistant'?'assistant':'user', content: String(m.content) }));
+  while (msgs.length && msgs[0].role!=='user') msgs.shift();   // Claude 要求首条必须是 user
+  const body = { model: cfg.model || 'claude-haiku-4-5', max_tokens: 1024, temperature: 0.8, messages: msgs };
+  if (system) body.system = system;
+  let res;
+  try {
+    res = await fetch(url, {
+      method:'POST',
+      headers: { 'content-type':'application/json', 'x-api-key':cfg.apiKey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {
+    throw new Error('网络/CORS 失败：'+e.message+'。Claude 官方地址需科学上网。');
+  }
+  if (!res.ok) {
+    let detail = '';
+    try { detail = (await res.json()).error?.message || ''; } catch(e){}
+    throw new Error(`HTTP ${res.status} ${res.statusText}${detail?'：'+detail:''}`);
+  }
+  const data = await res.json();
+  return (data.content||[]).find(b=>b && b.type==='text')?.text || '(无返回)';
+}
+
+function ttsButton(text, id, label='🔊 听') {
+  const b = el('button', 'tts-btn', label);
+  b.onclick = (ev)=>{ ev.stopPropagation(); if (b.classList.contains('playing')) { TTS.stop(); return; } TTS.speak(text, id, b); };
+  return b;
+}
+
+// ---- 语音连续对话舱 ----
+const VoiceChat = {
+  active:false, state:'idle', sciId:null, rec:null, lastTranscript:'', silenceTimer:null, ui:null, silenceMs:1300,
+  enter(sciId) {
+    if (!STT.available()) { toast('当前浏览器不支持语音输入，请用 Chrome 或 Edge'); return; }
+    if (!state.llm || !state.llm.apiKey) { toast('请先在【⚙️ 设置】里填 API Key'); openLLMSettings(); return; }
+    if (!state.chatConv) state.chatConv = [];
+    this.active = true; this.sciId = sciId || state.chatSci || MATHEMATICIANS[0].id;
+    this.buildUI();
+    const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+    const greet = `你好！我是${sci.name}。我们直接说话就行——你说完我就接话。今天想聊点什么数学话题？`;
+    this.appendTurn('sci', greet, sci);
+    state.chatConv.push({ role:'assistant', content: greet }); saveState();
+    this.speakReply(greet, sci);
+  },
+  exit() { this.active=false; this.setState('idle'); this.stopRec(); TTS.stop(); if (this.silenceTimer){clearTimeout(this.silenceTimer);this.silenceTimer=null;} this.destroyUI(); },
+  setState(s) { this.state = s; this.updateUI(); },
+  startRec() {
+    if (!this.active) return;
+    this.stopRec(); this.setState('listen'); this.lastTranscript='';
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { this.exit(); return; }
+    const r = new SR(); r.lang='zh-CN'; r.continuous=true; r.interimResults=true; r.maxAlternatives=1;
+    r.onresult = (ev)=>{ if (this.state!=='listen') return; let txt=''; for (let i=0;i<ev.results.length;i++) txt += ev.results[i][0].transcript; this.lastTranscript=txt; this.updateLive(txt); this.resetSilence(); };
+    r.onerror = (ev)=>{ const err=ev?.error||'unknown'; if (err==='not-allowed'||err==='service-not-allowed'){ this.appendTurn('err','麦克风没有权限，请在浏览器地址栏开启麦克风权限再试。'); this.exit(); } };
+    r.onend = ()=>{ if (!this.active||this.state!=='listen') return; if (this.lastTranscript.trim()) this.submit(); else setTimeout(()=>{ if (this.active&&this.state==='listen') this.startRec(); }, 250); };
+    try { r.start(); this.rec=r; } catch(e) { setTimeout(()=>{ if (this.active&&this.state==='listen') this.startRec(); }, 400); }
+  },
+  stopRec() { if (this.rec){ try{this.rec.stop();}catch(e){} this.rec=null; } if (this.silenceTimer){clearTimeout(this.silenceTimer);this.silenceTimer=null;} },
+  resetSilence() { if (this.silenceTimer) clearTimeout(this.silenceTimer); this.silenceTimer = setTimeout(()=>{ if (this.state==='listen'&&this.lastTranscript.trim()&&this.active) this.submit(); }, this.silenceMs); },
+  async submit() {
+    if (!this.active) return;
+    if (this.silenceTimer){clearTimeout(this.silenceTimer);this.silenceTimer=null;}
+    const text = (this.lastTranscript||'').trim(); this.lastTranscript=''; this.stopRec();
+    if (!text) { this.startRec(); return; }
+    this.setState('thinking'); this.appendTurn('user', text);
+    state.chatConv.push({ role:'user', content:text }); saveState(); this.updateLive('');
+    const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+    try {
+      const sys = buildSystemPrompt(sci) + '\n\n【特别注意】此刻是「连续语音对话」：回复请 (a) 60~140 字；(b) 最自然口语，像面对面聊；(c) 不要列表、不要长公式，能比喻就比喻；(d) 末尾用一个开放问题反问孩子；(e) 若孩子只说"嗯""然后呢"，就主动把上个话题展开讲。';
+      const reply = await callLLM([{ role:'system', content:sys }, ...state.chatConv.map(m=>({role:m.role,content:m.content}))]);
+      if (!this.active) return;
+      state.chatConv.push({ role:'assistant', content:reply }); this.appendTurn('sci', reply, sci);
+      state.chatAsked = (state.chatAsked||0)+1; saveState();
+      this.speakReply(reply, sci);
+    } catch(e) { if (!this.active) return; this.appendTurn('err','调用失败：'+e.message); setTimeout(()=>{ if (this.active) this.startRec(); }, 800); }
+  },
+  speakReply(text, sci) {
+    this.setState('speak');
+    if (!TTS.available() || !TTS.synth) { setTimeout(()=>{ if (this.active) this.startRec(); }, 400); return; }
+    try { TTS.synth.cancel(); } catch(e){}
+    const u = new SpeechSynthesisUtterance(TTS.stripMd(text)); u.lang='zh-CN';
+    const v = TTS.pickVoice(); if (v) u.voice=v;
+    const p = TTS.paramsFor(sci.id); u.pitch=p.pitch; u.rate=p.rate; u.volume=1.0;
+    u.onend = ()=>{ if (!this.active) return; setTimeout(()=>{ if (this.active&&this.state==='speak') this.startRec(); }, 300); };
+    u.onerror = ()=>{ if (!this.active) return; setTimeout(()=>{ if (this.active&&this.state==='speak') this.startRec(); }, 300); };
+    TTS.synth.speak(u);
+    setTimeout(()=>{ if (this.active&&this.state==='speak'&&!TTS.synth.speaking) this.startRec(); }, Math.max(8000, text.length*250));
+  },
+  buildUI() {
+    const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+    const mask = el('div','vc-mask');
+    mask.innerHTML = `
+      <div class="vc-card">
+        <div class="vc-top">
+          <div class="vc-sci"><div class="vc-avatar">${sci.face}</div><div><div style="font-size:18px;font-weight:800;color:var(--gold)">${sci.name}</div><div style="font-size:12px;color:var(--text-dim)">${sci.years} · ${sci.field}</div></div></div>
+          <button id="vcExit">✖ 退出</button>
+        </div>
+        <div class="vc-orb-wrap"><div class="vc-orb" id="vcOrb"></div></div>
+        <div class="vc-status" id="vcStatus">准备开始……</div>
+        <div class="vc-transcript" id="vcTranscript"></div>
+        <div class="vc-live" id="vcLive"></div>
+        <div class="vc-bottom">
+          <button id="vcPause">⏸ 暂停</button>
+          <button id="vcSkip" title="跳过他说的，直接你说">⏭ 让我说</button>
+          <button id="vcClear">🗑 清空记忆</button>
+        </div>
+      </div>`;
+    document.body.appendChild(mask);
+    this.ui = { mask, orb:$('#vcOrb',mask), status:$('#vcStatus',mask), transcript:$('#vcTranscript',mask), live:$('#vcLive',mask) };
+    $('#vcExit',mask).onclick = ()=>this.exit();
+    $('#vcPause',mask).onclick = ()=>{ if (['listen','thinking','speak'].includes(this.state)){ TTS.stop(); this.stopRec(); this.setState('paused'); } else if (this.state==='paused'){ this.startRec(); } };
+    $('#vcSkip',mask).onclick = ()=>{ TTS.stop(); if (this.active) this.startRec(); };
+    $('#vcClear',mask).onclick = ()=>{
+      if (!confirm('清空和这位数学家的对话记忆？')) return;
+      state.chatConv = []; saveState(); this.ui.transcript.innerHTML='';
+      const sci = MATHEMATICIANS.find(s=>s.id===this.sciId) || MATHEMATICIANS[0];
+      const greet = `好，我们重新开始。我是${sci.name}，你想聊什么？`;
+      this.appendTurn('sci', greet, sci); state.chatConv.push({ role:'assistant', content:greet }); saveState();
+      TTS.stop(); this.stopRec(); this.speakReply(greet, sci);
+    };
+  },
+  destroyUI() { if (this.ui && this.ui.mask) this.ui.mask.remove(); this.ui=null; },
+  updateUI() {
+    if (!this.ui) return;
+    ['idle','listen','thinking','speak','paused'].forEach(c=>this.ui.orb.classList.remove('vc-'+c));
+    this.ui.orb.classList.add('vc-'+this.state);
+    const msg = { idle:'', listen:'🎙️ 我在听……（你说话就行，停 1 秒我就接话）', thinking:'💭 我在想……', speak:'🗣️ 我正在说话（点 ⏭ 让我说可打断）', paused:'⏸ 已暂停（点 ▶ 继续）' };
+    this.ui.status.textContent = msg[this.state] || '';
+    if (this.state !== 'listen') this.updateLive('');
+    const pb = $('#vcPause', this.ui.mask); if (pb) pb.textContent = this.state==='paused' ? '▶ 继续' : '⏸ 暂停';
+  },
+  updateLive(text) { if (this.ui && this.ui.live) this.ui.live.textContent = text ? '「'+text+'」' : ''; },
+  appendTurn(role, content, sci) {
+    if (!this.ui) return;
+    const row = el('div','');
+    if (role==='user') row.innerHTML = `<div class="vc-bubble user">${mdRender(content)}</div>`;
+    else if (role==='sci') row.innerHTML = `<div class="vc-bubble sci"><b style="color:var(--gold)">${sci?sci.name:'数学家'}：</b>${mdRender(content)}</div>`;
+    else row.innerHTML = `<div class="vc-bubble err">⚠️ ${content}</div>`;
+    this.ui.transcript.appendChild(row); this.ui.transcript.scrollTop = this.ui.transcript.scrollHeight;
+  }
+};
+
+// ---- 问数学家 · 聊天核心（可挂到整页，也可挂到浮层）----
+function buildChatInto(host, mode) {
+  speech.stop();
+  if (!state.chatConv) state.chatConv = [];
+  if (!state.chatSci) state.chatSci = MATHEMATICIANS[0].id;
+  if (!state.llm) state.llm = { baseUrl:'https://api.deepseek.com/v1', model:'deepseek-chat', apiKey:'' };
+  const curSci = MATHEMATICIANS.find(s=>s.id===state.chatSci) || MATHEMATICIANS[0];
+  const opts = MATHEMATICIANS.map(s=>`<option value="${s.id}" ${s.id===curSci.id?'selected':''}>${s.face} ${s.name}（${s.field}）</option>`).join('');
+  const hasKey = !!(state.llm && state.llm.apiKey);
+  const voiceOn = !!state.voiceMode;
+  const ttsOk = TTS.available(), sttOk = STT.available();
+  const ov = mode === 'overlay';
+  const q = sel => host.querySelector(sel);
+  const rebuild = () => buildChatInto(host, mode);
+  host.innerHTML = `
+    ${ov ? '' : '<h2>💬 问数学家</h2>'}
+    <div class="subtitle">挑一位历代大数学家，用 TA 的口吻给你答疑。可 💬 打字、🎤 说话、或 📞 语音通话。<br>首次用请点 <b>⚙️ 设置</b> 填一个 API Key（只存在你这台电脑里）。</div>
+    <div class="ask-bar">
+      <span style="color:var(--text-dim)">导师：</span>
+      <select id="askSci" style="min-width:210px">${opts}</select>
+      <button class="mini ask-entry" id="enterVoiceChat" title="像打电话那样：你说一句他答一句、自动朗读">📞 语音通话</button>
+      <span class="voice-toggle ${voiceOn?'on':''}" id="voiceToggle" title="打字聊天时，让数学家的回答自动朗读">${voiceOn?'🔊 朗读：开':'🔊 朗读：关'}</span>
+      <button class="mini" id="askReset">🔄 重开</button>
+      <button class="mini" id="askSet">⚙️ 设置</button>
+      <button class="mini" id="askStop" title="声音停不下来时点这里">⏹ 静音</button>
+      <span class="api-pill" style="color:${hasKey?'var(--green)':'var(--red)'}">${hasKey?'● 已配置':'● 未配置 Key'}</span>
+    </div>
+    ${(!ttsOk||!sttOk) ? `<div style="font-size:12px;color:var(--gold-soft);text-align:center;margin-bottom:8px">⚠️ 你的浏览器${!ttsOk?' 不支持朗读':''}${!sttOk?' 不支持语音输入':''}，建议用 <b>Chrome</b> 或 <b>Edge</b>。</div>` : ''}
+    <div class="chat-area" id="chatArea" ${ov?'style="flex:1;height:auto;min-height:200px"':''}></div>
+    <div class="preset-row" id="presetRow"></div>
+    <div class="input-row">
+      <textarea id="askInput" placeholder="问个数学问题，例如：群、环、域为什么这么抽象？（回车发送，Shift+回车换行）也可点 🎤 用嘴问"></textarea>
+      <button class="mic-btn" id="micBtn" title="点击说话（再点一次结束）">🎤</button>
+      <button class="primary" id="askSend">发送</button>
+    </div>
+    ${ov ? '' : '<div class="btn-row"><button id="askBack">← 返回主菜单</button></div>'}
+  `;
+  const chatArea = q('#chatArea');
+  function appendMsg(role, content, sci=null) {
+    let b;
+    if (role==='user') { b = el('div','bubble user', mdRender(content)); chatArea.appendChild(b); }
+    else {
+      b = el('div','bubble sci');
+      b.innerHTML = `<div class="sci-head"><div class="face-mini">${sci?sci.face:'🧑‍🏫'}</div><div>${sci?sci.name:'数学家'} · ${sci?sci.field:''}</div></div><div class="content">${mdRender(content)}</div>`;
+      $('.sci-head', b).appendChild(ttsButton(content, sci?sci.id:'', '🔊 听'));
+      chatArea.appendChild(b);
+    }
+    chatArea.scrollTop = chatArea.scrollHeight; return b;
+  }
+  if (!state.chatConv.length) {
+    const greet = `你好！我是 **${curSci.name}**（${curSci.years}），主攻${curSci.field}。\n你想问什么数学问题？随便问，我会用我那个时代的眼光，加上你能听懂的方式，来给你讲清楚。`;
+    const b = appendMsg('sci', greet, curSci);
+    if (voiceOn && b) TTS.speak(greet, curSci.id, $('.tts-btn', b));
+  } else {
+    state.chatConv.forEach(m => m.role==='user' ? appendMsg('user', m.content) : appendMsg('sci', m.content, curSci));
+  }
+  chatArea.scrollTop = chatArea.scrollHeight;
+  // 起手问题 chips
+  const pr = q('#presetRow');
+  STARTER_QS.slice().sort(()=>Math.random()-0.5).slice(0,5).forEach(qq=>{
+    const b = el('button','', qq); b.onclick = ()=>{ const i = q('#askInput'); i.value = qq; i.focus(); }; pr.appendChild(b);
+  });
+  const dice = el('button','','🎲 换一组'); dice.onclick = ()=>rebuild(); pr.appendChild(dice);
+  // 事件
+  q('#askSci').onchange = ev=>{ TTS.stop(); state.chatSci=ev.target.value; state.chatConv=[]; saveState(); rebuild(); };
+  q('#askReset').onclick = ()=>{ TTS.stop(); state.chatConv=[]; saveState(); rebuild(); };
+  q('#askSet').onclick = openLLMSettings;
+  q('#askStop').onclick = ()=>{ TTS.stop(); STT.stop(); const mb=q('#micBtn'); if (mb) mb.classList.remove('recording'); };
+  q('#voiceToggle').onclick = ()=>{ state.voiceMode = !state.voiceMode; saveState(); TTS.stop(); STT.stop(); rebuild(); };
+  q('#enterVoiceChat').onclick = ()=>{ TTS.stop(); STT.stop(); VoiceChat.enter(state.chatSci); };
+  const backBtn = q('#askBack'); if (backBtn) backBtn.onclick = ()=>sceneMenu();
+  const input = q('#askInput');
+  input.onkeydown = ev=>{ if (ev.key==='Enter' && !ev.shiftKey) { ev.preventDefault(); send(); } };
+  q('#askSend').onclick = send;
+  const micBtn = q('#micBtn');
+  micBtn.onclick = ()=>{
+    if (STT.instance) { STT.stop(); return; }
+    if (!sttOk) { toast('当前浏览器不支持语音输入'); return; }
+    TTS.stop(); micBtn.classList.add('recording');
+    let finalText = '';
+    STT.start({
+      onResult: (text, isFinal)=>{ input.value = text; if (isFinal) finalText = text; },
+      onError: (err)=>{ toast('语音输入失败：'+err); },
+      onEnd: ()=>{ micBtn.classList.remove('recording'); if ((finalText || input.value.trim()) && state.voiceMode) setTimeout(send, 200); }
+    });
+  };
+  async function send() {
+    const text = input.value.trim(); if (!text) return;
+    if (!state.llm || !state.llm.apiKey) { openLLMSettings(); return; }
+    TTS.stop();
+    input.value=''; input.disabled=true; q('#askSend').disabled=true;
+    state.chatConv.push({ role:'user', content:text }); appendMsg('user', text);
+    const thinking = el('div','bubble sci thinking', `<div class="sci-head"><div class="face-mini">${curSci.face}</div><div>${curSci.name} 正在思考…</div></div>`);
+    chatArea.appendChild(thinking); chatArea.scrollTop = chatArea.scrollHeight;
+    try {
+      const sys = state.voiceMode
+        ? buildSystemPrompt(curSci) + '\n\n【特别注意】此刻是语音对话：回复 (a) 80~160 字；(b) 口语化、像聊天；(c) 避免长公式和列表，可用比喻；(d) 末尾留一个开放问题让孩子接话。'
+        : buildSystemPrompt(curSci);
+      const reply = await callLLM([{ role:'system', content:sys }, ...state.chatConv.map(m=>({role:m.role,content:m.content}))]);
+      thinking.remove();
+      state.chatConv.push({ role:'assistant', content:reply });
+      const b = appendMsg('sci', reply, curSci);
+      state.chatAsked = (state.chatAsked||0)+1; saveState();
+      if (state.voiceMode && b) TTS.speak(reply, curSci.id, $('.tts-btn', b));
+    } catch(e) {
+      thinking.remove();
+      appendMsg('sci', '**调用失败**：'+e.message+'\n\n点 ⚙️ 设置检查 API Key / Base URL，或换一个服务商。', curSci);
+    } finally { input.disabled=false; q('#askSend').disabled=false; input.focus(); }
+  }
+}
+// 整页版（主菜单进入）
+function sceneAsk() {
+  render('<div id="askHost" style="width:100%;display:flex;flex-direction:column;flex:1;min-height:0"></div>');
+  buildChatInto(document.getElementById('askHost'), 'scene');
+}
+// 💬 直接对话浮层（任何画面、答题中都能开，不离开当前页）
+function openChatOverlay() {
+  closeFabMenu();
+  if (document.getElementById('chatOvMask')) return;
+  const mask = el('div','chat-ov-mask'); mask.id = 'chatOvMask';
+  mask.innerHTML = `<div class="chat-ov-panel"><div class="chat-ov-head"><span>💬 问数学家</span><button class="mini chat-ov-close">✖ 关闭</button></div><div class="chat-ov-body" id="chatOvBody"></div></div>`;
+  document.body.appendChild(mask);
+  mask.querySelector('.chat-ov-close').onclick = ()=>{ TTS.stop(); STT.stop(); mask.remove(); };
+  mask.onclick = (e)=>{ if (e.target===mask) { TTS.stop(); STT.stop(); mask.remove(); } };
+  buildChatInto(mask.querySelector('#chatOvBody'), 'overlay');
+}
+// 🧑‍🏫 全局悬浮 AI 助教球：一键直达 💬 直接问 / 📞 语音通话
+function ensureChatFab() {
+  if (document.getElementById('aiFab')) return;
+  const wrap = el('div','ai-fab-wrap'); wrap.id = 'aiFab';
+  wrap.innerHTML = `
+    <div class="ai-fab-menu" id="aiFabMenu">
+      <button class="ai-fab-act" data-act="chat">💬 直接问</button>
+      <button class="ai-fab-act" data-act="call">📞 语音通话</button>
+    </div>
+    <button class="ai-fab-ball" title="问数学家 · 随时点我">🧑‍🏫</button>`;
+  document.body.appendChild(wrap);
+  const menu = wrap.querySelector('#aiFabMenu');
+  wrap.querySelector('.ai-fab-ball').onclick = (e)=>{ e.stopPropagation(); menu.classList.toggle('open'); };
+  wrap.querySelector('[data-act=chat]').onclick = (e)=>{ e.stopPropagation(); menu.classList.remove('open'); openChatOverlay(); };
+  wrap.querySelector('[data-act=call]').onclick = (e)=>{ e.stopPropagation(); menu.classList.remove('open'); if (!state.chatConv) state.chatConv = []; VoiceChat.enter(state.chatSci); };
+  document.addEventListener('click', ()=>menu.classList.remove('open'));
+}
+function closeFabMenu() { const m = document.getElementById('aiFabMenu'); if (m) m.classList.remove('open'); }
+
+function openLLMSettings() {
+  const cfg = state.llm || { baseUrl:'https://api.deepseek.com/v1', model:'deepseek-chat', apiKey:'' };
+  const presetBtns = LLM_PRESETS.map(p=>`<button data-pre="${p.id}" style="font-size:12px;padding:7px 11px;border-radius:999px">${p.label}</button>`).join(' ');
+  const mask = el('div','llm-mask');
+  mask.innerHTML = `
+    <div class="llm-modal">
+      <h2>⚙️ AI 接口设置</h2>
+      <div style="font-size:13px;color:var(--text-dim);text-align:center;margin:8px 0 14px">API Key 只保存在你本机浏览器（localStorage），不会上传任何服务器。</div>
+      <div style="font-size:13px;margin-bottom:8px">快速预设（点一下自动填好地址和模型，再粘贴你的 Key）：</div>
+      <div class="preset-row" style="justify-content:flex-start" id="lpre">${presetBtns}</div>
+      <div class="setting-grid">
+        <div><label>Base URL（OpenAI 兼容接口）</label><input id="lUrl" value="${cfg.baseUrl||''}" placeholder="https://api.deepseek.com/v1"></div>
+        <div><label>模型名 Model</label><input id="lModel" value="${cfg.model||''}" placeholder="deepseek-chat / qwen-plus / gpt-4o-mini ..."></div>
+        <div><label>API Key</label><input id="lKey" type="password" value="${cfg.apiKey||''}" placeholder="sk-..."></div>
+        <div id="lStatus" style="font-size:13px;color:var(--text-dim);min-height:18px"></div>
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button id="lTest">🔬 测试连接</button>
+        <button class="primary" id="lSave">保存</button>
+        <button id="lCancel">取消</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:14px;line-height:1.85">
+        ※ <b>国内直连·推荐</b>：DeepSeek / 通义千问 / 智谱GLM / Kimi —— 免代理、便宜、中文好，适合天天用。<br>
+        ※ <b>Claude</b>：浏览器可直连（已自动加直连授权头）；到 <b>console.anthropic.com</b> 申请 Key。最强 <code>claude-opus-4-8</code>、聪明 <code>claude-sonnet-4-6</code>、便宜快 <code>claude-haiku-4-5</code>；需科学上网。<br>
+        ※ <b>Gemini / GPT</b>：官方地址需代理；其中 Gemini 官方接口<b>不支持浏览器直连</b>（CORS），要在 Base URL 填你自己的中转/代理地址才能跑。Gemini 的 Key 可在 <b>aistudio.google.com</b> 免费申请。<br>
+        ※ <b>订阅 ≠ API</b>：ChatGPT Plus / Claude Pro / Gemini Advanced 这类网页会员<b>不能</b>直接用在这里——它们和开发者 API 是两套独立计费、额度不互通。要让这里能答题，必须单独申请一个 API Key（DeepSeek 极便宜、Gemini 有免费额度）。<br>
+        ※ Key 只存在你这台电脑的浏览器里，不上传任何服务器。本工具仅供自家本地使用，<b>别把填了 Key 的网页公开分享</b>。
+      </div>
+    </div>`;
+  document.body.appendChild(mask);
+  mask.querySelectorAll('[data-pre]').forEach(b=>b.onclick=ev=>{
+    const p = LLM_PRESETS.find(x=>x.id===ev.currentTarget.dataset.pre);
+    $('#lUrl',mask).value = p.baseUrl; $('#lModel',mask).value = p.model; $('#lKey',mask).focus();
+  });
+  $('#lCancel',mask).onclick = ()=>mask.remove();
+  $('#lSave',mask).onclick = ()=>{
+    state.llm = { baseUrl: $('#lUrl',mask).value.trim() || 'https://api.deepseek.com/v1', model: $('#lModel',mask).value.trim() || 'deepseek-chat', apiKey: $('#lKey',mask).value.trim() };
+    saveState(); mask.remove(); toast('✅ 已保存');
+    const _ov = document.getElementById('chatOvBody');
+    if (_ov) buildChatInto(_ov, 'overlay'); else if ($('#chatArea')) sceneAsk();
+  };
+  $('#lTest',mask).onclick = async ()=>{
+    const st = $('#lStatus',mask); st.style.color='var(--gold-soft)'; st.textContent='测试中…';
+    const backup = state.llm;
+    state.llm = { baseUrl: $('#lUrl',mask).value.trim(), model: $('#lModel',mask).value.trim(), apiKey: $('#lKey',mask).value.trim() };
+    try {
+      const r = await callLLM([{ role:'system', content:'你只回复两个字：你好' }, { role:'user', content:'请回复' }]);
+      st.style.color='var(--green)'; st.textContent='✅ 连接成功！示例回复：'+String(r).slice(0,40);
+    } catch(e) { st.style.color='var(--red)'; st.textContent='❌ '+e.message; }
+    finally { state.llm = backup; }
+  };
+}
+
+// 挂上全局悬浮 AI 助教球（在 body 上，跨 render 常驻）
+ensureChatFab();
+
+updateStreak(); checkDailyReward(); sceneMenu();
+</script>
+</body>
+</html>

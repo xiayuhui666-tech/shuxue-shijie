@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大宝的数学世界 · The Math Universe</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0a1a; --bg-mid: #15152e; --bg-light: #25253f;
+    --gold: #ffd700; --gold-soft: #f4c430;
+    --purple: #9d4edd; --teal: #4dd0e1; --aurora: #ff61f6; --mauve: #d6889b; --violet: #b388ff;
+    --green: #80ed99; --red: #ff6b6b;
+    --text: #e8e8f5; --text-dim: #a0a8c4;
+  }
+  html, body { height: 100%; font-family: 'Microsoft YaHei', sans-serif;
+    background: radial-gradient(ellipse at top, var(--bg-mid) 0%, var(--bg-deep) 70%);
+    color: var(--text); overflow: hidden; }
+  body::before { content: ''; position: fixed; inset: 0;
+    background-image: radial-gradient(2px 2px at 10% 20%, white, transparent),
+      radial-gradient(1px 1px at 30% 50%, var(--gold-soft), transparent),
+      radial-gradient(2px 2px at 70% 30%, var(--purple), transparent),
+      radial-gradient(1px 1px at 90% 70%, var(--teal), transparent),
+      radial-gradient(2px 2px at 50% 90%, var(--aurora), transparent),
+      radial-gradient(1px 1px at 20% 75%, white, transparent),
+      radial-gradient(1px 1px at 85% 15%, var(--violet), transparent);
+    background-size: 100% 100%; opacity: 0.45; pointer-events: none; animation: tw 5s ease-in-out infinite; z-index: 0; }
+  @keyframes tw { 0%,100%{opacity:0.45} 50%{opacity:0.22} }
+
+  /* ============ 一屏装下的主界面：数学世界 ============ */
+  .world { position: relative; z-index: 1; width: 100%; max-width: 1720px; margin: 0 auto;
+    height: 100vh; padding: clamp(10px, 1.8vh, 22px) clamp(22px, 3.6vw, 60px);
+    display: flex; flex-direction: column; justify-content: center;
+    gap: clamp(8px, 1.7vh, 22px); }
+
+  /* ---- HERO（紧凑版） ---- */
+  .hero { text-align: center; }
+  .world-core { font-family: 'Georgia', serif; font-size: clamp(26px, 4.2vh, 42px); line-height: 1;
+    color: var(--gold); text-shadow: 0 0 40px var(--gold), 0 0 90px var(--purple);
+    animation: pulse 4s ease-in-out infinite; display: inline-block; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+  h1 { font-family: 'Georgia', serif; color: var(--gold); font-weight: bold;
+    font-size: clamp(25px, 3.5vw, 46px); letter-spacing: clamp(2px, 0.7vw, 9px);
+    text-shadow: 0 0 36px rgba(255,215,0,0.5); margin: 2px 0 3px; line-height: 1.05; }
+  .subtitle { color: var(--text-dim); font-style: italic; letter-spacing: clamp(2px, 0.7vw, 8px);
+    font-size: clamp(11px, 1.1vw, 14px); text-transform: uppercase; }
+  .hero-desc { color: var(--text); max-width: 860px; margin: clamp(4px,0.9vh,9px) auto 0;
+    font-size: clamp(12px, 1.05vw, 15px); line-height: 1.5; }
+  .hero-desc .accent { color: var(--gold); }
+  .hero-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 30px;
+    margin-top: clamp(5px, 0.9vh, 10px); }
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Georgia', serif; font-size: clamp(19px, 1.9vw, 28px); color: var(--gold);
+    text-shadow: 0 0 20px rgba(255,215,0,0.4); line-height: 1; }
+  .stat-label { font-size: 10.5px; color: var(--text-dim); letter-spacing: 2px; margin-top: 3px; }
+
+  /* ---- 旅程之脊 ---- */
+  .journey { display: flex; align-items: flex-start; justify-content: center;
+    gap: 0; margin: 0 auto; max-width: 1040px; width: 100%; }
+  .j-node { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 0 0 auto; width: clamp(54px, 7vw, 88px); }
+  .j-dot { width: clamp(14px,1.5vw,20px); height: clamp(14px,1.5vw,20px); border-radius: 50%;
+    border: 2px solid var(--ncol, var(--purple)); background: var(--bg-deep);
+    box-shadow: 0 0 14px var(--ncol, var(--purple)); }
+  .j-era { font-size: clamp(10px,1vw,13px); color: var(--text); font-weight: 600; }
+  .j-age { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; }
+  .j-link { flex: 1 1 auto; height: 3px; margin-top: clamp(6px,0.8vw,9px);
+    background: linear-gradient(90deg, var(--a, var(--purple)), var(--b, var(--teal)));
+    border-radius: 2px; opacity: 0.7; min-width: 12px; }
+
+  /* ---- 五大境界：满屏铺开的入口（紧凑卡片） ---- */
+  .realms { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(14px, 1.5vw, 28px);
+    margin: clamp(8px, 2.2vh, 22px) 0 0; }
+  .realm { background: linear-gradient(150deg, rgba(21,21,46,0.92), rgba(37,37,63,0.82));
+    border: 2px solid var(--c, var(--purple)); border-radius: 18px;
+    padding: clamp(11px,1vw,16px) clamp(13px,1.05vw,18px);
+    position: relative; overflow: hidden; text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; transition: transform .28s, box-shadow .28s, border-color .28s; }
+  .realm::before { content: ''; position: absolute; inset: 0;
+    background: linear-gradient(160deg, transparent 55%, var(--c, var(--purple)) 240%); opacity: 0.16; pointer-events: none; }
+  .realm::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: var(--c, var(--purple)); box-shadow: 0 0 16px var(--c, var(--purple)); }
+  .realm:hover { transform: translateY(-8px); border-color: var(--gold);
+    box-shadow: 0 16px 38px var(--sh, rgba(157,78,221,0.45)); }
+  .realm-stage { font-family: 'Georgia', serif; color: var(--text-dim); font-size: 11px; letter-spacing: 3px; }
+  .realm-stage b { color: var(--gold); font-size: 20px; }
+  .realm-icon { font-family: 'Cambria Math','Georgia',serif; font-size: clamp(26px,2.3vw,36px); line-height: 1;
+    color: var(--c, var(--purple)); text-shadow: 0 0 22px var(--c, var(--purple)); margin: 3px 0 2px; }
+  .realm-title { font-family: 'Georgia', serif; color: var(--gold); font-size: clamp(17px,1.4vw,22px);
+    font-weight: bold; margin-bottom: 2px; }
+  .realm-sub { color: var(--c, var(--purple)); font-size: 11px; letter-spacing: 1.5px; font-style: italic; margin-bottom: 6px; }
+  .realm-desc { color: var(--text); font-size: clamp(11px,0.78vw,12.5px); line-height: 1.42; flex: 1; }
+  .realm-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 7px 0 9px; }
+  .pill { background: rgba(255,215,0,0.08); border: 1px solid var(--gold-soft); color: var(--gold-soft);
+    padding: 2px 9px; border-radius: 11px; font-size: 10.5px; }
+  .realm-enter { text-align: center; padding: 7px; border-radius: 11px; font-weight: bold; font-size: 13px;
+    letter-spacing: 1px; color: var(--bg-deep); background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+    transition: transform .2s, box-shadow .2s; }
+  .realm:hover .realm-enter { box-shadow: 0 6px 18px rgba(255,215,0,0.45); }
+
+  /* ---- 结尾（单行） ---- */
+  footer { text-align: center; color: var(--text-dim); font-size: 12px;
+    margin-top: clamp(12px, 3vh, 32px);
+    padding-top: clamp(6px,1vh,12px); border-top: 1px dashed rgba(255,215,0,0.2); }
+  .footer-poem { font-style: italic; color: var(--gold-soft); margin-top: 4px; line-height: 1.45; font-size: 12.5px; }
+
+  /* ============ 响应式 ============ */
+  /* 短屏/窄屏安全网：内容放不下时改为可滚动，绝不裁切卡片 */
+  @media (max-height: 860px) { html,body{overflow:auto;} .world{ height:auto; min-height:100vh; justify-content:flex-start; padding-top: 18px; } }
+  @media (max-width: 1400px) { .realms { grid-template-columns: repeat(3, 1fr); } .world { height: auto; min-height: 100vh; } html,body{overflow:auto;} }
+  @media (max-width: 920px)  { .realms { grid-template-columns: repeat(2, 1fr); }
+    .journey { flex-wrap: wrap; gap: 10px; } .j-link { display: none; } .j-node { width: 30%; } }
+  @media (max-width: 560px)  { .realms { grid-template-columns: 1fr; } .j-node { width: 45%; } }
+</style>
+</head>
+<body>
+<main class="world">
+
+  <header class="hero">
+    <div class="world-core">∑</div>
+    <h1>大宝的数学世界</h1>
+    <div class="subtitle">The Math Universe · From Middle School to the Frontier</div>
+    <p class="hero-desc">从初一第一个<span class="accent">负数</span>，到博士论文里悬而未决的<span class="accent">猜想</span>——这是一条长达十几年的路。每天走一段就行。</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">大境界</div></div>
+      <div class="stat"><div class="stat-num">72</div><div class="stat-label">关 / 专题</div></div>
+      <div class="stat"><div class="stat-num">12→∞</div><div class="stat-label">岁 · 终身</div></div>
+    </div>
+  </header>
+
+  <nav class="journey" aria-label="五大境界进度脉络">
+    <div class="j-node" style="--ncol:#9d4edd;"><div class="j-dot"></div><div class="j-era">初中</div><div class="j-age">12-15</div></div>
+    <div class="j-link" style="--a:#9d4edd;--b:#4dd0e1;"></div>
+    <div class="j-node" style="--ncol:#4dd0e1;"><div class="j-dot"></div><div class="j-era">高中</div><div class="j-age">15-18</div></div>
+    <div class="j-link" style="--a:#4dd0e1;--b:#b388ff;"></div>
+    <div class="j-node" style="--ncol:#b388ff;"><div class="j-dot"></div><div class="j-era">本科</div><div class="j-age">18-22</div></div>
+    <div class="j-link" style="--a:#b388ff;--b:#d6889b;"></div>
+    <div class="j-node" style="--ncol:#d6889b;"><div class="j-dot"></div><div class="j-era">硕士</div><div class="j-age">22-25</div></div>
+    <div class="j-link" style="--a:#d6889b;--b:#ff61f6;"></div>
+    <div class="j-node" style="--ncol:#ff61f6;"><div class="j-dot"></div><div class="j-era">博士</div><div class="j-age">25→∞</div></div>
+  </nav>
+
+  <section class="realms">
+
+    <a class="realm" href="数学魔法学院.html" style="--c:#9d4edd; --sh:rgba(157,78,221,0.45);">
+      <div class="realm-stage">STAGE <b>①</b></div>
+      <div class="realm-icon">√π</div>
+      <div class="realm-title">数学魔法学院</div>
+      <div class="realm-sub">MAGIC TOWER · 初中</div>
+      <div class="realm-desc">人教版初一到初三六个学期化作三十二层魔塔。多种 SVG / 小游戏互动玩法，每关含故事、概念卡、随机题库、BOSS 战与符号宠物。</div>
+      <div class="realm-meta"><span class="pill">32 关</span><span class="pill">塔楼</span><span class="pill">SVG 互动</span></div>
+      <div class="realm-enter">进入魔法学院 →</div>
+    </a>
+
+    <a class="realm" href="高中数学之巅.html" style="--c:#4dd0e1; --sh:rgba(77,208,225,0.45);">
+      <div class="realm-stage">STAGE <b>②</b></div>
+      <div class="realm-icon">∑</div>
+      <div class="realm-title">高中数学之巅</div>
+      <div class="realm-sub">SUMMIT · 高中</div>
+      <div class="realm-desc">12 座山峰：集合·函数·指对幂·三角·向量·复数·立体·解析·数列·导数·概率·计数。必修与选必精华，攻顶有 BOSS 综合考。</div>
+      <div class="realm-meta"><span class="pill">12 峰</span><span class="pill">登山</span><span class="pill">高考核心</span></div>
+      <div class="realm-enter">开始登山 →</div>
+    </a>
+
+    <a class="realm" href="大学数学殿堂.html" style="--c:#b388ff; --sh:rgba(179,136,255,0.45);">
+      <div class="realm-stage">STAGE <b>③</b></div>
+      <div class="realm-icon">∂</div>
+      <div class="realm-title">大学数学殿堂</div>
+      <div class="realm-sub">PANTHEON · 本科</div>
+      <div class="realm-desc">数学系核心 12 门：数分三关、线代、抽代、实变、复变、拓扑、概率论、数理统计、微分几何。每门含故事与期末 BOSS。</div>
+      <div class="realm-meta"><span class="pill">12 课</span><span class="pill">殿堂</span><span class="pill">专业核心</span></div>
+      <div class="realm-enter">进入殿堂 →</div>
+    </a>
+
+    <a class="realm" href="数学研究院.html" style="--c:#d6889b; --sh:rgba(214,136,155,0.45);">
+      <div class="realm-stage">STAGE <b>④</b></div>
+      <div class="realm-icon">∮</div>
+      <div class="realm-title">数学研究院</div>
+      <div class="realm-sub">GRADUATE · 硕士</div>
+      <div class="realm-desc">8 个研究生专题：测度·泛函·调和·PDE·代几·微分流形·表示论·范畴论。历史故事 + 时间线 + 概念精解，从练习走向理解。</div>
+      <div class="realm-meta"><span class="pill">8 专题</span><span class="pill">时间线</span><span class="pill">辨析</span></div>
+      <div class="realm-enter">进入研究院 →</div>
+    </a>
+
+    <a class="realm" href="数学前沿.html" style="--c:#ff61f6; --sh:rgba(255,97,246,0.45);">
+      <div class="realm-stage">STAGE <b>⑤</b></div>
+      <div class="realm-icon">∞</div>
+      <div class="realm-title">数学前沿</div>
+      <div class="realm-sub">FRONTIER · 博士与之后</div>
+      <div class="realm-desc">8 个前沿专题：Clay 千禧年问题与当代研究方向并列呈现，包括黎曼假设、朗兰兹、庞加莱、P vs NP、杨-米尔斯、N-S 方程、霍奇、同伦类型论。无练习，只阅读与凝视。</div>
+      <div class="realm-meta"><span class="pill">8 画廊</span><span class="pill">纯阅读</span><span class="pill">Clay / 前沿</span></div>
+      <div class="realm-enter">仰望前沿 →</div>
+    </a>
+
+  </section>
+
+  <footer>
+    <p>共 <span style="color:var(--gold);font-weight:bold;">5 个阶段</span> · <span style="color:var(--gold);font-weight:bold;">72 关 / 专题</span> · 一座从初中通往博士的数学之塔</p>
+    <div class="footer-poem">“数学不是匆匆走过的道路，而是一片可以反复走、反复看的风景。”</div>
+  </footer>
+
+</main>
+
+<script>
+/* 首页键盘：按 1-5 直接进入对应板块 */
+(function(){
+  function realms(){ return Array.prototype.slice.call(document.querySelectorAll('a.realm')); }
+  document.addEventListener('keydown', function(e){
+    var t = e.target;
+    if (t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key;
+    if (k.length===1 && k>='1' && k<='9'){
+      var list = realms(); var i = +k - 1;
+      if (i < list.length){
+        e.preventDefault();
+        var a = list[i];
+        a.style.transition = 'transform .1s'; a.style.transform = 'scale(0.96)';
+        a.style.outline = '2px solid var(--gold)';
+        setTimeout(function(){ window.location.href = a.getAttribute('href'); }, 130);
+      }
+    }
+  });
+  var hint = document.createElement('div');
+  hint.id = 'kbdHint';
+  hint.innerHTML = '⌨️ 按 <kbd>1</kbd>–<kbd>5</kbd> 直接进入对应板块';
+  document.body.appendChild(hint);
+})();
+</script>
+<style>
+  #kbdHint { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 200;
+    background: rgba(13,18,38,0.82); border: 1px solid rgba(157,78,221,0.45); color: #b8c4e0;
+    font-size: 12px; padding: 5px 14px; border-radius: 20px; backdrop-filter: blur(6px);
+    pointer-events: none; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+  #kbdHint kbd { background: rgba(157,78,221,0.2); border: 1px solid rgba(157,78,221,0.6); border-radius: 4px; padding: 0 5px; color: #d9b8ff; font-family: inherit; }
+  @media (max-width: 600px) { #kbdHint { font-size: 10px; padding: 4px 10px; } }
+</style>
+</body>
+</html>
