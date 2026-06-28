@@ -614,7 +614,7 @@ function sceneMenu() {
   const hasSave = state.unitsCompleted.length > 0 || state.xp > 0;
   render(`<div class="menu-content">
     <h1>高中数学之巅</h1>
-    <div class="subtitle">Summit · 12 座山峰</div>
+    <div class="subtitle">Summit · ${PEAKS.length} 座山峰</div>
     <div class="summit-crystal">∑</div>
     <p style="color:var(--text-dim);margin-bottom:6px;">${PEAKS.length} 座山峰，覆盖必修与选必</p>
     <p style="color:var(--text-dim);font-size:13px;">集合 / 函数 / 三角 / 解三角形 / 三角图象 / 向量 / 复数 / 立体 / 解析 / 数列 / 导数 / 概率 / 计数</p>
@@ -640,7 +640,7 @@ function sceneMap() {
     }).join('');
     return `<div class="phase-section"><h3 class="phase-header">⛰️ ${phase} <span style="color:var(--text-dim);font-size:13px;">(${done}/${grouped[phase].length})</span></h3><div class="peak-grid">${cards}</div></div>`;
   }).join('');
-  render(`${hudHtml()}<h2>🏔️ 高中数学之巅 · 12 座峰</h2><div class="peak-map">${sections}</div><div class="btn-row"><button onclick="sceneMenu()">主菜单</button></div>`);
+  render(`${hudHtml()}<h2>🏔️ 高中数学之巅 · ${PEAKS.length} 座峰</h2><div class="peak-map">${sections}</div><div class="btn-row"><button onclick="sceneMenu()">主菜单</button></div>`);
 }
 
 let currentPeak = null, storyStep = 0;
@@ -878,7 +878,7 @@ function sceneVictory() {
   if (!state.pets.find(x => x.name === p.pet.name)) state.pets.push(p.pet);
   addXP(40); saveState(); sndVictory(); confetti();
   const all = state.unitsCompleted.length === PEAKS.length;
-  render(`${hudHtml()}<div class="victory-content"><h1>🎊 登顶！</h1><p style="color:var(--gold);font-size:20px;">${p.title} 完成</p><div class="trophy">🏆</div><div class="reward-pet"><div class="pet-icon">${p.pet.symbol}</div><div class="pet-name">${p.pet.name}</div><p style="color:var(--text-dim);font-size:13px;margin-top:8px;">+ 40 XP</p></div>${all?`<p style="color:var(--gold);font-size:18px;">🌟 12 座峰全登顶！</p>`:''}<div class="btn-row"><button class="primary" onclick="sceneMap()">返回</button>${p.id<PEAKS.length?`<button onclick="startPeak(${p.id+1})">下一峰 →</button>`:''}</div></div>`);
+  render(`${hudHtml()}<div class="victory-content"><h1>🎊 登顶！</h1><p style="color:var(--gold);font-size:20px;">${p.title} 完成</p><div class="trophy">🏆</div><div class="reward-pet"><div class="pet-icon">${p.pet.symbol}</div><div class="pet-name">${p.pet.name}</div><p style="color:var(--text-dim);font-size:13px;margin-top:8px;">+ 40 XP</p></div>${all?`<p style="color:var(--gold);font-size:18px;">🌟 ${PEAKS.length} 座峰全登顶！</p>`:''}<div class="btn-row"><button class="primary" onclick="sceneMap()">返回</button>${p.id<PEAKS.length?`<button onclick="startPeak(${p.id+1})">下一峰 →</button>`:''}</div></div>`);
 }
 function sceneDefeat() {
   render(`${hudHtml()}<div class="victory-content"><h2>😵 战败</h2><div style="font-size:80px;margin:20px 0;">💔</div><p style="color:var(--text-dim);">复习一下概念，再战！</p><div class="btn-row"><button onclick="sceneConcepts()">← 概念</button><button class="primary" onclick="startBoss()">再战</button><button onclick="sceneMap()">返回</button></div></div>`);
